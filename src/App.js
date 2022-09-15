@@ -1,25 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react"
+import Main from "./components/Main"
+import Shelf from './components/Shelf'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const AppCSS = {
+	display: "flex",
+	alignItems: "stretch",
+	backgroundColor: "rgba(0, 100, 20, 0.2)",
+	width: "100%",
+	height: "95vh",
+	scrollX: "none",
+	scrollY: "none",
+	border: "2px solid rgba(0, 100, 20, 0.5)",
+	borderRadius: "10px",
 }
 
-export default App;
+function App() {
+	return (
+		<div style={AppCSS}>
+			<Main />
+      <Shelf />
+		</div>
+	)
+}
+
+export default App
