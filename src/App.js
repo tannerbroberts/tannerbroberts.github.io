@@ -1,6 +1,6 @@
 import React from "react"
 import Main from "./components/Main"
-import Shelf from './components/Shelf'
+import Shelf from "./components/Shelf"
 
 const AppCSS = {
 	display: "flex",
@@ -18,7 +18,7 @@ function App() {
 	return (
 		<div style={AppCSS}>
 			<Main />
-      <Shelf />
+			<Shelf />
 		</div>
 	)
 }
