@@ -1,8 +1,13 @@
 /* eslint-disable react/prop-types */
 import React from "react"
+import { useATP_StateContext } from "../../../providers/ATP_Context"
+import { useATP_DispatchContext } from "../../../providers/ATP_Context"
 
-export default function ShelfToggle({ visible, setVisible }) {
-	const ShelfToggleCSS = (visible) => {
+export default function ShelfToggle() {
+	const state = useATP_StateContext()
+	const dispatch = useATP_DispatchContext()
+
+	const ShelfToggleCSS = () => {
 		const obj = {
 			backgroundColor: "rgba(0, 100, 20, 0.5)",
 			borderRadius: "10px 0 0 10px",
@@ -21,7 +26,7 @@ export default function ShelfToggle({ visible, setVisible }) {
 			textAlign: "center",
 			userSelect: "none",
 		}
-		if (!visible) {
+		if (!state?.shelfOpen) {
 			obj.marginRight = "5px"
 			obj.borderRadius = "10px"
 		}
@@ -31,10 +36,10 @@ export default function ShelfToggle({ visible, setVisible }) {
 
 	return (
 		<div
-			style={ShelfToggleCSS(visible)}
-			onClick={() => setVisible(!visible)}
+			style={ShelfToggleCSS()}
+			onClick={() => dispatch({ type: "TOGGLE_SHELF" })}
 		>
-			{visible ? ">" : "<"}
+			{state?.shelfOpen ? ">" : "<"}
 		</div>
 	)
 }

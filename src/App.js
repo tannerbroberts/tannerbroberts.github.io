@@ -1,6 +1,7 @@
 import React from "react"
 import Main from "./components/Main"
 import Shelf from "./components/Shelf"
+import ATP_ContextProvider from "./providers/ATP_Context"
 
 const AppCSS = {
 	display: "flex",
@@ -16,10 +17,14 @@ const AppCSS = {
 
 function App() {
 	return (
-		<div style={AppCSS}>
-			<Main />
-			<Shelf />
-		</div>
+		<React.StrictMode>
+			<ATP_ContextProvider>
+				<div style={AppCSS}>
+					<Main />
+					<Shelf />
+				</div>
+			</ATP_ContextProvider>
+		</React.StrictMode>
 	)
 }
 
