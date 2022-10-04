@@ -6,5 +6,11 @@
 	"prettier.printWidth": 70,
 	"prettier.semi": false,
 	"prettier.useTabs": true,
-	"editor.foldingImportsByDefault": false
+	"editor.foldingImportsByDefault": false,
+	"files.exclude": {
+		".eslintrc.js": true,
+		".vscode": true,
+		"package.json": true,
+		"public": true
+	}
 }

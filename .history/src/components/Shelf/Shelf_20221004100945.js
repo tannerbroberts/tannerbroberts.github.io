@@ -1,0 +1,25 @@
+/* eslint-disable react/prop-types */
+import React from "react"
+import { cssHelper } from "../../api/cssHelper"
+import ShelfToggle from "./ShelfToggle"
+import { useATP_StateContext } from "../../providers/ATP_Context"
+
+const shelfContentCSS = (openStatus) => {
+	const obj = { ...cssHelper }
+	openStatus ? '' : (obj.display = "none")
+
+	return obj
+}
+
+const shelfCSS = ()
+
+export default function Shelf() {
+	const { shelfOpen } = useATP_StateContext()
+
+	return (
+		<div>
+			<div style={shelfContentCSS(shelfOpen)}></div> {/** content area */}
+			<ShelfToggle />
+		</div>
+	)
+}
