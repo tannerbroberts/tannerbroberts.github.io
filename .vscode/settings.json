@@ -8,9 +8,12 @@
 	"prettier.useTabs": true,
 	"editor.foldingImportsByDefault": false,
 	"files.exclude": {
-		".eslintrc.js": true,
-		".vscode": true,
-		"package.json": true,
-		"public": true
+		"**/.DS_Store": false,
+		"**/.git": false,
+		"**/.hg": false,
+		"**/.svn": false,
+		"**/CVS": false,
+		"**/Thumbs.db": false,
+		"**package**": true
 	}
 }

@@ -4,7 +4,7 @@ import { cssHelper } from "../../api/cssHelper"
 import { useATP_StateContext } from "../../providers/ATP_Context"
 
 const shelfCSS = (openStatus) => {
-	const obj = { ...cssHelper, width: "50%" }
+	const obj = { ...cssHelper, width: "40%" }
 	openStatus ? '' : obj.display = "none"
 
 	return obj
