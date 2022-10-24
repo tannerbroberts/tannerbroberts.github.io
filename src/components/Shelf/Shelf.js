@@ -1,12 +1,20 @@
-/* eslint-disable react/prop-types */
 import React from "react"
 import { cssHelper } from "../../api/cssHelper"
 import { useATP_StateContext } from "../../providers/ATP_Context"
 import ItemLibraryContextProvider from "../../providers/ItemLibraryContext"
 import ItemLibrary from "./ItemLibrary"
+import Shared_Drawer from "../../shared/Shared_Drawer"
 
 const shelfCSS = (openStatus) => {
-	const obj = { ...cssHelper, width: "40%" }
+	const obj = {
+		...cssHelper,
+		width: "40%",
+		overflowY: "scroll",
+		display: "flex",
+		flexFlow: "column",
+		alignItems: "flex-start",
+		justifyConent: "flex-start",
+	}
 	openStatus ? "" : (obj.display = "none")
 
 	return obj
@@ -22,11 +30,28 @@ export default function Shelf() {
 	const { shelfOpen } = state
 
 	return (
-		<div style={shelfCSS(shelfOpen)}>
-			<ItemLibraryContextProvider>
-				<ItemLibrary />
-			</ItemLibraryContextProvider>
-			<CurrentShelfAddons state={state} />
-		</div>
+		<ItemLibraryContextProvider>
+			<div style={shelfCSS(shelfOpen)}>
+			<Shared_Drawer title='Item Library'>
+					<ItemLibrary />
+				</Shared_Drawer>
+				<Shared_Drawer title='Item Library'>
+					<ItemLibrary />
+				</Shared_Drawer>
+				<Shared_Drawer title='Item Library'>
+					<ItemLibrary />
+				</Shared_Drawer>
+				<Shared_Drawer title='Item Library'>
+					<ItemLibrary />
+				</Shared_Drawer>
+				<Shared_Drawer title='Item Library'>
+					<ItemLibrary />
+				</Shared_Drawer>
+				<Shared_Drawer title='Item Library'>
+					<ItemLibrary />
+				</Shared_Drawer>
+				<CurrentShelfAddons state={state} />
+			</div>
+		</ItemLibraryContextProvider>
 	)
 }

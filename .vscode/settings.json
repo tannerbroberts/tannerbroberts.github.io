@@ -13,7 +13,6 @@
 		"**/.hg": false,
 		"**/.svn": false,
 		"**/CVS": false,
-		"**/Thumbs.db": false,
-		"**package**": true
+		"**/Thumbs.db": false
 	}
 }

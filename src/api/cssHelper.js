@@ -3,7 +3,6 @@ export const cssHelper = {
 
 	height: "100%",
 	width: "100%",
-	// border: "2px solid black",
 	margin: "auto",
 	padding: "10px",
 	gap: "10px",
@@ -12,6 +11,7 @@ export const cssHelper = {
 	gridTemplate: "1fr / 1fr",
 	backgroundColor: "rgb(185, 255, 183)",
 	border: "2px solid rgb(69, 69, 69)",
+	borderRadius: "10px",
 }
 
 export const mainColor = {

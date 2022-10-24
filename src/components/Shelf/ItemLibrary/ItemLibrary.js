@@ -3,7 +3,7 @@ import { cssHelper } from "../../../api/cssHelper"
 import { useItemLibraryStateContext } from "../../../providers/ItemLibraryContext"
 
 const itemLibraryCSS = (openState) => {
-	const obj = { ...cssHelper }
+	const obj = { ...cssHelper, height: '600px' }
 	if (openState) return obj
 
 	return obj

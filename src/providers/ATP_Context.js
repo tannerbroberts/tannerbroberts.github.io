@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React, { useContext, useReducer, createContext } from "react"
 import ATP_Reducer, { initialState } from "./ATP_Reducer"
 
