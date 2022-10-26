@@ -1,9 +1,15 @@
 import React from "react"
-import { cssHelper } from "../../../api/cssHelper"
+import { color2, cssHelper } from "../../../api/cssHelper"
 import { useItemLibraryStateContext } from "../../../providers/ItemLibraryContext"
+import ItemFilter from "./ItemFilter"
+import ItemList from "./ItemList"
+import ButtonBar from "./ButtonBar"
 
 const itemLibraryCSS = (openState) => {
-	const obj = { ...cssHelper, height: '600px' }
+	const obj = {
+		...cssHelper,
+		...color2,
+	}
 	if (openState) return obj
 
 	return obj
@@ -14,7 +20,9 @@ export default function ItemLibrary() {
 	const { itemLibraryDrawerOpen } = state
 	return (
 		<div style={itemLibraryCSS(itemLibraryDrawerOpen)}>
-			Item Library
+			<ButtonBar />
+			<ItemFilter />
+			<ItemList />
 		</div>
 	)
 }

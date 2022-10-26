@@ -1,16 +1,14 @@
 import React, { useState } from "react"
-import { cssHelper } from "../../api/cssHelper"
+import { cssHelper, color3 } from "../../api/cssHelper"
 
-const drawerCSS = (open) => {
-	const obj = { ...cssHelper, height: 'min-content' }
-	if (open) {
-		obj.border = "5px solid black"
-	}
+const drawerCSS = () => {
+	const obj = { ...cssHelper, ...color3 }
+
 	return obj
 }
 
 const knobCSS = () => {
-	const obj = { ...cssHelper, height: "50px" }
+	const obj = { ...cssHelper, height: "50px", ...color3 }
 
 	return obj
 }
@@ -18,7 +16,7 @@ const knobCSS = () => {
 export default function Shared_Drawer({ children, title }) {
 	const [open, setOpen] = useState(false)
 	return (
-		<div style={drawerCSS(open)}>
+		<div style={drawerCSS()}>
 			<div style={knobCSS()} onClick={() => setOpen(!open)}>
 				{title}
 			</div>
