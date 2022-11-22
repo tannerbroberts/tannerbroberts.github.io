@@ -1,7 +1,7 @@
 import React from "react"
 import { useATP_StateContext } from "../../providers/ATP_Context"
 import { useATP_DispatchContext } from "../../providers/ATP_Context"
-import { cssHelper } from "../../api/cssHelper"
+import { cssHelper, STRUCTURE } from "../../api/cssHelper"
 
 export default function ShelfToggle() {
 	const state = useATP_StateContext()
@@ -9,6 +9,7 @@ export default function ShelfToggle() {
 
 	const shelfToggleCSS = {
 		...cssHelper,
+		...STRUCTURE,
 		position: "fixed",
 		bottom: "20px",
 		right: "20px",

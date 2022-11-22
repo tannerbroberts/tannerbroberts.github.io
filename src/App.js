@@ -1,26 +1,30 @@
 import React from "react"
-import { color5, cssHelper } from "./api/cssHelper"
+import { cssHelper, STRUCTURE } from "./api/cssHelper"
 import Main from "./components/Main"
 import Shelf from "./components/Shelf"
 import ShelfToggle from "./components/ShelfToggle"
+import ATP_ContextProvider from "./providers/ATP_Context"
 
 function App() {
 	const AppCSS = {
 		...cssHelper,
-		...color5,
+		...STRUCTURE,
 		height: "95vh",
 		width: "95vw",
 		marginTop: "10px",
+		// If you change this from flex, update the main README
 		display: "flex",
 		position: "relative",
 	}
 
 	return (
-		<div style={AppCSS}>
-			<Main />
-			<Shelf />
-			<ShelfToggle />
-		</div>
+		<ATP_ContextProvider>
+			<div style={AppCSS}>
+				<Main />
+				<Shelf />
+				<ShelfToggle />
+			</div>
+		</ATP_ContextProvider>
 	)
 }
 

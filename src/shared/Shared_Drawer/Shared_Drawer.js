@@ -1,14 +1,14 @@
 import React, { useState } from "react"
-import { cssHelper, color3 } from "../../api/cssHelper"
+import { cssHelper, SHARED } from "../../api/cssHelper"
 
 const drawerCSS = () => {
-	const obj = { ...cssHelper, ...color3 }
+	const obj = { ...cssHelper, ...SHARED }
 
 	return obj
 }
 
 const knobCSS = () => {
-	const obj = { ...cssHelper, height: "50px", ...color3 }
+	const obj = { ...cssHelper, height: "50px", ...SHARED }
 
 	return obj
 }

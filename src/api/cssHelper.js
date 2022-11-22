@@ -1,3 +1,24 @@
+
+// This is where all the colors are declared
+// Green
+export const color1 = "rgb(97, 226, 148)"
+export const color1_darker = "rgb(28, 155, 79)"
+// Red/Orange
+export const color2 = {
+	backgroundColor: "rgb(255, 133, 82)",
+}
+// Light blue
+export const color3 = "rgb(191, 219, 247)"
+export const color3_darker = "rgb(64, 147, 255)"
+// Graylike
+export const color4 = {
+	backgroundColor: "rgb(36, 123, 160)",
+}
+// Deep blue
+export const color5 = {
+	backgroundColor: "rgb(9, 12, 155)",
+}
+
 export const cssHelper = {
 	boxSizing: "border-box",
 
@@ -24,18 +45,15 @@ export const cssHelper = {
 	backgroundColor: "white",
 }
 
-export const color1 = {
-	backgroundColor: "rgb(97, 226, 148)",
+export const SHARED = {
+	backgroundColor: color3,
+	border: `2px solid ${color3_darker}`,
+	borderRadius: '10px',
 }
-export const color2 = {
-	backgroundColor: "rgb(255, 133, 82)",
-}
-export const color3 = {
-	backgroundColor: "rgb(191, 219, 247)",
-}
-export const color4 = {
-	backgroundColor: "rgb(36, 123, 160)",
-}
-export const color5 = {
-	backgroundColor: "rgb(9, 12, 155)",
+
+export const STRUCTURE = {
+	backgroundColor: color1,
+	border: `2px solid ${color1_darker}`,
+	borderRadius: '5px',
+	padding: '5px',
 }

@@ -1,5 +1,5 @@
 import React from "react"
-import { color1, cssHelper } from "../../api/cssHelper"
+import { cssHelper, STRUCTURE } from "../../api/cssHelper"
 import { useATP_StateContext } from "../../providers/ATP_Context"
 import Calendar from "./Calendar"
 import ItemView from "./ItemView"
@@ -7,7 +7,7 @@ import Accounting from "./Accounting"
 
 const MainCSS = {
 	...cssHelper,
-	...color1,
+	...STRUCTURE,
 }
 
 const CurrentFrame = ({ state }) => {

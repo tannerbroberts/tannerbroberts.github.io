@@ -1,5 +1,5 @@
 import React from "react"
-import { color2, cssHelper } from "../../../api/cssHelper"
+import { cssHelper, STRUCTURE } from "../../../api/cssHelper"
 import { useItemLibraryStateContext } from "../../../providers/ItemLibraryContext"
 import ItemFilter from "./ItemFilter"
 import ItemList from "./ItemList"
@@ -8,7 +8,7 @@ import ButtonBar from "./ButtonBar"
 const itemLibraryCSS = (openState) => {
 	const obj = {
 		...cssHelper,
-		...color2,
+		...STRUCTURE,
 	}
 	if (openState) return obj
 

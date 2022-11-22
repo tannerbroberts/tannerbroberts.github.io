@@ -1,5 +1,5 @@
 import React from "react"
-import { color1, cssHelper } from "../../api/cssHelper"
+import { cssHelper, STRUCTURE } from "../../api/cssHelper"
 import { useATP_StateContext } from "../../providers/ATP_Context"
 import ItemLibraryContextProvider from "../../providers/ItemLibraryContext"
 import ItemLibrary from "./ItemLibrary"
@@ -8,7 +8,7 @@ import Shared_Drawer from "../../shared/Shared_Drawer"
 const shelfCSS = (openStatus) => {
 	const obj = {
 		...cssHelper,
-		...color1,
+		...STRUCTURE,
 		width: "40%",
 		overflowY: "scroll",
 	}
@@ -29,6 +29,18 @@ export default function Shelf() {
 	return (
 		<ItemLibraryContextProvider>
 			<div style={shelfCSS(shelfOpen)}>
+			<Shared_Drawer title='Item Library'>
+					<ItemLibrary />
+				</Shared_Drawer>
+				<Shared_Drawer title='Item Library'>
+					<ItemLibrary />
+				</Shared_Drawer>
+				<Shared_Drawer title='Item Library'>
+					<ItemLibrary />
+				</Shared_Drawer>
+				<Shared_Drawer title='Item Library'>
+					<ItemLibrary />
+				</Shared_Drawer>
 				<Shared_Drawer title='Item Library'>
 					<ItemLibrary />
 				</Shared_Drawer>

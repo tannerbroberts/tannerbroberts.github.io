@@ -1,0 +1,3 @@
+Have a provider for ANYTHING that may hoist state...
+
+Everything to its own separate provider... Hmmm. That's a thought.
