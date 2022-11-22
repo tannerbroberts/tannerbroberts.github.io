@@ -5,21 +5,22 @@ key:
 
 STORIES:
     FILL:
-        Build the calendar view:
         Item creation and saving
         Item deletion
         changes staging and saving
         Variables
             Variables can be added, removed, and combined
-        Quotas
+            Quotas
+        Build the calendar view:
         Items can have color and pattern
-        ItemFilter can filter based on length, variable*, and name
+        ItemFilter can filter based on length, variable condition, and name
 
     DO:
         Give structural components one style
         Refactor colors to be only the string, and for only internal use, and names are descriptive
 
     DONE:
+        Load and save Library in reducer
         Give shared components one style
 
 GamePlans:
