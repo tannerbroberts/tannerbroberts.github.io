@@ -4,28 +4,28 @@ const VARIABLE_NAME_SPACE = `${DELIMITER}ITEM${DELIMITER}`
 const ITEM_NAME_SPACE = `${DELIMITER}ITEM${DELIMITER}`
 
 const hasIllegalName = (objectWithNameProperty) => {
-	return objectWithNameProperty.name.contains(DELIMITER)
+	return objectWithNameProperty.name.includes(DELIMITER)
 }
 
 export const getLibrary = () => {
-	const library = localStorage.getItem(`${DELIMITER}${LIBRARY}`)
-	if(library) return library
+	const library = localStorage.getItem(LIBRARY)
+	if (library) return JSON.parse(library)
 	return []
 }
 
 export const saveLibrary = (libraryItemNameArray) => {
-	localStorage.setItem(`${LIBRARY}`, libraryItemNameArray)
+	localStorage.setItem(LIBRARY, JSON.stringify(libraryItemNameArray))
 }
 
 export const getItem = (name) => {
-    const item = localStorage.getItem(`${ITEM_NAME_SPACE}${name}`)
-    if(item) return item
-    return {}
+	const item = localStorage.getItem(`${ITEM_NAME_SPACE}${name}`)
+	if (item) return JSON.parse(item)
+	return {}
 }
 
 export const saveItem = (itemObject) => {
 	if (hasIllegalName(itemObject)) return false
-	localStorage.setItem(`${ITEM_NAME_SPACE}${itemObject.name}`)
+	localStorage.setItem(`${ITEM_NAME_SPACE}${itemObject.name}`, JSON.stringify(itemObject))
 }
 
 export const deleteItem = (itemObject) => {
@@ -33,14 +33,14 @@ export const deleteItem = (itemObject) => {
 }
 
 export const getVariable = (name) => {
-    const item = localStorage.getItem(`${VARIABLE_NAME_SPACE}${name}`)
-    if(item) return item
-    return {}
+	const item = localStorage.getItem(`${VARIABLE_NAME_SPACE}${name}`)
+	if (item) return JSON.parse(item)
+	return {}
 }
 
 export const saveVariable = (variableObject) => {
 	if (hasIllegalName(variableObject)) return false
-	localStorage.setItem(`${VARIABLE_NAME_SPACE}${variableObject.name}`)
+	localStorage.setItem(`${VARIABLE_NAME_SPACE}${JSON.stringify(variableObject)}`)
 }
 
 export const deleteVariable = (itemObject) => {

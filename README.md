@@ -5,7 +5,6 @@ key:
 
 STORIES:
     FILL:
-        Item creation and saving
         Item deletion
         changes staging and saving
         Variables
@@ -14,10 +13,12 @@ STORIES:
         Build the calendar view:
         Items can have color and pattern
         ItemFilter can filter based on length, variable condition, and name
+        Give structural components one style
 
     DO:
-        Give structural components one style
-        Refactor colors to be only the string, and for only internal use, and names are descriptive
+        Item creation and saving
+            Localstorage only does Strings, so made use of JSON.stringify and JSON.parse
+            The Library only stores the names of the items and variables (for which there is still only one list)
 
     DONE:
         Load and save Library in reducer

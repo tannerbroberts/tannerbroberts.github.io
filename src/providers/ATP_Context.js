@@ -6,7 +6,8 @@ export const ATP_StateContext = createContext()
 export const ATP_DispatchContext = createContext()
 
 export default function ATP_ContextProvider({ children }) {
-	initialState.library = getLibrary()
+	const lib = getLibrary()
+	initialState.library = lib
 	const [state, dispatch] = useReducer(ATP_Reducer, initialState)
 
 	return (

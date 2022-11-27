@@ -1,14 +1,12 @@
-import React from "react";
-import { color4, cssHelper } from "../../../../api/cssHelper";
+import React from "react"
+import { cssHelper } from "../../../../api/cssHelper"
 
 const itemFilterCSS = () => {
-    const obj = { ...cssHelper, ...color4 }
+	const obj = { ...cssHelper }
 
-    return obj
+	return obj
 }
 
 export default function ItemFilter() {
-    return (
-        <div style={itemFilterCSS()}>Item Filter placeholder</div>
-    )
+	return <div style={itemFilterCSS()}>Item Filter placeholder</div>
 }

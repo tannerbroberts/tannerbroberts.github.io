@@ -27,7 +27,6 @@ const dispatchDictionary = {
 }
 
 export default function ItemLibraryReducer(state, action) {
-	console.log("calling a App reducer function now")
 	if (action.type && dispatchDictionary[action.type])
 		return dispatchDictionary[action.type](state, action)
 }

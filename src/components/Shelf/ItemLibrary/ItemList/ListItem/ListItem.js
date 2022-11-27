@@ -7,6 +7,6 @@ const listItemCSS = () => {
 	return obj
 }
 
-export default function ListItem({ item }) {
-	return <div style={listItemCSS()}>{item?.name}</div>
+export default function ListItem({ itemName }) {
+	return <div style={listItemCSS()}>{itemName}</div>
 }

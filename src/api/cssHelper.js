@@ -1,21 +1,20 @@
-
 // This is where all the colors are declared
 // Green
-export const color1 = "rgb(97, 226, 148)"
-export const color1_darker = "rgb(28, 155, 79)"
+const GREENISH = "rgb(97, 226, 148)"
+const GREENISH_DARKER = "rgb(28, 155, 79)"
 // Red/Orange
-export const color2 = {
+const RED_ORANGE = {
 	backgroundColor: "rgb(255, 133, 82)",
 }
 // Light blue
-export const color3 = "rgb(191, 219, 247)"
-export const color3_darker = "rgb(64, 147, 255)"
+const LIGHT_BLUE = "rgb(191, 219, 247)"
+const LIGHT_BLUE_DARKER = "rgb(64, 147, 255)"
 // Graylike
-export const color4 = {
+export const GRAYLIKE = {
 	backgroundColor: "rgb(36, 123, 160)",
 }
 // Deep blue
-export const color5 = {
+export const DEEP_BLUE = {
 	backgroundColor: "rgb(9, 12, 155)",
 }
 
@@ -46,14 +45,21 @@ export const cssHelper = {
 }
 
 export const SHARED = {
-	backgroundColor: color3,
-	border: `2px solid ${color3_darker}`,
-	borderRadius: '10px',
+	backgroundColor: LIGHT_BLUE,
+	border: `2px solid ${LIGHT_BLUE_DARKER}`,
+	borderRadius: "10px",
 }
 
 export const STRUCTURE = {
-	backgroundColor: color1,
-	border: `2px solid ${color1_darker}`,
-	borderRadius: '5px',
-	padding: '5px',
+	backgroundColor: GREENISH,
+	border: `2px solid ${GREENISH_DARKER}`,
+	borderRadius: "5px",
+	padding: "5px",
+}
+
+export const INPUT = {
+	backgroundColor: RED_ORANGE,
+	border: `2px solid ${GREENISH_DARKER}`,
+	borderRadius: "5px",
+	padding: "5px",
 }

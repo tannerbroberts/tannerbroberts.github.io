@@ -29,18 +29,6 @@ export default function Shelf() {
 	return (
 		<ItemLibraryContextProvider>
 			<div style={shelfCSS(shelfOpen)}>
-			<Shared_Drawer title='Item Library'>
-					<ItemLibrary />
-				</Shared_Drawer>
-				<Shared_Drawer title='Item Library'>
-					<ItemLibrary />
-				</Shared_Drawer>
-				<Shared_Drawer title='Item Library'>
-					<ItemLibrary />
-				</Shared_Drawer>
-				<Shared_Drawer title='Item Library'>
-					<ItemLibrary />
-				</Shared_Drawer>
 				<Shared_Drawer title='Item Library'>
 					<ItemLibrary />
 				</Shared_Drawer>

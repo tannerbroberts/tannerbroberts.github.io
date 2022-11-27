@@ -1,5 +1,6 @@
 import React from "react";
 import { cssHelper } from "../../../../../api/cssHelper";
+import { useATP_DispatchContext } from '../../../../../providers/ATP_Context'
 
 const newItemCSS = () => {
     const obj = { ...cssHelper, backgroundColor: "lightGreen" }
@@ -8,7 +9,8 @@ const newItemCSS = () => {
 }
 
 export default function NewItem() {
+    const dispatch = useATP_DispatchContext()
     return (
-        <div style={newItemCSS()} onClick={() => console.log("Clicked new Item")}>Create New Item</div>
+        <button style={newItemCSS()} onClick={() => dispatch({type: "TOGGLE_ITEM_CREATE_MENU"})}>Create New Item</button>
     )
 }

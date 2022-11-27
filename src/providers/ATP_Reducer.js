@@ -2,7 +2,7 @@ import {
 	// getLibrary() gets called in ATP_Context.js
 	saveLibrary,
 	// getItem,
-	// saveItem,
+	saveItem,
 	// deleteItem,
 	// getVariable,
 	// saveVariable,
@@ -25,6 +25,9 @@ export const initialState = {
 	focusedItem: undefined,
 
 	library: [],
+
+	// Item creation popup
+	popupVisible: false,
 }
 
 // Put your reducer functions here
@@ -49,18 +52,30 @@ function setFocusedItem() {
 		"called setFocusedItem in reducer, but its not setup yet"
 	)
 }
+function toggleItemCreateMenu(state) {
+	return { ...state, popupVisible: !state.popupVisible}
+}
+function createItem(state, action) {
+	saveItem(action.value)
+	saveLibrary([...state.library, action.value.name])
+	return { ...state, library: [...state.library, action.value.name], popupVisible: false}
+}
 
 const dispatchDictionary = {
 	LOAD_FRAME: loadFrame,
 	CLOSE_FRAME: closeFrame,
 	TOGGLE_SHELF: toggleShelf,
 	SET_FOCUSED_ITEM: setFocusedItem,
+	TOGGLE_ITEM_CREATE_MENU: toggleItemCreateMenu,
+	CREATE_ITEM: createItem,
 }
 
 export default function ATP_Reducer(state, action) {
-	console.log("calling a App reducer function now")
-	if (action.type && dispatchDictionary[action.type]) {
-		saveLibrary(state.library)
+	console.log("Calling the App reducer function with action object:", action)
+	if (action?.type && dispatchDictionary[action?.type]) {
+		console.log("Type is valid")
+		// saveLibrary(state.library)
 		return dispatchDictionary[action.type](state, action)
 	}
+	console.log("Something at the bottom of ATP_Reducer.js went wrong")
 }

@@ -4,6 +4,7 @@ import Main from "./components/Main"
 import Shelf from "./components/Shelf"
 import ShelfToggle from "./components/ShelfToggle"
 import ATP_ContextProvider from "./providers/ATP_Context"
+import Popup from "./components/Popup/Popup"
 
 function App() {
 	const AppCSS = {
@@ -23,6 +24,7 @@ function App() {
 				<Main />
 				<Shelf />
 				<ShelfToggle />
+				<Popup />
 			</div>
 		</ATP_ContextProvider>
 	)

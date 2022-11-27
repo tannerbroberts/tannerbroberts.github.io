@@ -1,12 +1,12 @@
 import React from "react"
-import { color4, cssHelper } from "../../../../api/cssHelper"
+import { cssHelper, STRUCTURE } from "../../../../api/cssHelper"
 import DeleteItem from "./DeleteItem"
 import NewItem from "./NewItem"
 
 const buttonBarCSS = () => {
 	const obj = {
 		...cssHelper,
-		...color4,
+		...STRUCTURE,
 		gridTemplate: " 1fr / 1fr 1fr",
         textAlign: "center",
 	}
