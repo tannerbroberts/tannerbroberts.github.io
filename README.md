@@ -5,22 +5,23 @@ key:
 
 STORIES:
     FILL:
-        Item deletion
         changes staging and saving
         Variables
             Variables can be added, removed, and combined
             Quotas
-        Build the calendar view:
         Items can have color and pattern
         ItemFilter can filter based on length, variable condition, and name
         Give structural components one style
 
     DO:
+        Build the calendar view:
+            Build "Add to item" button's functionality
+
+    DONE:
+        Item deletion
         Item creation and saving
             Localstorage only does Strings, so made use of JSON.stringify and JSON.parse
             The Library only stores the names of the items and variables (for which there is still only one list)
-
-    DONE:
         Load and save Library in reducer
         Give shared components one style
 

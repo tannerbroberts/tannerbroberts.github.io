@@ -10,12 +10,18 @@ const itemListCSS = () => {
 }
 
 export default function ItemList() {
-	const { library } = useATP_StateContext()
+	const { library, focusedListItem } = useATP_StateContext()
 
 	return (
 		<div style={itemListCSS()}>
 			{library.map((name) => {
-				return <ListItem key={name} itemName={name} />
+				return (
+					<ListItem
+						key={name}
+						itemName={name}
+						focused={name === focusedListItem}
+					/>
+				)
 			})}
 		</div>
 	)

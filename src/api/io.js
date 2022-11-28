@@ -25,11 +25,14 @@ export const getItem = (name) => {
 
 export const saveItem = (itemObject) => {
 	if (hasIllegalName(itemObject)) return false
-	localStorage.setItem(`${ITEM_NAME_SPACE}${itemObject.name}`, JSON.stringify(itemObject))
+	localStorage.setItem(
+		`${ITEM_NAME_SPACE}${itemObject.name}`,
+		JSON.stringify(itemObject)
+	)
 }
 
-export const deleteItem = (itemObject) => {
-	localStorage.removeItem(itemObject.name)
+export const deleteItem = (name) => {
+	localStorage.removeItem(`${ITEM_NAME_SPACE}${name}`)
 }
 
 export const getVariable = (name) => {
@@ -40,9 +43,11 @@ export const getVariable = (name) => {
 
 export const saveVariable = (variableObject) => {
 	if (hasIllegalName(variableObject)) return false
-	localStorage.setItem(`${VARIABLE_NAME_SPACE}${JSON.stringify(variableObject)}`)
+	localStorage.setItem(
+		`${VARIABLE_NAME_SPACE}${JSON.stringify(variableObject)}`
+	)
 }
 
-export const deleteVariable = (itemObject) => {
-	localStorage.removeItem(itemObject.name)
+export const deleteVariable = (name) => {
+	localStorage.removeItem(`${VARIABLE_NAME_SPACE}${name}`)
 }

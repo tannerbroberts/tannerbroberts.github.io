@@ -2,6 +2,7 @@ import React from "react"
 import { cssHelper, STRUCTURE } from "../../../../api/cssHelper"
 import DeleteItem from "./DeleteItem"
 import NewItem from "./NewItem"
+import ViewItem from './ViewItem'
 
 const buttonBarCSS = () => {
 	const obj = {
@@ -18,5 +19,6 @@ export default function ButtonBar() {
 	return <div style={buttonBarCSS()}>
         <NewItem />
         <DeleteItem />
+		<ViewItem />
     </div>
 }

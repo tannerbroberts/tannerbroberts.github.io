@@ -3,7 +3,7 @@ import {
 	saveLibrary,
 	// getItem,
 	saveItem,
-	// deleteItem,
+	deleteItem,
 	// getVariable,
 	// saveVariable,
 	// deleteVariable,
@@ -14,15 +14,16 @@ export const initialState = {
 	// I want to stage changes and only make them permenant if the save button is pressed
 	mainStack: [
 		/* main frames 
-			frameType: accounting, itemView, Calendar
+			frameType: Accounting, ItemView, Calendar
 		    value: for the name of the item being displayed */
 		{ frameType: "Calendar", value: "", changeList: [] },
 	],
 	// This keeps track of weather or not the main shelf is open... That's it. Don't read anything into it
 	shelfOpen: true,
 
-	// This is the item that should be rendered in the main screen.
-	focusedItem: undefined,
+	// This is the name of the item that should be rendered in the main screen.
+	// Also the item that is highlighted in the library
+	focusedListItem: undefined,
 
 	library: [],
 
@@ -31,34 +32,64 @@ export const initialState = {
 }
 
 // Put your reducer functions here
-
 function loadFrame(state, action) {
-	const stack = state.mainFrame
-	stack.push(action.value)
-	return { ...state, mainFrame: stack }
+	if (action?.value) {
+		let frame
+		if (action.value === "Calendar") {
+			frame = { frameType: "Calendar", value: "", changeList: [] }
+		} else if (action.value === "Accounting") {
+			frame = { frameType: "Accounting", value: "", changeList: [] }
+		} else {
+			if (!state.focusedListItem) return state
+			frame = {
+				frameType: "ItemView",
+				value: state?.focusedListItem,
+				changeList: [],
+			}
+		}
+		return {
+			...state,
+			mainStack: [...state.mainStack, frame],
+			focusedListItem: "",
+		}
+	}
+	return state
 }
 function closeFrame(state) {
-	const stack = state.mainFrame
+	const stack = state.mainStack
 
 	// Never let the Main-Calendar frame get popped
 	if (stack.length > 1) stack.pop()
-	return { ...state, mainFrame: stack }
+	return { ...state, mainStack: stack }
 }
 function toggleShelf(state) {
 	return { ...state, shelfOpen: !state?.shelfOpen }
 }
-function setFocusedItem() {
-	console.log(
-		"called setFocusedItem in reducer, but its not setup yet"
-	)
+function setFocusedItem(state, action) {
+	return { ...state, focusedListItem: action.value }
 }
 function toggleItemCreateMenu(state) {
-	return { ...state, popupVisible: !state.popupVisible}
+	return { ...state, popupVisible: !state.popupVisible }
 }
 function createItem(state, action) {
 	saveItem(action.value)
 	saveLibrary([...state.library, action.value.name])
-	return { ...state, library: [...state.library, action.value.name], popupVisible: false}
+	return {
+		...state,
+		library: [...state.library, action.value.name],
+		popupVisible: false,
+	}
+}
+function removeItem(state, action) {
+	if (action?.value) {
+		deleteItem(action.value)
+		const newLib = state.library.filter(
+			(name) => name !== action.value
+		)
+		saveLibrary(newLib)
+		return { ...state, library: newLib, focusedListItem: "" }
+	}
+	return state
 }
 
 const dispatchDictionary = {
@@ -68,13 +99,13 @@ const dispatchDictionary = {
 	SET_FOCUSED_ITEM: setFocusedItem,
 	TOGGLE_ITEM_CREATE_MENU: toggleItemCreateMenu,
 	CREATE_ITEM: createItem,
+	REMOVE_ITEM: removeItem,
 }
 
 export default function ATP_Reducer(state, action) {
-	console.log("Calling the App reducer function with action object:", action)
+	console.log("Calling App reducer with:", action)
 	if (action?.type && dispatchDictionary[action?.type]) {
 		console.log("Type is valid")
-		// saveLibrary(state.library)
 		return dispatchDictionary[action.type](state, action)
 	}
 	console.log("Something at the bottom of ATP_Reducer.js went wrong")
