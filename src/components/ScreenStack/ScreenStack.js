@@ -3,8 +3,9 @@ import Accounting from "./Accounting"
 import Calendar from "./Calendar"
 import ItemView from "./ItemView"
 import { ScreenStackProvider } from "./ScreenStackContext"
+import { cssHelper } from "../../api/cssHelper"
 
-export default function ScreenStack({ style }) {
+export default function ScreenStack() {
 	const [count, setCount] = useState(0)
 	const [stack, setStack] = useState([{ path: "calendar" }])
 
@@ -29,7 +30,16 @@ export default function ScreenStack({ style }) {
 
 	return (
 		<ScreenStackProvider value={{ pushFrame, popFrame }}>
-			<div style={style}>
+			<div
+				style={{
+					...cssHelper,
+					height: "95vh",
+					width: "95vw",
+					marginTop: "10px",
+					position: "relative",
+				}}
+			>
+				<h1>Screen Stack</h1>
 				<button onClick={popFrame}>Pop</button>
 				<span style={{ marginLeft: "10px", display: "inline" }}>
 					{count}

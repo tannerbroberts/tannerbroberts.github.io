@@ -1,5 +1,6 @@
 import React from "react"
+import { cssHelper } from "../../../api/cssHelper"
 
 export default function Calendar() {
-	return <h1>Calendar</h1>
+	return <h1 style={cssHelper}>Calendar</h1>
 }

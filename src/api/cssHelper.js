@@ -38,7 +38,7 @@ export const cssHelper = {
 	alignContent: "start",
 
 	// Aesthetics
-	// border: "2px solid rgb(69, 69, 69)",
+	border: "2px solid rgb(69, 69, 69)",
 	cursor: "default",
 	userSelect: "none",
 	backgroundColor: "white",
