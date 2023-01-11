@@ -1,6 +1,5 @@
 import React from "react"
 import { cssHelper, STRUCTURE } from "../../../api/cssHelper"
-import { useItemLibraryStateContext } from "../../../providers/ItemLibraryContext"
 import ItemFilter from "./ItemFilter"
 import ItemList from "./ItemList"
 import ButtonBar from "./ButtonBar"
@@ -16,10 +15,8 @@ const itemLibraryCSS = (openState) => {
 }
 
 export default function ItemLibrary() {
-	const state = useItemLibraryStateContext()
-	const { itemLibraryDrawerOpen } = state
 	return (
-		<div style={itemLibraryCSS(itemLibraryDrawerOpen)}>
+		<div style={itemLibraryCSS(true)}>
 			<ButtonBar />
 			<ItemFilter />
 			<ItemList />

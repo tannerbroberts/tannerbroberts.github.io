@@ -26,7 +26,9 @@ export default function ScreenStack() {
 	}
 
 	const getTopPath = () => stack[stack.length - 1]?.path
-	const getTopName = () => stack[stack.length - 1]?.name
+	const getTopName = () => {
+		return stack[stack.length - 1]?.name
+	}
 
 	return (
 		<ScreenStackProvider value={{ pushFrame, popFrame }}>
