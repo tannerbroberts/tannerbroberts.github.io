@@ -4,24 +4,32 @@ import Calendar from "./Calendar"
 import ItemView from "./ItemView"
 import { ScreenStackProvider } from "./ScreenStackContext"
 import { cssHelper } from "../../api/cssHelper"
+import BreadCrumbsWrapper from "./BreadCrumbsWrapper/BreadCrumbsWrapper"
+
+const screenStackCSS = () => {
+	return {
+		...cssHelper,
+		position: "relative",
+	}
+}
 
 export default function ScreenStack() {
-	const [count, setCount] = useState(0)
+	const [count, setCount] = useState(1)
 	const [stack, setStack] = useState([{ path: "calendar" }])
 
 	const componentList = ["accounting", "calendar", "itemView"]
 
 	const pushFrame = (obj) => {
-		if (componentList.includes(obj.path)) {
+		if (obj && componentList.includes(obj.path) && obj.name) {
 			setStack(() => [...stack, obj])
 			setCount(() => count + 1)
 		}
 	}
 
-	const popFrame = () => {
-		if (stack.length > 1) {
-			setStack(() => stack.slice(0, -1))
-			setCount(() => count - 1)
+	const popFrames = (popCount) => {
+		if (stack.length > 1 && stack.length > popCount - 1) {
+			setStack(() => stack.slice(0, popCount * -1))
+			setCount(() => count - popCount)
 		}
 	}
 
@@ -31,21 +39,9 @@ export default function ScreenStack() {
 	}
 
 	return (
-		<ScreenStackProvider value={{ pushFrame, popFrame }}>
-			<div
-				style={{
-					...cssHelper,
-					height: "95vh",
-					width: "95vw",
-					marginTop: "10px",
-					position: "relative",
-				}}
-			>
-				<h1>Screen Stack</h1>
-				<button onClick={popFrame}>Pop</button>
-				<span style={{ marginLeft: "10px", display: "inline" }}>
-					{count}
-				</span>
+		<ScreenStackProvider value={{ pushFrame, popFrames }}>
+			<div style={screenStackCSS()}>
+				<BreadCrumbsWrapper objects={stack} />
 				{getTopPath() === "accounting" && <Accounting />}
 				{getTopPath() === "calendar" && <Calendar />}
 				{getTopPath() === "itemView" && (

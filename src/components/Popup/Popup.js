@@ -1,16 +1,15 @@
-import React, { useState } from "react"
-import {
-	useATP_DispatchContext,
-	useATP_StateContext,
-} from "../../providers/ATP_Context"
+import React from "react"
+import { useGlobalContext } from "../../GlobalContext"
 import { cssHelper } from "../../api/cssHelper"
+import ButtonWrapper from "../../shared/ButtonWrapper"
+import { Stack } from "@mui/system"
 
 const popupCSS = (visible) => {
 	const obj = {
 		...cssHelper,
 		width: "500px",
 		height: "500px",
-		textAlign: "center",
+		textAlign: "left",
 		fontSize: "32",
 		position: "absolute",
 		left: "20%",
@@ -18,48 +17,37 @@ const popupCSS = (visible) => {
 		display: "none",
 	}
 	if (visible) delete obj.display
+	if(window.innerWidth < 500) {
+		obj.position = "absolute"
+		obj.width = "90vw"
+		obj.height = "90vh"
+		obj.left = "5vw"
+		obj.top = "5vh"
+	}
 
 	return obj
 }
 
-export default function Popup() {
-	const dispatch = useATP_DispatchContext()
-	const { popupVisible } = useATP_StateContext()
-	const [itemName, setItemName] = useState("")
-	const [itemLength, setItemLength] = useState("")
+export default function Popup({ children }) {
+	const { popupOpen, closePopup } = useGlobalContext()
 
 	return (
-		<div style={popupCSS(popupVisible)}>
-			<label htmlFor='itemName'>
-				Item Name
-				<input
-					id='itemName'
-					value={itemName}
-					onChange={(e) => setItemName(e.target.value)}
+		<div style={popupCSS(popupOpen)}>
+			<Stack direction='row' divider={<hr />}>
+				<ButtonWrapper
+					style={{ width: "min-width" }}
+					type='text'
+					label='Close'
+					onClick={() => {
+						closePopup()
+					}}
 				/>
-			</label>
-			<label htmlFor='itemDuration'>
-				Item Duration
-				<input
-					id='itemDuration'
-					value={itemLength}
-					onChange={(e) => setItemLength(e.target.value)}
-				/>
-			</label>
-			<button
-				onClick={() =>
-					dispatch({
-						type: "CREATE_ITEM",
-						value: {
-							name: itemName,
-							length: itemLength,
-							children: [],
-						},
-					})
-				}
-			>
-				Create
-			</button>
+				<h3 style={{ margin: "auto", textAlign: "center" }}>
+					Item Creation Menu
+				</h3>
+			</Stack>
+			<hr />
+			{children}
 		</div>
 	)
 }

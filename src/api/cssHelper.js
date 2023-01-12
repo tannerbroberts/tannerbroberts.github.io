@@ -18,32 +18,6 @@ export const DEEP_BLUE = {
 	backgroundColor: "rgb(9, 12, 155)",
 }
 
-export const cssHelper = {
-	boxSizing: "border-box",
-
-	// These two make each is a nice child of grid
-	height: "100%",
-	width: "100%",
-
-	// These two make each is a grid and spaces chidlren
-	margin: "auto",
-	padding: "10px",
-	gap: "10px",
-	display: "grid",
-
-	// Grid layout of children
-	// gridTemplateRows / gridTemplateColumns
-	gridTemplate: "1fr / 1fr",
-	gridTemplateRows: "min-content",
-	alignContent: "start",
-
-	// Aesthetics
-	border: "2px solid rgb(69, 69, 69)",
-	cursor: "default",
-	userSelect: "none",
-	backgroundColor: "white",
-}
-
 export const SHARED = {
 	backgroundColor: LIGHT_BLUE,
 	border: `2px solid ${LIGHT_BLUE_DARKER}`,
@@ -62,4 +36,28 @@ export const INPUT = {
 	border: `2px solid ${GREENISH_DARKER}`,
 	borderRadius: "5px",
 	padding: "5px",
+}
+
+export const cssHelper = {
+	boxSizing: "border-box",
+
+	// These two make each is a nice child of grid
+	width: "100%",
+
+	// These two make each is a grid and spaces chidlren
+	padding: "10px",
+	gap: "10px",
+	display: "grid",
+
+	// Grid layout of children
+	// gridTemplateRows / gridTemplateColumns
+	gridTemplateColumns: "1fr",
+	gridTemplateRows: "min-content",
+	alignItems: "start",
+
+	// Aesthetics
+	border: "1px solid black",
+	cursor: "default",
+	userSelect: "none",
+	backgroundColor: "white",
 }

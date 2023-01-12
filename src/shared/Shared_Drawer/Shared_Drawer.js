@@ -8,17 +8,25 @@ const drawerCSS = () => {
 }
 
 const knobCSS = () => {
-	const obj = { ...cssHelper, height: "50px", ...SHARED }
+	const obj = {
+		...cssHelper,
+		height: "50px",
+		...SHARED,
+		textAlign: "center",
+		fontSize: "30px",
+		fontFamily: "monospace",
+		lineHeight: "100%",
+	}
 
 	return obj
 }
 
 export default function Shared_Drawer({ children, title }) {
-	const [open, setOpen] = useState(false)
+	const [open, setOpen] = useState(true)
 	return (
 		<div style={drawerCSS()}>
 			<div style={knobCSS()} onClick={() => setOpen(!open)}>
-				{title}
+				{`•${title}•`}
 			</div>
 			{open ? children : ""}
 		</div>
