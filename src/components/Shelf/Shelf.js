@@ -1,5 +1,5 @@
 import React from "react"
-import { cssHelper, STRUCTURE } from "../../api/cssHelper"
+import { cssHelper, MOBILE_BREAKPOINT, STRUCTURE } from "../../api/cssHelper"
 import ItemLibrary from "./ItemLibrary"
 import Shared_Drawer from "../../shared/Shared_Drawer"
 import { useGlobalContext } from "../../GlobalContext"
@@ -9,11 +9,11 @@ const shelfCSS = (openStatus) => {
 		...cssHelper,
 		STRUCTURE,
 		gridTemplateRows: "min-content",
-		width: "40%",
+		width: "150%",
 		overflowY: "scroll",
 	}
 	openStatus ? null : (obj.display = "none")
-	if(window.innerWidth < 500) {
+	if(window.innerWidth < MOBILE_BREAKPOINT) {
 		obj.position = "absolute"
 		obj.width="95vw"
 		obj.height="95vh"

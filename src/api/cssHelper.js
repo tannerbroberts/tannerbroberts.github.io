@@ -61,3 +61,5 @@ export const cssHelper = {
 	userSelect: "none",
 	backgroundColor: "white",
 }
+
+export const MOBILE_BREAKPOINT = 570

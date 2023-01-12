@@ -1,10 +1,10 @@
 import { Stack } from "@mui/system"
 import React, { useState } from "react"
-import { cssHelper } from "../api/cssHelper"
+import { cssHelper, MOBILE_BREAKPOINT } from "../api/cssHelper"
 import ButtonWrapper from "./ButtonWrapper"
 
 const getDirection = () => {
-	if(window.innerWidth < 500) {
+	if (window.innerWidth < MOBILE_BREAKPOINT) {
 		return "column"
 	} else return "row"
 }

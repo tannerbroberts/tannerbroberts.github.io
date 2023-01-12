@@ -1,6 +1,6 @@
 import React from "react"
 import { useGlobalContext } from "../../GlobalContext"
-import { cssHelper } from "../../api/cssHelper"
+import { cssHelper, MOBILE_BREAKPOINT } from "../../api/cssHelper"
 import ButtonWrapper from "../../shared/ButtonWrapper"
 import { Stack } from "@mui/system"
 
@@ -17,7 +17,7 @@ const popupCSS = (visible) => {
 		display: "none",
 	}
 	if (visible) delete obj.display
-	if(window.innerWidth < 500) {
+	if(window.innerWidth < MOBILE_BREAKPOINT) {
 		obj.position = "absolute"
 		obj.width = "90vw"
 		obj.height = "90vh"
