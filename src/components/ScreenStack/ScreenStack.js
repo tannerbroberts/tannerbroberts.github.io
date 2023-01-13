@@ -1,10 +1,10 @@
-import React, { useState } from "react"
+import React from "react"
 import Accounting from "./Accounting"
 import Calendar from "./Calendar"
 import ItemView from "./ItemView"
-import { ScreenStackProvider } from "./ScreenStackContext"
 import { cssHelper } from "../../api/cssHelper"
 import BreadCrumbsWrapper from "./BreadCrumbsWrapper/BreadCrumbsWrapper"
+import { useGlobalContext } from "../../GlobalContext"
 
 const screenStackCSS = () => {
 	return {
@@ -14,24 +14,7 @@ const screenStackCSS = () => {
 }
 
 export default function ScreenStack() {
-	const [count, setCount] = useState(1)
-	const [stack, setStack] = useState([{ path: "calendar" }])
-
-	const componentList = ["accounting", "calendar", "itemView"]
-
-	const pushFrame = (obj) => {
-		if (obj && componentList.includes(obj.path) && obj.name) {
-			setStack(() => [...stack, obj])
-			setCount(() => count + 1)
-		}
-	}
-
-	const popFrames = (popCount) => {
-		if (stack.length > 1 && stack.length > popCount - 1) {
-			setStack(() => stack.slice(0, popCount * -1))
-			setCount(() => count - popCount)
-		}
-	}
+	const { stack } = useGlobalContext()
 
 	const getTopPath = () => stack[stack.length - 1]?.path
 	const getTopName = () => {
@@ -39,7 +22,6 @@ export default function ScreenStack() {
 	}
 
 	return (
-		<ScreenStackProvider value={{ pushFrame, popFrames }}>
 			<div style={screenStackCSS()}>
 				<BreadCrumbsWrapper objects={stack} />
 				{getTopPath() === "accounting" && <Accounting />}
@@ -48,6 +30,5 @@ export default function ScreenStack() {
 					<ItemView name={getTopName()} />
 				)}
 			</div>
-		</ScreenStackProvider>
 	)
 }

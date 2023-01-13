@@ -2,7 +2,7 @@ import * as React from "react"
 import Breadcrumbs from "@mui/material/Breadcrumbs"
 import Link from "@mui/material/Link"
 import HomeIcon from "@mui/icons-material/Home"
-import { useScreenStackContext } from "../ScreenStackContext"
+import { useGlobalContext } from "../../../GlobalContext"
 
 const popFramesUsage = (index, array, popFrames) => {
 	const popCount = Math.max(0, array.length - index - 1)
@@ -18,7 +18,7 @@ const popFramesUsage = (index, array, popFrames) => {
 }
 
 export default function BreadCrumbsWrapper({ objects }) {
-	const { popFrames } = useScreenStackContext()
+	const { popFrames } = useGlobalContext()
 
 	return (
 		<Breadcrumbs aria-label='breadcrumb'>

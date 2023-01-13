@@ -14,9 +14,10 @@ const popupCSS = (visible) => {
 		position: "absolute",
 		left: "20%",
 		top: "20%",
-		display: "none",
+		display: "grid",
+		gap: "20px",
 	}
-	if (visible) delete obj.display
+	if (!visible) obj.display = "none"
 	if(window.innerWidth < MOBILE_BREAKPOINT) {
 		obj.position = "absolute"
 		obj.width = "90vw"

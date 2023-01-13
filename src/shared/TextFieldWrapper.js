@@ -1,12 +1,13 @@
-import React, { useState } from "react"
+import React from "react"
 import Box from "@mui/material/Box"
 import TextField from "@mui/material/TextField"
 
 export default function BasicTextFields({
 	label,
 	type = "standard",
+	value = "",
+	setValue = () => {},
 }) {
-	const [name, setName] = useState()
 	return (
 		<Box
 			component='form'
@@ -20,8 +21,8 @@ export default function BasicTextFields({
 				id='standard-basic'
 				label={label}
 				variant={type} // Or: standard, filled
-				value={name}
-				onChange={(e) => setName(e.target.value)}
+				value={value}
+				onChange={(e) => setValue(e.target.value)}
 			/>
 		</Box>
 	)

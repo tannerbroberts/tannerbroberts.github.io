@@ -22,6 +22,9 @@ function App() {
 	const [shelfOpen, setShelfOpen] = useState(true)
 	const [popupOpen, setPopupOpen] = useState(false)
 	const [popupChild, setPopupChild] = useState(() => {})
+	// For the screen stack
+	const [count, setCount] = useState(1)
+	const [stack, setStack] = useState([{ path: "calendar" }])
 
 	const openPopup = (child) => {
 		setPopupOpen(true)
@@ -33,6 +36,24 @@ function App() {
 		setPopupOpen(false)
 	})
 
+	const componentList = ["accounting", "calendar", "itemView"]
+
+	const pushFrame = (obj) => {
+		console.log("here")
+		if (obj && componentList.includes(obj.path) && obj.name) {
+			setStack(() => [...stack, obj])
+			setCount(() => count + 1)
+		}
+		console.log("count", count)
+	}
+
+	const popFrames = (popCount) => {
+		if (stack.length > 1 && stack.length > popCount - 1) {
+			setStack(() => stack.slice(0, popCount * -1))
+			setCount(() => count - popCount)
+		}
+	}
+
 	return (
 		<GlobalContextProvider
 			value={{
@@ -41,6 +62,12 @@ function App() {
 				popupOpen,
 				openPopup,
 				closePopup,
+				stack,
+				setStack,
+				count,
+				setCount,
+				pushFrame,
+				popFrames,
 			}}
 		>
 			<div style={appCSS}>

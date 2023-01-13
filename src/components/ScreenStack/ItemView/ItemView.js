@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { useScreenStackContext } from "../ScreenStackContext"
+import { useGlobalContext } from "../../../GlobalContext"
 
 export default function ItemView({ name }) {
 	const [itemName, setItemName] = useState(name)
@@ -7,8 +7,8 @@ export default function ItemView({ name }) {
 	useEffect(() => {
 		setItemName(name)
 	}, [name])
-	
-	const { pushFrame } = useScreenStackContext()
+
+	const { pushFrame } = useGlobalContext()
 	return (
 		<h1>
 			<input

@@ -4,5 +4,6 @@ const ScreenStackContext = createContext({})
 
 export const ScreenStackProvider = ScreenStackContext.Provider
 
-export const useScreenStackContext = () =>
-	useContext(ScreenStackContext)
+export const useScreenStackContext = () => {
+	return useContext(ScreenStackContext)
+}
