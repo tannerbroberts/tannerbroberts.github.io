@@ -5,25 +5,31 @@ key:
 
 STORIES:
     FILL:
-        changes staging and saving
         Variables
             Variables can be added, removed, and combined
+            Variable Summaries
             Quotas
-        Items can have color and pattern
-        ItemFilter can filter based on length, variable condition, and name
-        Give structural components one style
+        Item RealTime view
+        Accountability view
+        ItemFilter: filterName filterProperties
+            ItemFilter can filter based on length, variable condition, and name
+        BaseCalendarView
+        CalendarView
+        DeleteItem
+        ViewItem
+        CreateNewItem
+        Item Library is basically just no filter, any other preset filters live below
+        ItemList
+        ItemListChild
 
     DO:
-        Build the calendar view:
-            Build "Add to item" button's functionality
 
     DONE:
-        Item deletion
-        Item creation and saving
-            Localstorage only does Strings, so made use of JSON.stringify and JSON.parse
-            The Library only stores the names of the items and variables (for which there is still only one list)
-        Load and save Library in reducer
-        Give shared components one style
+        BreadCrumbs
+        Shelf
+        GlobalContext
+        ItemCreatePopup
+        Popup
 
 GamePlans:
     CSS:
@@ -32,6 +38,6 @@ GamePlans:
         2) Every component fills the height and width 100%
     Folder Structure:
         1) Components that appear only once inside of one other component will exist in a folder of that component.
+        2) Shared components will live in the shared components folder
     State:
-        1) Make state as close to immutable as possible
-        2) Derrive what I can from the minimum amount of state possible
+        1) Derrive what I can from the minimum amount of state possible
