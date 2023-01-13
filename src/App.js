@@ -46,7 +46,7 @@ function App() {
 			<div style={appCSS}>
 				<ScreenStack />
 				<Shelf />
-				<Popup>{popupChild}</Popup>
+				<Popup title='Item Creation Menu'>{popupChild}</Popup>
 				<ShelfToggle />
 			</div>
 		</GlobalContextProvider>

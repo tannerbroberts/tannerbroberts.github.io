@@ -28,7 +28,7 @@ const popupCSS = (visible) => {
 	return obj
 }
 
-export default function Popup({ children }) {
+export default function Popup({ children, title }) {
 	const { popupOpen, closePopup } = useGlobalContext()
 
 	return (
@@ -43,7 +43,7 @@ export default function Popup({ children }) {
 					}}
 				/>
 				<h3 style={{ margin: "auto", textAlign: "center" }}>
-					Item Creation Menu
+					{title}
 				</h3>
 			</Stack>
 			<hr />
