@@ -39,12 +39,10 @@ function App() {
 	const componentList = ["accounting", "calendar", "itemView"]
 
 	const pushFrame = (obj) => {
-		console.log("here")
 		if (obj && componentList.includes(obj.path) && obj.name) {
 			setStack(() => [...stack, obj])
 			setCount(() => count + 1)
 		}
-		console.log("count", count)
 	}
 
 	const popFrames = (popCount) => {

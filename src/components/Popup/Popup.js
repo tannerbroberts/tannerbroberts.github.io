@@ -1,24 +1,25 @@
 import React from "react"
 import { useGlobalContext } from "../../GlobalContext"
 import { cssHelper, MOBILE_BREAKPOINT } from "../../api/cssHelper"
-import ButtonWrapper from "../../shared/ButtonWrapper"
-import { Stack } from "@mui/system"
+import { Button } from "@mui/material"
 
 const popupCSS = (visible) => {
 	const obj = {
 		...cssHelper,
 		width: "500px",
-		height: "500px",
-		textAlign: "left",
+		height: "min-content",
+		paddingBottom: "20px",
 		fontSize: "32",
 		position: "absolute",
 		left: "20%",
 		top: "20%",
 		display: "grid",
-		gap: "20px",
+		gap: "10px",
+		overflowY: "scroll",
+		gridTemplateColumns: "1fr",
 	}
 	if (!visible) obj.display = "none"
-	if(window.innerWidth < MOBILE_BREAKPOINT) {
+	if (window.innerWidth < MOBILE_BREAKPOINT) {
 		obj.position = "absolute"
 		obj.width = "90vw"
 		obj.height = "90vh"
@@ -34,19 +35,24 @@ export default function Popup({ children, title }) {
 
 	return (
 		<div style={popupCSS(popupOpen)}>
-			<Stack direction='row' divider={<hr />}>
-				<ButtonWrapper
-					style={{ width: "min-width" }}
+			<div
+				style={{
+					display: "flex",
+					justifyContent: "space-around",
+					alignItems: "center",
+				}}
+			>
+				<Button
+					style={{ justifySelf: "start" }}
 					type='text'
-					label='Close'
 					onClick={() => {
 						closePopup()
 					}}
-				/>
-				<h3 style={{ margin: "auto", textAlign: "center" }}>
-					{title}
-				</h3>
-			</Stack>
+				>
+					Close
+				</Button>
+				<h3>{title}</h3>
+			</div>
 			<hr />
 			{children}
 		</div>

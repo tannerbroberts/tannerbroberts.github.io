@@ -15,7 +15,6 @@ export default function ViewItem() {
 		<button
 			style={viewItemCSS()}
 			onClick={() => {
-				console.log("pushed a frame", context)
 				pushFrame({ path: "itemView", name: "item" })
 			}}
 		>
