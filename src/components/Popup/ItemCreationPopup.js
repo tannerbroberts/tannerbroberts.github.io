@@ -1,13 +1,16 @@
-/* eslint-disable no-unused-vars */
 import React, { useCallback, useState } from "react"
 import { TextField } from "@mui/material"
 import Button from "@mui/material/Button"
-import { isIllegalString, addItem } from "../../api/io"
+import { isIllegalString, postItem } from "../../api/io"
+import { useGlobalContext } from "../../GlobalContext"
 
 export default function ItemCreationPopup() {
+	const { closePopup } = useGlobalContext()
 	const [itemName, setItemName] = useState()
 
 	const onSubmit = useCallback((e) => {
+		e.preventDefault()
+
 		const getLength = () => {
 			let length = 0
 			length += e.target.itemDays.value * 86_400_000
@@ -17,11 +20,11 @@ export default function ItemCreationPopup() {
 
 			return length
 		}
-		
-		// This object is everything that the item has when it first gets saved
-		addItem({ name: e.target.itemName.value, length: getLength() })
 
-		e.preventDefault()
+		// This object is everything that the item has when it first gets saved
+		const postSuccess = postItem({ name: e.target.itemName.value, length: getLength() })
+
+		if(postSuccess) closePopup()
 	}, [])
 
 	return (

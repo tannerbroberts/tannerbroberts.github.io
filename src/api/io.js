@@ -13,21 +13,39 @@ const ITEM_NAME_SPACE = `${DELIMITER}ITEM${DELIMITER}`
 |_______/__/ \__\ | _|       \______/  | _| `._____|   |__|     |_______||_______/ 
 */
 
-export const addItem = (itemObject) => {
-	console.log("Adding Item")
-	console.log("If check:", !objectHasIllegalName(itemObject))
-	if (!objectHasIllegalName(itemObject)) {
-		const library = getLibrary()
-		saveItem(itemObject)
-		console.log("Library mid addition:", library)
-		saveLibrary({ ...library, itemObject })
-	}
-}
-
 export const isIllegalString = (nameString) => {
+	const library = getLibrary()
 	if (nameString) {
 		return nameString.includes(DELIMITER)
+		|| library.includes(nameString)
 	} else return true
+}
+
+export const postItem = (itemObject) => {
+	if (!objectHasIllegalName(itemObject)) {
+		saveItem(itemObject)
+		return true
+	}
+	return false
+}
+
+export const getItem = (name) => {
+	const item = localStorage.getItem(`${ITEM_NAME_SPACE}${name}`)
+	if (item) return JSON.parse(item)
+	return undefined
+}
+
+export const deleteItem = (name) => {
+	// Remove from LS
+	localStorage.removeItem(`${ITEM_NAME_SPACE}${name}`)
+	// Remove from Library
+	saveLibrary(getLibrary().filter((itemName) => itemName === name))
+}
+
+export const getLibrary = () => {
+	const library = JSON.parse(localStorage.getItem(LIBRARY))
+	if (library) return library
+	return ["*"]
 }
 
 /**
@@ -40,42 +58,21 @@ export const isIllegalString = (nameString) => {
  */
 
 const objectHasIllegalName = (objectWithNameProperty) => {
-	console.log("object:", objectWithNameProperty)
-	console.log(
-		"illegal object if check:",
-		objectWithNameProperty?.name
-	)
 	if (objectWithNameProperty?.name)
 		return isIllegalString(objectWithNameProperty?.name)
 	else return true
-}
-
-const getLibrary = () => {
-	const library = localStorage.getItem(LIBRARY)
-	if (library) return JSON.parse(library)
-	return []
 }
 
 const saveLibrary = (libraryItemNameArray) => {
 	localStorage.setItem(LIBRARY, JSON.stringify(libraryItemNameArray))
 }
 
-const getItem = (name) => {
-	const item = localStorage.getItem(`${ITEM_NAME_SPACE}${name}`)
-	if (item) return JSON.parse(item)
-	return {}
-}
-
 const saveItem = (itemObject) => {
-	if (objectHasIllegalName(itemObject)) return false
 	localStorage.setItem(
 		`${ITEM_NAME_SPACE}${itemObject.name}`,
 		JSON.stringify(itemObject)
 	)
-}
-
-const deleteItem = (name) => {
-	localStorage.removeItem(`${ITEM_NAME_SPACE}${name}`)
+	saveLibrary([...getLibrary(), itemObject.name])
 }
 
 const getVariable = (name) => {
