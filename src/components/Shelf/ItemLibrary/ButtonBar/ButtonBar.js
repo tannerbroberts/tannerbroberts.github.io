@@ -1,5 +1,6 @@
 import React from "react"
 import { cssHelper, STRUCTURE } from "../../../../api/cssHelper"
+import AddItem from "./AddItem/AddItem"
 import DeleteItem from "./DeleteItem"
 import NewItem from "./NewItem"
 import ViewItem from './ViewItem'
@@ -20,5 +21,6 @@ export default function ButtonBar() {
         <NewItem />
         <DeleteItem />
 		<ViewItem />
+		<AddItem />
     </div>
 }

@@ -1,28 +1,17 @@
-import React, { useEffect, useState } from "react"
-import { useGlobalContext } from "../../../GlobalContext"
+import React from "react"
+import { getItem } from "../../../api/io"
 
-export default function ItemView({ name }) {
-	const [itemName, setItemName] = useState(name)
+export default function ItemView({ itemName }) {
+	const frameItem = getItem(itemName)
 
-	useEffect(() => {
-		setItemName(name)
-	}, [name])
-
-	const { pushFrame } = useGlobalContext()
 	return (
-		<h1>
-			<input
-				value={itemName}
-				onChange={(e) => setItemName(e.target.value)}
-			/>
-			<button
-				onClick={() =>
-					pushFrame({ path: "itemView", name: itemName })
-				}
-			>
-				push item
-			</button>
-			Placeholder for ItemView: {name}
-		</h1>
+		<>
+			<h1>Placeholder for ItemView: {itemName}</h1>
+			<p>
+				{Object.entries(frameItem).map((key) => (
+					<p key={Math.random()}>{`${key[0]}: ${key[1]}`}</p>
+				))}
+			</p>
+		</>
 	)
 }

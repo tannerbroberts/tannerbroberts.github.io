@@ -30,8 +30,8 @@ export const postItem = (itemObject) => {
 }
 
 export const getItem = (name) => {
-	const item = localStorage.getItem(`${ITEM_NAME_SPACE}${name}`)
-	if (item) return JSON.parse(item)
+	const item = JSON.parse(localStorage.getItem(`${ITEM_NAME_SPACE}${name}`))
+	if (item) return item
 	return undefined
 }
 
@@ -39,7 +39,7 @@ export const deleteItem = (name) => {
 	// Remove from LS
 	localStorage.removeItem(`${ITEM_NAME_SPACE}${name}`)
 	// Remove from Library
-	saveLibrary(getLibrary().filter((itemName) => itemName === name))
+	saveLibrary(getLibrary().filter((itemName) => itemName !== name))
 }
 
 export const getLibrary = () => {

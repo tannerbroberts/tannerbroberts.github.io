@@ -6,14 +6,6 @@ import { useGlobalContext } from "../../../GlobalContext"
 
 const popFramesUsage = (index, array, popFrames) => {
 	const popCount = Math.max(0, array.length - index - 1)
-	console.log(
-		"Length: ",
-		array.length,
-		"Index: ",
-		index,
-		"popCount: ",
-		popCount
-	)
 	popFrames(popCount)
 }
 

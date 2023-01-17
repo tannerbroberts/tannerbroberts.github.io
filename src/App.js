@@ -25,6 +25,8 @@ function App() {
 	// For the screen stack
 	const [count, setCount] = useState(1)
 	const [stack, setStack] = useState([{ path: "calendar" }])
+	// For the library list of items
+	const [selectedItemName, setSelectedItemName] = useState("")
 
 	const openPopup = (child) => {
 		setPopupOpen(true)
@@ -42,14 +44,27 @@ function App() {
 		if (obj && componentList.includes(obj.path) && obj.name) {
 			setStack(() => [...stack, obj])
 			setCount(() => count + 1)
+			setSelectedItemName("")
 		}
 	}
 
 	const popFrames = (popCount) => {
-		if (stack.length > 1 && stack.length > popCount - 1) {
+		if (stack.length > 1 && stack.length > popCount - 1 && popCount !== 0) {
 			setStack(() => stack.slice(0, popCount * -1))
 			setCount(() => count - popCount)
 		}
+	}
+
+	const openItemView = () => {
+		if (selectedItemName) {
+			pushFrame({ path: "itemView", name: selectedItemName })
+			setSelectedItemName("")
+		}
+	}
+
+	const addItem = () => {
+		// I need to add the selected item to the stack. It'll also be nice to not have any items in the
+		// library view that are smaller than the one on the top of the screenStack
 	}
 
 	return (
@@ -64,8 +79,11 @@ function App() {
 				setStack,
 				count,
 				setCount,
-				pushFrame,
 				popFrames,
+				selectedItemName,
+				setSelectedItemName,
+				openItemView,
+				addItem,
 			}}
 		>
 			<div style={appCSS}>

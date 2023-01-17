@@ -1,3 +1,4 @@
+import { Button } from "@mui/material"
 import React from "react"
 import { cssHelper } from "../../../../../api/cssHelper"
 import { useGlobalContext } from "../../../../../GlobalContext"
@@ -9,17 +10,15 @@ const viewItemCSS = () => {
 }
 
 export default function ViewItem() {
-	const context = useGlobalContext()
-	const { pushFrame } = context
+	const { openItemView } = useGlobalContext()
 	return (
-		<button
+		<Button
 			style={viewItemCSS()}
 			onClick={() => {
-				pushFrame({ path: "itemView", name: "item" })
+				openItemView()
 			}}
 		>
 			View Item
-		</button>
+		</Button>
 	)
 }
-                     

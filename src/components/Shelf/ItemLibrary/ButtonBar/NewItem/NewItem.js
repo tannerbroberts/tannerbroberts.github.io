@@ -1,10 +1,15 @@
+import { Button } from "@mui/material"
 import React from "react"
 import { cssHelper } from "../../../../../api/cssHelper"
 import { useGlobalContext } from "../../../../../GlobalContext"
 import ItemCreationPopup from "../../../../Popup/ItemCreationPopup"
 
 const newItemCSS = () => {
-	const obj = { ...cssHelper, backgroundColor: "lightGreen" }
+	const obj = {
+		...cssHelper,
+		backgroundColor: "lightGreen",
+		color: "black",
+	}
 
 	return obj
 }
@@ -12,11 +17,11 @@ const newItemCSS = () => {
 export default function NewItem() {
 	const { openPopup } = useGlobalContext()
 	return (
-		<button
+		<Button
 			style={newItemCSS()}
 			onClick={() => openPopup(<ItemCreationPopup />)}
 		>
-			Create New Item
-		</button>
+			New Item
+		</Button>
 	)
 }
