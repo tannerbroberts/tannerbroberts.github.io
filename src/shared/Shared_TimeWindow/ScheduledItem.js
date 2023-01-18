@@ -1,12 +1,12 @@
 import React from "react"
 import { cssHelper } from "../../api/cssHelper"
 
-const scheduledItemCSS = (position, length) => {
+const scheduledItemCSS = (position, length, scale) => {
 	const obj = {
 		...cssHelper,
-		position: "relative",
-		top: `${position}px`,
-		height: `${length}px`,
+		position: "absolute",
+		top: `${Math.floor(position / scale)}px`,
+		height: `${Math.floor(length / scale)}px`,
 		textAlign: "center",
 		lineHeight: "100%",
 	}
@@ -14,6 +14,6 @@ const scheduledItemCSS = (position, length) => {
 	return obj
 }
 
-export default function ScheduledItem({ name, position, length }) {
-	return <div style={scheduledItemCSS(position, length)}>{name}</div>
+export default function ScheduledItem({ name, position, length, scale }) {
+	return <div style={scheduledItemCSS(position, length, scale)}>{name}</div>
 }

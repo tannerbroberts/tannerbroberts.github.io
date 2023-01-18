@@ -6,7 +6,7 @@ import { cssHelper } from "../../../../../api/cssHelper"
 const addItemCSS = () => {
 	const obj = {
 		...cssHelper,
-        backgroundColor: "lightblue",
+		backgroundColor: "lightblue",
 		color: "black",
 	}
 
@@ -14,12 +14,15 @@ const addItemCSS = () => {
 }
 
 export default function AddItem() {
-	const { selectedItemName, addItem } = useGlobalContext()
-	console.log("Name:", selectedItemName)
+	const { addItem } = useGlobalContext()
 
-    return (
-        <Button style={addItemCSS()} variant="contained" onClick={addItem} >
-            Add Item
-        </Button>
-    )
+	return (
+		<Button
+			style={addItemCSS()}
+			variant='contained'
+			onClick={addItem}
+		>
+			Add Item
+		</Button>
+	)
 }

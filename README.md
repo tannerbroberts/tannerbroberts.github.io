@@ -14,17 +14,25 @@ STORIES:
         ItemFilter: filterName filterProperties
             ItemFilter can filter based on length, variable condition, and name
         BaseCalendarView
-        CalendarView
-        DeleteItem
         ViewItem
-        CreateNewItem
         Item Library is basically just no filter, any other preset filters live below
-        ItemList
-        ItemListChild
+        Mobile View closes shelf onViewItemClick and onAddItem
 
     DO:
+        CalendarView
+            Units
+            Scale input setter thing
+            Item Blocks
+            Scheduler option on block
+            onLongPressListener (creates new anonamous item?)
+        AddItemOnClickListener
 
     DONE:
+        BUG: BackgroundSections aren't rendering
+        DeleteItem
+        ItemList
+        ItemListChild
+        CreateNewItem
         BreadCrumbs
         Shelf
         GlobalContext

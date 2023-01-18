@@ -63,8 +63,11 @@ function App() {
 	}
 
 	const addItem = () => {
-		// I need to add the selected item to the stack. It'll also be nice to not have any items in the
+		// I need to add the selected item to the item being displayed on top of the stack. It'll also be nice to not have any items in the
 		// library view that are smaller than the one on the top of the screenStack
+		// This function doesn't do the actual adding, it just opens the popup that will have the submit button which adds it.
+		// The popup is needed because there can be scheduling conflicts which need to be resolved before scheduling
+		// It's also needed for the mere fact that the start time needs to be resolved as well.
 	}
 
 	return (
