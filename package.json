@@ -21,7 +21,7 @@
 		"start": "react-scripts start",
 		"predeploy": "npm run build",
 		"deploy": "gh-pages -d build",
-		"preminor": "git add --all && git commit -m 'minor version bump' && gp && npm version patch",
+		"preminor": "git add --all && git commit -m 'minor version bump' && git push && npm version patch",
 		"minor" : "deploy",
 		"build": "react-scripts build",
 		"test": "react-scripts test",
