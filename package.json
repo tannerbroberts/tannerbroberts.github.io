@@ -1,6 +1,6 @@
 {
 	"name": "about-time",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"homepage": "https://tannerbroberts.github.io",
 	"private": true,
 	"dependencies": {
@@ -22,7 +22,7 @@
 		"predeploy": "npm run build",
 		"deploy": "gh-pages -d build",
 		"preminor": "git add --all && git commit -m 'minor version bump' && git push && npm version patch",
-		"minor" : "deploy",
+		"minor": "deploy",
 		"build": "react-scripts build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject"
