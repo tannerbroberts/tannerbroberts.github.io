@@ -12,7 +12,7 @@ const timeWindowCSS = () => {
 		...cssHelper,
 		position: "relative",
 		overflowY: "scroll",
-		height: "50vh",
+		height: "83vh",
 	}
 
 	return obj

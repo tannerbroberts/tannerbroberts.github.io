@@ -20,8 +20,8 @@ STORIES:
 
     DO:
         TimeWindow
-            Item Blocks
             Scheduler option on block
+                block onLongClickListener
                 appears onAddItem along with the new block
                 schedule submit button
             BackgroundSection
@@ -30,6 +30,7 @@ STORIES:
         AddItem onClickListener
 
     DONE:
+            Item Blocks
             TimeScale
                 Scale input setter thing
                 ClickListeners

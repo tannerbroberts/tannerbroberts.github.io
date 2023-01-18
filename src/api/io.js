@@ -14,6 +14,7 @@ const ITEM_NAME_SPACE = `${DELIMITER}ITEM${DELIMITER}`
 */
 
 export const isIllegalString = (nameString) => {
+	console.log("io: checking illegal string")
 	const library = getLibrary()
 	if (nameString) {
 		return (
@@ -23,6 +24,7 @@ export const isIllegalString = (nameString) => {
 }
 
 export const postItem = (itemObject) => {
+	console.log("io: posting item")
 	if (!objectHasIllegalName(itemObject)) {
 		saveItem(itemObject)
 		return true
@@ -31,7 +33,7 @@ export const postItem = (itemObject) => {
 }
 
 export const getItem = (name) => {
-	console.log("getting item: ", name)
+	console.log("io: getting item")
 	const item = JSON.parse(
 		localStorage.getItem(`${ITEM_NAME_SPACE}${name}`)
 	)
@@ -40,6 +42,7 @@ export const getItem = (name) => {
 }
 
 export const deleteItem = (name) => {
+	console.log("io: deleting item")
 	// Remove from LS
 	localStorage.removeItem(`${ITEM_NAME_SPACE}${name}`)
 	// Remove from Library
@@ -47,6 +50,7 @@ export const deleteItem = (name) => {
 }
 
 export const getLibrary = () => {
+	console.log("io: getting library")
 	const library = JSON.parse(localStorage.getItem(LIBRARY))
 	if (library) return library
 	return ["*"]

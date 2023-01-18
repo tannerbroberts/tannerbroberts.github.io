@@ -8,7 +8,6 @@ const backgroundSectionCSS = (index) => {
 		position: "absolute",
 		top: `${index * 100}px`,
 		height: "100px",
-		borderRight: "10px solid black",
 		backgroundColor: "whitesmoke",
 		textAlign: "left",
 		padding: "10px",
