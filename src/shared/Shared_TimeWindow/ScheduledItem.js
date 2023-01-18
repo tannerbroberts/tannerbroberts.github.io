@@ -1,19 +1,31 @@
 import React from "react"
 import { cssHelper } from "../../api/cssHelper"
+import { getItem } from "../../api/io"
+import { useGlobalContext } from "../../GlobalContext"
 
-const scheduledItemCSS = (position, length, scale) => {
+const scheduledItemCSS = (position, length) => {
+	const { scale } = useGlobalContext()
 	const obj = {
 		...cssHelper,
 		position: "absolute",
-		top: `${Math.floor(position / scale)}px`,
-		height: `${Math.floor(length / scale)}px`,
+		top: `${(position / scale) * 100}px`,
+		left: "100px",
+		width: "300px",
+		height: `${(length / scale) * 100}px`,
 		textAlign: "center",
-		lineHeight: "100%",
+		padding: "10px",
+		backgroundColor: "rgba(155, 255, 155, 1)",
+		borderRadius: "10px",
 	}
 
 	return obj
 }
 
-export default function ScheduledItem({ name, position, length, scale }) {
-	return <div style={scheduledItemCSS(position, length, scale)}>{name}</div>
+export default function ScheduledItem({ name, position }) {
+	const itemData = getItem(name)
+	return (
+		<div style={scheduledItemCSS(position, itemData.length)}>
+			{name}
+		</div>
+	)
 }

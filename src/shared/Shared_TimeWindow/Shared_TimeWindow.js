@@ -38,20 +38,16 @@ export default function TimeWindow() {
 		const itemLength = item?.length
 		const children = item?.children
 
-		const scale = 60_000
-
 		return (
 			<div>
 				<TimeScale />
 				<div style={timeWindowCSS()}>
-					<BackgroundSections sectionCount={itemLength / scale} />
+					<BackgroundSections length={itemLength} />
 					{children?.map((child) => (
 						<ScheduledItem
 							key={child?.name + child?.position}
 							name={child?.name}
 							position={child?.position}
-							length={child?.length}
-							scale={scale}
 						/>
 					))}
 				</div>

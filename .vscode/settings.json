@@ -14,5 +14,6 @@
 		"**/.svn": false,
 		"**/CVS": false,
 		"**/Thumbs.db": false
-	}
+	},
+	"workbench.editor.wrapTabs": true
 }

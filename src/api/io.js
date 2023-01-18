@@ -16,8 +16,9 @@ const ITEM_NAME_SPACE = `${DELIMITER}ITEM${DELIMITER}`
 export const isIllegalString = (nameString) => {
 	const library = getLibrary()
 	if (nameString) {
-		return nameString.includes(DELIMITER)
-		|| library.includes(nameString)
+		return (
+			nameString.includes(DELIMITER) || library.includes(nameString)
+		)
 	} else return true
 }
 
@@ -30,7 +31,10 @@ export const postItem = (itemObject) => {
 }
 
 export const getItem = (name) => {
-	const item = JSON.parse(localStorage.getItem(`${ITEM_NAME_SPACE}${name}`))
+	console.log("getting item: ", name)
+	const item = JSON.parse(
+		localStorage.getItem(`${ITEM_NAME_SPACE}${name}`)
+	)
 	if (item) return item
 	return undefined
 }

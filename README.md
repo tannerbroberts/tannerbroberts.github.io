@@ -20,19 +20,21 @@ STORIES:
 
     DO:
         TimeWindow
+            Item Blocks
+            Scheduler option on block
+                appears onAddItem along with the new block
+                schedule submit button
+            BackgroundSection
+                onLongPressListener
+                partial sections
+        AddItem onClickListener
+
+    DONE:
             TimeScale
                 Scale input setter thing
                 ClickListeners
                 State
-            Item Blocks
-            Scheduler option on block
-                appears onAddItem along with the new block
-                submit button
-            BackgroundSection
-                onLongPressListener
-        AddItemOnClickListener
-
-    DONE:
+                time block Labels
         BUG: BackgroundSections aren't rendering
         DeleteItem
         ItemList
@@ -54,3 +56,4 @@ GamePlans:
         2) Shared components will live in the shared components folder
     State:
         1) Derrive what I can from the minimum amount of state possible
+        2) absolutely no prop drilling!!! Okay, not really, but I really like context, so there's that.

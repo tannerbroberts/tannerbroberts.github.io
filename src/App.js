@@ -27,6 +27,8 @@ function App() {
 	const [stack, setStack] = useState([{ path: "calendar" }])
 	// For the library list of items
 	const [selectedItemName, setSelectedItemName] = useState("")
+	const [scale, setScale] = useState(3_600_000)
+	const [unit, setUnit] = useState("hr")
 
 	const openPopup = (child) => {
 		setPopupOpen(true)
@@ -87,6 +89,10 @@ function App() {
 				setSelectedItemName,
 				openItemView,
 				addItem,
+				scale,
+				setScale,
+				unit,
+				setUnit
 			}}
 		>
 			<div style={appCSS}>

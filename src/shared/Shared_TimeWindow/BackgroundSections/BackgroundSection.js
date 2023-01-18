@@ -1,23 +1,23 @@
 import React from "react"
 import { cssHelper } from "../../../api/cssHelper"
+import { useGlobalContext } from "../../../GlobalContext"
 
-const backgroundSectionCSS = (position) => {
+const backgroundSectionCSS = (index) => {
 	const obj = {
 		...cssHelper,
 		position: "absolute",
-		top: `${position * 100}px`,
+		top: `${index * 100}px`,
 		height: "100px",
-		border: "1px solid black",
+		borderRight: "10px solid black",
 		backgroundColor: "whitesmoke",
+		textAlign: "left",
+		padding: "10px",
 	}
 
 	return obj
 }
 
-export default function BackgroundSection({
-	position,
-	length,
-	scale,
-}) {
-	return <div style={backgroundSectionCSS(position, length, scale)} />
+export default function BackgroundSection({ index }) {
+	const { unit } = useGlobalContext()
+	return <div style={backgroundSectionCSS(index)}>{`${index} ${unit}`}</div>
 }
