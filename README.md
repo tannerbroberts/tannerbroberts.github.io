@@ -19,12 +19,17 @@ STORIES:
         Mobile View closes shelf onViewItemClick and onAddItem
 
     DO:
-        CalendarView
-            Units
-            Scale input setter thing
+        TimeWindow
+            TimeScale
+                Scale input setter thing
+                ClickListeners
+                State
             Item Blocks
             Scheduler option on block
-            onLongPressListener (creates new anonamous item?)
+                appears onAddItem along with the new block
+                submit button
+            BackgroundSection
+                onLongPressListener
         AddItemOnClickListener
 
     DONE:
