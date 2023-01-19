@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { cssHelper } from "../../../../api/cssHelper"
 import { getLibrary } from "../../../../api/io"
-import { useGlobalContext } from "../../../../GlobalContext"
+import { useGlobalContext } from "../../../../App"
 
 const itemListCSS = () => {
 	const obj = { ...cssHelper }
@@ -17,12 +17,15 @@ const Row = ({ itemName, setSelectedItemName, selectedItemName }) => {
 			style={{
 				border: "1px solid black",
 				padding: "10px",
-				backgroundColor: itemName === selectedItemName ? "lightgreen" : backgroundColor,
+				backgroundColor:
+					itemName === selectedItemName
+						? "lightgreen"
+						: backgroundColor,
 			}}
 			onMouseEnter={() => setBackgroundColor("lightgray")}
 			onMouseLeave={() => setBackgroundColor("whitesmoke")}
 			onClick={() => {
-				if(selectedItemName === itemName) setSelectedItemName("")
+				if (selectedItemName === itemName) setSelectedItemName("")
 				else setSelectedItemName(itemName)
 			}}
 		>
@@ -37,15 +40,15 @@ export default function ItemList() {
 	return (
 		<div style={itemListCSS()}>
 			{library.map((itemName) => {
-				if(itemName != "*")
-				return (
-					<Row
-						key={Math.random()}
-						itemName={itemName}
-						setSelectedItemName={setSelectedItemName}
-						selectedItemName={selectedItemName}
-					/>
-				)
+				if (itemName != "*")
+					return (
+						<Row
+							key={Math.random()}
+							itemName={itemName}
+							setSelectedItemName={setSelectedItemName}
+							selectedItemName={selectedItemName}
+						/>
+					)
 			})}
 		</div>
 	)

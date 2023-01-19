@@ -1,6 +1,6 @@
 // Set the composite item in LS
 
-const setls = () => {
+export const setls = () => {
     localStorage.setItem("*ITEM*composite", JSON.stringify({name: "composite", length: 3_600_000, children: [{name: "bacon_eggs", position: 0}]}))
     localStorage.setItem("*ITEM*bacon_eggs", JSON.stringify({name: "bacon_eggs", length: 3_600_000}))
     localStorage.setItem("*ITEM*bacon_eggs1/3",  JSON.stringify({name: "bacon_eggs1/3", length: 1_200_000}))

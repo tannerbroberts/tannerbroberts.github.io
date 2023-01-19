@@ -14,17 +14,20 @@ const ITEM_NAME_SPACE = `${DELIMITER}ITEM${DELIMITER}`
 */
 
 export const isIllegalString = (nameString) => {
-	console.log("io: checking illegal string")
-	const library = getLibrary()
-	if (nameString) {
-		return (
-			nameString.includes(DELIMITER) || library.includes(nameString)
-		)
-	} else return true
+	try {
+		const library = getLibrary()
+		if (nameString) {
+			return (
+				nameString.includes(DELIMITER) || library.includes(nameString)
+			)
+		} else return true
+	} catch (err) {
+		console.log("ERROR: in f() isIllegalString:", err)
+	}
+	return true
 }
 
 export const postItem = (itemObject) => {
-	console.log("io: posting item")
 	if (!objectHasIllegalName(itemObject)) {
 		saveItem(itemObject)
 		return true
@@ -32,8 +35,17 @@ export const postItem = (itemObject) => {
 	return false
 }
 
+export const postChildPositionChange = (itemObject) => {
+	if (valid(itemObject)) saveItem(itemObject, false)
+	return true
+}
+
+export const postChildRemove = (itemObject) => {
+	if (valid(itemObject)) saveItem(itemObject, false)
+	return true
+}
+
 export const getItem = (name) => {
-	console.log("io: getting item")
 	const item = JSON.parse(
 		localStorage.getItem(`${ITEM_NAME_SPACE}${name}`)
 	)
@@ -42,7 +54,6 @@ export const getItem = (name) => {
 }
 
 export const deleteItem = (name) => {
-	console.log("io: deleting item")
 	// Remove from LS
 	localStorage.removeItem(`${ITEM_NAME_SPACE}${name}`)
 	// Remove from Library
@@ -50,7 +61,6 @@ export const deleteItem = (name) => {
 }
 
 export const getLibrary = () => {
-	console.log("io: getting library")
 	const library = JSON.parse(localStorage.getItem(LIBRARY))
 	if (library) return library
 	return ["*"]
@@ -75,12 +85,12 @@ const saveLibrary = (libraryItemNameArray) => {
 	localStorage.setItem(LIBRARY, JSON.stringify(libraryItemNameArray))
 }
 
-const saveItem = (itemObject) => {
+const saveItem = (itemObject, addToLibrary = true) => {
 	localStorage.setItem(
 		`${ITEM_NAME_SPACE}${itemObject.name}`,
 		JSON.stringify(itemObject)
 	)
-	saveLibrary([...getLibrary(), itemObject.name])
+	if (addToLibrary) saveLibrary([...getLibrary(), itemObject.name])
 }
 
 const getVariable = (name) => {
@@ -98,4 +108,26 @@ const saveVariable = (variableObject) => {
 
 const deleteVariable = (name) => {
 	localStorage.removeItem(`${VARIABLE_NAME_SPACE}${name}`)
+}
+
+const match = (a, b) => {
+	try {
+		return (
+			valid(a) &&
+			valid(b) &&
+			a.name === b.name &&
+			a.lengh === b.length
+		)
+	} catch (err) {
+		console.log("ERROR: in f() match:", err)
+	}
+	return false
+}
+
+const valid = (obj) => {
+	try {
+		return obj.name && obj.length
+	} catch (err) {
+		console.log("ERROR: in f() valid:", err)
+	}
 }

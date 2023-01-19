@@ -1,5 +1,5 @@
 import React from "react"
-import { useGlobalContext } from "../../GlobalContext"
+import { useGlobalContext } from "../../App"
 import { cssHelper, MOBILE_BREAKPOINT } from "../../api/cssHelper"
 import { Button } from "@mui/material"
 

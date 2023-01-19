@@ -1,6 +1,6 @@
 import React from "react"
 import { cssHelper } from "../../../api/cssHelper"
-import { useGlobalContext } from "../../../GlobalContext"
+import { useGlobalContext } from "../../../App"
 
 const backgroundSectionCSS = (index) => {
 	const obj = {
@@ -18,5 +18,9 @@ const backgroundSectionCSS = (index) => {
 
 export default function BackgroundSection({ index }) {
 	const { unit } = useGlobalContext()
-	return <div style={backgroundSectionCSS(index)}>{`${index} ${unit}`}</div>
+	return (
+		<div
+			style={backgroundSectionCSS(index)}
+		>{`${index} ${unit}`}</div>
+	)
 }

@@ -1,6 +1,6 @@
 import React from "react"
 import { Button } from "@mui/material"
-import { useGlobalContext } from "../../../../../GlobalContext"
+import { useGlobalContext } from "../../../../../App"
 import { cssHelper } from "../../../../../api/cssHelper"
 
 const addItemCSS = () => {

@@ -1,8 +1,12 @@
 import React from "react"
-import { cssHelper, MOBILE_BREAKPOINT, STRUCTURE } from "../../api/cssHelper"
+import {
+	cssHelper,
+	MOBILE_BREAKPOINT,
+	STRUCTURE,
+} from "../../api/cssHelper"
 import ItemLibrary from "./ItemLibrary"
 import Shared_Drawer from "../../shared/Shared_Drawer"
-import { useGlobalContext } from "../../GlobalContext"
+import { useGlobalContext } from "../../App"
 
 const shelfCSS = (openStatus) => {
 	const obj = {
@@ -13,12 +17,11 @@ const shelfCSS = (openStatus) => {
 		overflowY: "scroll",
 	}
 	openStatus ? null : (obj.display = "none")
-	if(window.innerWidth < MOBILE_BREAKPOINT) {
+	if (window.innerWidth < MOBILE_BREAKPOINT) {
 		obj.position = "absolute"
-		obj.width="95vw"
-		obj.height="95vh"
-		obj.left=0
-
+		obj.width = "95vw"
+		obj.height = "95vh"
+		obj.left = 0
 	}
 	return obj
 }

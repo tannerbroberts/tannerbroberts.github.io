@@ -1,5 +1,5 @@
-import React from "react"
-import { useGlobalContext } from "../../GlobalContext"
+import React, { createContext, useContext, useState } from "react"
+import { useGlobalContext } from "../../App"
 import { getItem } from "../../api/io"
 import ScheduledItem from "./ScheduledItem"
 import BackgroundSections from "./BackgroundSections"
@@ -18,6 +18,8 @@ const timeWindowCSS = () => {
 	return obj
 }
 
+const TimeWindowContext = createContext()
+
 export default function TimeWindow() {
 	const { stack } = useGlobalContext()
 	const index = stack.length - 1
@@ -34,24 +36,47 @@ export default function TimeWindow() {
 	// This is the TimeWindow for an itemView
 	else if (frame.path === "itemView") {
 		const itemName = frame?.name
-		const item = getItem(itemName)
-		const itemLength = item?.length
-		const children = item?.children
+		const parentItem = getItem(itemName)
+		const itemLength = parentItem?.length
+		const [children, setChildren] = useState(parentItem?.children)
+
+		const removeTimeWindowStateChild = (name, position) => {
+			try {
+				setChildren(
+					children.filter(
+						(child) =>
+							child.name !== name || child.position !== position
+					)
+				)
+			} catch (err) {
+				console.log("ERROR: in f() removeTimeWindowStateChild:", err)
+			}
+		}
 
 		return (
-			<div>
-				<TimeScale />
-				<div style={timeWindowCSS()}>
-					<BackgroundSections length={itemLength} />
-					{children?.map((child) => (
-						<ScheduledItem
-							key={child?.name + child?.position}
-							name={child?.name}
-							position={child?.position}
-						/>
-					))}
+			<TimeWindowContext.Provider
+				value={{ parentItem, removeTimeWindowStateChild }}
+			>
+				<div>
+					<TimeScale />
+					<div
+						style={timeWindowCSS()}
+						id='textFieldInItemSchedulerAddon'
+					>
+						<BackgroundSections length={itemLength} />
+						{children?.map((child) => (
+							<ScheduledItem
+								key={child?.name + child?.position}
+								name={child?.name}
+								startMillisProp={child?.position}
+							/>
+						))}
+					</div>
 				</div>
-			</div>
+			</TimeWindowContext.Provider>
 		)
 	}
 }
+
+export const useTimeWindowContext = () =>
+	useContext(TimeWindowContext)

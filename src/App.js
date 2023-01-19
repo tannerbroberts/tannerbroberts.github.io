@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react"
+import React, { createContext, useCallback, useContext, useState } from "react"
 import ScreenStack from "./components/ScreenStack"
 import Shelf from "./components/Shelf"
 import Popup from "./components/Popup"
@@ -7,7 +7,9 @@ import "@fontsource/roboto/400.css"
 import "@fontsource/roboto/500.css"
 import "@fontsource/roboto/700.css"
 import ShelfToggle from "./components/FloatingActionButtonWrapper/FloatingActionButtonWrapper"
-import { GlobalContextProvider } from "./GlobalContext"
+// The next two lines are for testing and populating with goodies
+// import { setls } from "./notes"
+// setls()
 
 const appCSS = {
 	display: "flex",
@@ -16,6 +18,8 @@ const appCSS = {
 	height: "98vh",
 	width: "98vw",
 }
+
+const GlobalContext = createContext()
 
 function App() {
 	// App context variables
@@ -51,7 +55,11 @@ function App() {
 	}
 
 	const popFrames = (popCount) => {
-		if (stack.length > 1 && stack.length > popCount - 1 && popCount !== 0) {
+		if (
+			stack.length > 1 &&
+			stack.length > popCount - 1 &&
+			popCount !== 0
+		) {
 			setStack(() => stack.slice(0, popCount * -1))
 			setCount(() => count - popCount)
 		}
@@ -73,7 +81,7 @@ function App() {
 	}
 
 	return (
-		<GlobalContextProvider
+		<GlobalContext.Provider
 			value={{
 				shelfOpen,
 				setShelfOpen,
@@ -92,7 +100,7 @@ function App() {
 				scale,
 				setScale,
 				unit,
-				setUnit
+				setUnit,
 			}}
 		>
 			<div style={appCSS}>
@@ -101,8 +109,10 @@ function App() {
 				<Popup title='Item Creation Menu'>{popupChild}</Popup>
 				<ShelfToggle />
 			</div>
-		</GlobalContextProvider>
+		</GlobalContext.Provider>
 	)
 }
 
 export default App
+
+export const useGlobalContext = () => useContext(GlobalContext)

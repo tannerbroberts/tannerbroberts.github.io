@@ -2,7 +2,7 @@ import * as React from "react"
 import Breadcrumbs from "@mui/material/Breadcrumbs"
 import Link from "@mui/material/Link"
 import HomeIcon from "@mui/icons-material/Home"
-import { useGlobalContext } from "../../../GlobalContext"
+import { useGlobalContext } from "../../../App"
 
 const popFramesUsage = (index, array, popFrames) => {
 	const popCount = Math.max(0, array.length - index - 1)

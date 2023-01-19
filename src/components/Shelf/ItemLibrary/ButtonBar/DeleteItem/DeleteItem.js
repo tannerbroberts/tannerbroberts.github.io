@@ -2,7 +2,7 @@ import React from "react"
 import { Button } from "@mui/material"
 import { cssHelper } from "../../../../../api/cssHelper"
 import { deleteItem } from "../../../../../api/io"
-import { useGlobalContext } from "../../../../../GlobalContext"
+import { useGlobalContext } from "../../../../../App"
 
 const deleteItemCSS = () => {
 	const obj = {

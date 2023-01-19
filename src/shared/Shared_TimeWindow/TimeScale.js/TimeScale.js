@@ -1,6 +1,6 @@
 import { Button } from "@mui/material"
 import React from "react"
-import { useGlobalContext } from "../../../GlobalContext"
+import { useGlobalContext } from "../../../App"
 
 const scaleButtonCSS = () => {
 	return {

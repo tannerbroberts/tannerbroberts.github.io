@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react"
 import { TextField } from "@mui/material"
 import Button from "@mui/material/Button"
 import { isIllegalString, postItem } from "../../api/io"
-import { useGlobalContext } from "../../GlobalContext"
+import { useGlobalContext } from "../../App"
 
 export default function ItemCreationPopup() {
 	const { closePopup } = useGlobalContext()

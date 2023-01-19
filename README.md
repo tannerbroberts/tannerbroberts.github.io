@@ -1,28 +1,14 @@
-key:
-    FILL: The story needs talk with Tanner, || is yet to be written
-    DO: These are ready to be done. They have enough description to make the developer happy
-    DONE: ... It's done... I don't know what else to say
+    key:
+        FILL: The story needs talk with Tanner, || is yet to be written
+        DO: These are ready to be done. They have enough description to make the developer happy
+        DONE: ... It's done... I don't know what else to say
 
 STORIES:
-    FILL:
-        Variables
-            Variables can be added, removed, and combined
-            Variable Summaries
-            Quotas
-        Item RealTime view
-        Accountability view
-        ItemFilter: filterName filterProperties
-            ItemFilter can filter based on length, variable condition, and name
-        BaseCalendarView
-        ViewItem
-        Item Library is basically just no filter, any other preset filters live below
-        Mobile View closes shelf onViewItemClick and onAddItem
 
     DO:
         TimeWindow
             Scheduler option on block
-                block onLongClickListener
-                appears onAddItem along with the new block
+                appears onAddItem along with the item block
                 schedule submit button
             BackgroundSection
                 onLongPressListener
@@ -30,6 +16,7 @@ STORIES:
         AddItem onClickListener
 
     DONE:
+                block onLongClickListener
             Item Blocks
             TimeScale
                 Scale input setter thing
@@ -47,6 +34,20 @@ STORIES:
         ItemCreatePopup
         Popup
 
+    FILL:
+        Variables
+            Variables can be added, removed, and combined
+            Variable Summaries
+            Quotas
+        Item RealTime view
+        Accountability view
+        ItemFilter: filterName filterProperties
+            ItemFilter can filter based on length, variable condition, and name
+        BaseCalendarView
+        ViewItem
+        Item Library is basically just no filter, any other preset filters live below
+        Mobile View closes shelf onViewItemClick and onAddItem
+
 GamePlans:
     CSS:
         1) Every visible component has a grid, and is a child of grid by default unless there's some wizardry that needs be done, in which case, it will be documented here:
@@ -58,3 +59,4 @@ GamePlans:
     State:
         1) Derrive what I can from the minimum amount of state possible
         2) absolutely no prop drilling!!! Okay, not really, but I really like context, so there's that.
+        3) Prop drilling for components inside of a map function just cause that's easier than thinking about the alternatives
