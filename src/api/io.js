@@ -3,6 +3,7 @@ const DELIMITER = "*"
 const LIBRARY = `${DELIMITER}LIBRARY${DELIMITER}`
 const VARIABLE_NAME_SPACE = `${DELIMITER}ITEM${DELIMITER}`
 const ITEM_NAME_SPACE = `${DELIMITER}ITEM${DELIMITER}`
+const STATE_NAME_SPACE = `${DELIMITER}STATE${DELIMITER}`
 
 /*
  __________   ___ .______     ______   .______     .___________. _______  _______  
