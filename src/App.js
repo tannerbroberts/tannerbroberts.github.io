@@ -1,4 +1,10 @@
-import React, { createContext, useCallback, useContext, useState } from "react"
+import React, {
+	createContext,
+	useCallback,
+	useContext,
+	useState,
+} from "react"
+import { useLS } from "./api/useLS"
 import ScreenStack from "./components/ScreenStack"
 import Shelf from "./components/Shelf"
 import Popup from "./components/Popup"
@@ -7,7 +13,6 @@ import "@fontsource/roboto/400.css"
 import "@fontsource/roboto/500.css"
 import "@fontsource/roboto/700.css"
 import ShelfToggle from "./components/FloatingActionButtonWrapper/FloatingActionButtonWrapper"
-// The next two lines are for testing and populating with goodies
 // import { setls } from "./notes"
 // setls()
 
@@ -23,16 +28,18 @@ const GlobalContext = createContext()
 
 function App() {
 	// App context variables
-	const [shelfOpen, setShelfOpen] = useState(true)
+	const [shelfOpen, setShelfOpen] = useLS("shelfOpen", true)
 	const [popupOpen, setPopupOpen] = useState(false)
-	const [popupChild, setPopupChild] = useState(() => {})
+	const [popupChild, setPopupChild] = useState(null)
 	// For the screen stack
-	const [count, setCount] = useState(1)
-	const [stack, setStack] = useState([{ path: "calendar" }])
+	const [stack, setStack] = useLS("stack", [{ path: "calendar" }])
 	// For the library list of items
-	const [selectedItemName, setSelectedItemName] = useState("")
-	const [scale, setScale] = useState(3_600_000)
-	const [unit, setUnit] = useState("hr")
+	const [selectedItemName, setSelectedItemName] = useLS(
+		"selectedItemName",
+		null
+	)
+	const [scale, setScale] = useLS("scale", 3_600_000)
+	const [unit, setUnit] = useLS("unit", "hr")
 
 	const openPopup = (child) => {
 		setPopupOpen(true)
@@ -40,7 +47,7 @@ function App() {
 	}
 
 	const closePopup = useCallback(() => {
-		setPopupChild(() => {})
+		setPopupChild(null)
 		setPopupOpen(false)
 	})
 
@@ -48,9 +55,8 @@ function App() {
 
 	const pushFrame = (obj) => {
 		if (obj && componentList.includes(obj.path) && obj.name) {
-			setStack(() => [...stack, obj])
-			setCount(() => count + 1)
-			setSelectedItemName("")
+			setStack([...stack, obj])
+			setSelectedItemName(null)
 		}
 	}
 
@@ -60,15 +66,14 @@ function App() {
 			stack.length > popCount - 1 &&
 			popCount !== 0
 		) {
-			setStack(() => stack.slice(0, popCount * -1))
-			setCount(() => count - popCount)
+			setStack(stack.slice(0, popCount * -1))
 		}
 	}
 
 	const openItemView = () => {
 		if (selectedItemName) {
 			pushFrame({ path: "itemView", name: selectedItemName })
-			setSelectedItemName("")
+			setSelectedItemName(null)
 		}
 	}
 
@@ -90,8 +95,6 @@ function App() {
 				closePopup,
 				stack,
 				setStack,
-				count,
-				setCount,
 				popFrames,
 				selectedItemName,
 				setSelectedItemName,

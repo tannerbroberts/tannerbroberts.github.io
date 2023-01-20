@@ -67,6 +67,28 @@ export const getLibrary = () => {
 	return ["*"]
 }
 
+export const saveState = (stateName, stateValue) => {
+	localStorage.setItem(
+		`${STATE_NAME_SPACE}${stateName}`,
+		JSON.stringify(stateValue)
+	)
+}
+
+export const loadState = (stateName) => {
+	try {
+		const savedValue = localStorage.getItem(
+			`${STATE_NAME_SPACE}${stateName}`
+		)
+		if (savedValue) {
+			return JSON.parse(savedValue)
+		}
+		return null
+	} catch (err) {
+		console.log("ERROR in f() loadState:", err)
+	}
+	return null
+}
+
 /**
  __    __   _______  __      .______    _______ .______          _______.
 |  |  |  | |   ____||  |     |   _  \  |   ____||   _  \        /       |

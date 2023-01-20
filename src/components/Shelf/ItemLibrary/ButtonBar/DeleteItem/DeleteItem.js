@@ -26,7 +26,7 @@ export default function DeleteItem() {
 			)
 		)
 		deleteItem(selectedItemName)
-		setSelectedItemName("")
+		setSelectedItemName(null)
 	}
 
 	return (

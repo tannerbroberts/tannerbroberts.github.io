@@ -25,7 +25,7 @@ const Row = ({ itemName, setSelectedItemName, selectedItemName }) => {
 			onMouseEnter={() => setBackgroundColor("lightgray")}
 			onMouseLeave={() => setBackgroundColor("whitesmoke")}
 			onClick={() => {
-				if (selectedItemName === itemName) setSelectedItemName("")
+				if (selectedItemName === itemName) setSelectedItemName(null)
 				else setSelectedItemName(itemName)
 			}}
 		>
