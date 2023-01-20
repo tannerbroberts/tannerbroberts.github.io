@@ -25,7 +25,7 @@ const scheduledItemCSS = (tempStartMillis, length) => {
 
 const ScheduledItemContext = createContext()
 
-export default function ScheduledItem({ name, startMillisProp }) {
+export default function ScheduledItem({ name, startMillisProp, scheduling=false }) {
 	const [tempStartMillis, setTempStartMillis] =
 		useState(startMillisProp)
 	const item = getItem(name)
@@ -35,7 +35,7 @@ export default function ScheduledItem({ name, startMillisProp }) {
 		setSchedulerVisible(true)
 	})
 
-	const [schedulerVisible, setSchedulerVisible] = useState(false)
+	const [schedulerVisible, setSchedulerVisible] = useState(scheduling)
 
 	return (
 		<ScheduledItemContext.Provider

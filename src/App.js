@@ -13,6 +13,7 @@ import "@fontsource/roboto/400.css"
 import "@fontsource/roboto/500.css"
 import "@fontsource/roboto/700.css"
 import ShelfToggle from "./components/FloatingActionButtonWrapper/FloatingActionButtonWrapper"
+import { getItem } from "./api/io"
 // import { setls } from "./notes"
 // setls()
 
@@ -38,8 +39,11 @@ function App() {
 		"selectedItemName",
 		null
 	)
+	// For the scheduler
 	const [scale, setScale] = useLS("scale", 3_600_000)
 	const [unit, setUnit] = useLS("unit", "hr")
+	// For the TimeWindow
+	const [children, setChildren] = useState([])
 
 	const openPopup = (child) => {
 		setPopupOpen(true)
@@ -73,16 +77,20 @@ function App() {
 	const openItemView = () => {
 		if (selectedItemName) {
 			pushFrame({ path: "itemView", name: selectedItemName })
+			setChildren(getItem(selectedItemName)?.children ?? [])
 			setSelectedItemName(null)
 		}
 	}
 
 	const addItem = () => {
-		// I need to add the selected item to the item being displayed on top of the stack. It'll also be nice to not have any items in the
-		// library view that are smaller than the one on the top of the screenStack
-		// This function doesn't do the actual adding, it just opens the popup that will have the submit button which adds it.
-		// The popup is needed because there can be scheduling conflicts which need to be resolved before scheduling
-		// It's also needed for the mere fact that the start time needs to be resolved as well.
+		if (selectedItemName) {
+			console.log("children:", children)
+			console.log("new children:", );
+			setChildren([...children, {
+				name: selectedItemName,
+				position: 0,
+			}])
+		}
 	}
 
 	return (
@@ -104,6 +112,8 @@ function App() {
 				setScale,
 				unit,
 				setUnit,
+				children,
+				setChildren,
 			}}
 		>
 			<div style={appCSS}>

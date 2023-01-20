@@ -20,7 +20,7 @@ export default function AddItem() {
 		<Button
 			style={addItemCSS()}
 			variant='contained'
-			onClick={addItem}
+			onClick={() => addItem()}
 		>
 			Add Item
 		</Button>

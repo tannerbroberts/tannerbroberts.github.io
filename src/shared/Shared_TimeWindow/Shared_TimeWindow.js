@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react"
+import React, { createContext, useContext } from "react"
 import { useGlobalContext } from "../../App"
 import { getItem } from "../../api/io"
 import ScheduledItem from "./ScheduledItem"
@@ -21,7 +21,7 @@ const timeWindowCSS = () => {
 const TimeWindowContext = createContext()
 
 export default function TimeWindow() {
-	const { stack } = useGlobalContext()
+	const { stack, children } = useGlobalContext()
 	const index = stack.length - 1
 	const frame = stack[index]
 
@@ -38,24 +38,10 @@ export default function TimeWindow() {
 		const itemName = frame?.name
 		const parentItem = getItem(itemName)
 		const itemLength = parentItem?.length
-		const [children, setChildren] = useState(parentItem?.children)
-
-		const removeTimeWindowStateChild = (name, position) => {
-			try {
-				setChildren(
-					children.filter(
-						(child) =>
-							child.name !== name || child.position !== position
-					)
-				)
-			} catch (err) {
-				console.log("ERROR: in f() removeTimeWindowStateChild:", err)
-			}
-		}
 
 		return (
 			<TimeWindowContext.Provider
-				value={{ parentItem, removeTimeWindowStateChild }}
+				value={{ parentItem }}
 			>
 				<div>
 					<TimeScale />
@@ -69,6 +55,7 @@ export default function TimeWindow() {
 								key={child?.name + child?.position}
 								name={child?.name}
 								startMillisProp={child?.position}
+								scheduling={child?.scheduling}
 							/>
 						))}
 					</div>
