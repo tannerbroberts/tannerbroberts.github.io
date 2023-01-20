@@ -90,6 +90,7 @@ function App() {
 				name: selectedItemName,
 				position: 0,
 			}])
+			setSelectedItemName(null)
 		}
 	}
 
