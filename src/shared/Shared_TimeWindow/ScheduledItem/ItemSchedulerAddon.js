@@ -56,7 +56,6 @@ export default function ItemSchedulerAddon() {
 	return (
 		<div
 			style={{
-				width: "90%",
 				marginLeft: "5%",
 				borderRadius: "0 0 10px 10px",
 				backgroundColor: "lightgreen",

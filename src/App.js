@@ -20,9 +20,7 @@ import { getItem } from "./api/io"
 const appCSS = {
 	display: "flex",
 	flexFlow: "row",
-	alignItems: "stretch",
-	height: "98vh",
-	width: "98vw",
+	height: "100%",
 }
 
 const GlobalContext = createContext()
@@ -85,11 +83,14 @@ function App() {
 	const addItem = () => {
 		if (selectedItemName) {
 			console.log("children:", children)
-			console.log("new children:", );
-			setChildren([...children, {
-				name: selectedItemName,
-				position: 0,
-			}])
+			console.log("new children:")
+			setChildren([
+				...children,
+				{
+					name: selectedItemName,
+					position: 0,
+				},
+			])
 			setSelectedItemName(null)
 		}
 	}

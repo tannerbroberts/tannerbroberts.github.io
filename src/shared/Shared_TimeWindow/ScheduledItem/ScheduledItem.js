@@ -12,7 +12,6 @@ const scheduledItemCSS = (tempStartMillis, length) => {
 		position: "absolute",
 		top: `${(tempStartMillis / scale) * 100}px`,
 		left: "100px",
-		width: "calc(100% - 101px)",
 		height: `${(length / scale) * 100}px`,
 		textAlign: "center",
 		padding: "10px",
@@ -25,7 +24,11 @@ const scheduledItemCSS = (tempStartMillis, length) => {
 
 const ScheduledItemContext = createContext()
 
-export default function ScheduledItem({ name, startMillisProp, scheduling=false }) {
+export default function ScheduledItem({
+	name,
+	startMillisProp,
+	scheduling = false,
+}) {
 	const [tempStartMillis, setTempStartMillis] =
 		useState(startMillisProp)
 	const item = getItem(name)

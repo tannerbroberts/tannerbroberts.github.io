@@ -6,6 +6,9 @@
 STORIES:
 
     DO:
+        Positioning of components using CSS
+            There are all sorts of problems going on because I assumed too much about width and height styles.
+                Scrolling on mobile becase of a too-large component isn't a ship stopper for me, but will be for most users.
         TimeWindow
             Scheduler option on block
                 appears onAddItem along with the item block

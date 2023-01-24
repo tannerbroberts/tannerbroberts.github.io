@@ -40,9 +40,7 @@ export default function TimeWindow() {
 		const itemLength = parentItem?.length
 
 		return (
-			<TimeWindowContext.Provider
-				value={{ parentItem }}
-			>
+			<TimeWindowContext.Provider value={{ parentItem }}>
 				<div>
 					<TimeScale />
 					<div

@@ -1,31 +1,23 @@
 import React from "react"
 import { useGlobalContext } from "../../App"
-import { cssHelper, MOBILE_BREAKPOINT } from "../../api/cssHelper"
+import { cssHelper } from "../../api/cssHelper"
 import { Button } from "@mui/material"
 
 const popupCSS = (visible) => {
 	const obj = {
 		...cssHelper,
-		width: "500px",
-		height: "min-content",
-		paddingBottom: "20px",
 		fontSize: "32",
 		position: "absolute",
-		left: "20%",
-		top: "20%",
+		left: "2vw",
+		top: "2vh",
+		width: "96vw",
+		height: "96vh",
 		display: "grid",
 		gap: "10px",
 		overflowY: "scroll",
 		gridTemplateColumns: "1fr",
 	}
 	if (!visible) obj.display = "none"
-	if (window.innerWidth < MOBILE_BREAKPOINT) {
-		obj.position = "absolute"
-		obj.width = "90vw"
-		obj.height = "90vh"
-		obj.left = "5vw"
-		obj.top = "5vh"
-	}
 
 	return obj
 }
