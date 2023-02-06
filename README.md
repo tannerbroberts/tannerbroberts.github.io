@@ -6,8 +6,7 @@
 STORIES:
 
     DO:
-        Positioning of components using CSS
-            Messing with screen dom lookups for a pseudo-media-query
+        Positioning of components using CSS. Seems like something to do with positioning? 
         BUG: Click listeners for ItemSchedulerAddon are broken
         TimeWindow
             Scheduler option on block
