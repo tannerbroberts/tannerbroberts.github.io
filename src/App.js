@@ -3,43 +3,43 @@ import React, {
 	useCallback,
 	useContext,
 	useState,
-} from "react"
-import { useLS } from "./api/useLS"
-import ScreenStack from "./components/ScreenStack"
-import Shelf from "./components/Shelf"
-import Popup from "./components/Popup"
-import "@fontsource/roboto/300.css"
-import "@fontsource/roboto/400.css"
-import "@fontsource/roboto/500.css"
-import "@fontsource/roboto/700.css"
-import ShelfToggle from "./components/FloatingActionButtonWrapper/FloatingActionButtonWrapper"
-import { getItem } from "./api/io"
+} from 'react'
+import { useLS } from './api/useLS'
+import ScreenStack from './components/ScreenStack'
+import Shelf from './components/Shelf'
+import Popup from './components/Popup'
+import '@fontsource/roboto/300.css'
+import '@fontsource/roboto/400.css'
+import '@fontsource/roboto/500.css'
+import '@fontsource/roboto/700.css'
+import ShelfToggle from './components/FloatingActionButtonWrapper/FloatingActionButtonWrapper'
+import { getItem } from './api/io'
 // import { setls } from "./notes"
 // setls()
 
 const appCSS = {
-	display: "flex",
-	flexFlow: "row",
-	height: "100%",
+	position: 'relative',
+	display: 'flex',
+	flexFlow: 'row',
 }
 
 const GlobalContext = createContext()
 
 function App() {
 	// App context variables
-	const [shelfOpen, setShelfOpen] = useLS("shelfOpen", true)
+	const [shelfOpen, setShelfOpen] = useLS('shelfOpen', true)
 	const [popupOpen, setPopupOpen] = useState(false)
 	const [popupChild, setPopupChild] = useState(null)
 	// For the screen stack
-	const [stack, setStack] = useLS("stack", [{ path: "calendar" }])
+	const [stack, setStack] = useLS('stack', [{ path: 'calendar' }])
 	// For the library list of items
 	const [selectedItemName, setSelectedItemName] = useLS(
-		"selectedItemName",
+		'selectedItemName',
 		null
 	)
 	// For the scheduler
-	const [scale, setScale] = useLS("scale", 3_600_000)
-	const [unit, setUnit] = useLS("unit", "hr")
+	const [scale, setScale] = useLS('scale', 3_600_000)
+	const [unit, setUnit] = useLS('unit', 'hr')
 	// For the TimeWindow
 	const [children, setChildren] = useState([])
 
@@ -53,7 +53,7 @@ function App() {
 		setPopupOpen(false)
 	})
 
-	const componentList = ["accounting", "calendar", "itemView"]
+	const componentList = ['accounting', 'calendar', 'itemView']
 
 	const pushFrame = (obj) => {
 		if (obj && componentList.includes(obj.path) && obj.name) {
@@ -74,7 +74,7 @@ function App() {
 
 	const openItemView = () => {
 		if (selectedItemName) {
-			pushFrame({ path: "itemView", name: selectedItemName })
+			pushFrame({ path: 'itemView', name: selectedItemName })
 			setChildren(getItem(selectedItemName)?.children ?? [])
 			setSelectedItemName(null)
 		}
@@ -82,8 +82,6 @@ function App() {
 
 	const addItem = () => {
 		if (selectedItemName) {
-			console.log("children:", children)
-			console.log("new children:")
 			setChildren([
 				...children,
 				{

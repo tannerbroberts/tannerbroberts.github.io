@@ -1,8 +1,8 @@
-import React, { useCallback, useState } from "react"
-import { TextField } from "@mui/material"
-import Button from "@mui/material/Button"
-import { isIllegalString, postItem } from "../../api/io"
-import { useGlobalContext } from "../../App"
+import React, { useCallback, useState } from 'react'
+import { TextField } from '@mui/material'
+import Button from '@mui/material/Button'
+import { isIllegalString, postItem } from '../../api/io'
+import { useGlobalContext } from '../../App'
 
 export default function ItemCreationPopup() {
 	const { closePopup } = useGlobalContext()
@@ -22,14 +22,17 @@ export default function ItemCreationPopup() {
 		}
 
 		// This object is everything that the item has when it first gets saved
-		const postSuccess = postItem({ name: e.target.itemName.value, length: getLength() })
+		const postSuccess = postItem({
+			name: e.target.itemName.value,
+			length: getLength(),
+		})
 
-		if(postSuccess) closePopup()
+		if (postSuccess) closePopup()
 	}, [])
 
 	return (
 		<form onSubmit={onSubmit}>
-			<div style={{ textAlign: "center" }}>
+			<div style={{ textAlign: 'center' }}>
 				<TextField
 					id='itemName'
 					label='Item Name'
@@ -38,15 +41,15 @@ export default function ItemCreationPopup() {
 					error={isIllegalString(itemName)}
 				/>
 			</div>
-			<div style={{ marginTop: "20px", textAlign: "center" }}>
+			<div style={{ textAlign: 'center' }}>
 				<TextField id='itemDays' label='Days' type='number' />
 				<TextField id='itemHours' label='Hours' type='number' />
 			</div>
-			<div style={{ marginTop: "20px", textAlign: "center" }}>
+			<div style={{ textAlign: 'center' }}>
 				<TextField id='itemMinutes' label='Minutes' type='number' />
 				<TextField id='itemSeconds' label='Seconds' type='number' />
 			</div>
-			<div style={{ marginTop: "20px", textAlign: "center" }}>
+			<div style={{ textAlign: 'center' }}>
 				<Button variant='contained' type='submit'>
 					Create
 				</Button>

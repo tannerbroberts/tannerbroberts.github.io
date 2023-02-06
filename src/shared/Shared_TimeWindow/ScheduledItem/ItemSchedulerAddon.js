@@ -56,20 +56,21 @@ export default function ItemSchedulerAddon() {
 	return (
 		<div
 			style={{
-				marginLeft: "5%",
 				borderRadius: "0 0 10px 10px",
 				backgroundColor: "lightgreen",
 				position: "absolute",
 				top: 0,
+				padding: "10px",
 			}}
 		>
-			** Select the correct start time **
+			** Select start time **
 			<br />
-			<div style={{ display: "flex", flexFlow: "row" }}>
+			<div style={{ display: "flex", flexFlow: "row", }}>
 				<TextField
 					type='number'
 					label={unit}
 					value={tempStartMillis / scale}
+					style={{width: `${Math.floor(Math.log10(tempStartMillis / scale)) + 9}ch`}}
 					onChange={(e) => {
 						setTempStartMillis(e.target.value * scale)
 						const scrollingContainer =

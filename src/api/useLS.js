@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { loadState, saveState } from "./io"
+import { useState } from 'react'
+import { loadState, saveState } from './io'
 export const useLS = (stateName, initialState) => {
 	try {
 		let savedState = loadState(stateName)
@@ -7,12 +7,12 @@ export const useLS = (stateName, initialState) => {
 		savedState = loadState(stateName)
 		const [state, setState] = useState(savedState)
 		const reallySetState = (newValue) => {
-			console.log(`saving ${stateName}: ${newValue}`)
+			console.log(`useLS hook saving - - - ${stateName}: ${newValue}`)
 			saveState(stateName, newValue)
 			setState(newValue)
 		}
 		return [state, reallySetState]
 	} catch (err) {
-		console.log("ERROR in hook: useLS():", err)
+		console.log('ERROR in hook: useLS():', err)
 	}
 }

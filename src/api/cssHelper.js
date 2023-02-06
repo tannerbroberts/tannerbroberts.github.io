@@ -1,55 +1,58 @@
 // This is where all the colors are declared
 // Green
-const GREENISH = "rgb(97, 226, 148)"
+const GREENISH = 'rgb(97, 226, 148)'
 // const GREENISH_DARKER = "rgb(28, 155, 79)"
 // // Red/Orange
 // const RED_ORANGE = {
 // 	backgroundColor: "rgb(255, 133, 82)",
 // }
 // Light blue
-const LIGHT_BLUE = "rgb(191, 219, 247)"
+const LIGHT_BLUE = 'rgb(191, 219, 247)'
 // const LIGHT_BLUE_DARKER = "rgb(64, 147, 255)"
 // Graylike
 export const GRAYLIKE = {
-	backgroundColor: "rgb(36, 123, 160)",
+	backgroundColor: 'rgb(36, 123, 160)',
 }
 // Deep blue
 export const DEEP_BLUE = {
-	backgroundColor: "rgb(9, 12, 155)",
+	backgroundColor: 'rgb(9, 12, 155)',
 }
 
 export const SHARED = {
 	backgroundColor: LIGHT_BLUE,
 	border: `2px solid black`,
-	borderRadius: "10px",
+	borderRadius: '10px',
 }
 
 export const STRUCTURE = {
 	backgroundColor: GREENISH,
 	border: `2px solid black`,
-	borderRadius: "5px",
-	padding: "5px",
+	borderRadius: '5px',
+	padding: '5px',
 }
 
 export const cssHelper = {
-	boxSizing: "border-box",
+	boxSizing: 'border-box',
 
 	// These two make each is a nice child of grid
 
 	// These two make each is a grid and spaces chidlren
-	padding: "10px",
-	gap: "10px",
-	display: "grid",
+	padding: '10px',
+	gap: '10px',
+	display: 'grid',
+
+	width: '100%',
+
+	backgroundColor: 'blue',
 
 	// Grid layout of children
 	// gridTemplateRows / gridTemplateColumns
-	gridTemplateColumns: "1fr",
-	gridTemplateRows: "min-content",
-	alignItems: "start",
+	gridTemplateColumns: '1fr',
+	gridTemplateRows: 'min-content',
+	alignItems: 'start',
 
 	// Aesthetics
-	border: "1px solid black",
-	cursor: "default",
-	userSelect: "none",
-	backgroundColor: "white",
+	border: '1px solid black',
+	cursor: 'default',
+	userSelect: 'none',
 }
