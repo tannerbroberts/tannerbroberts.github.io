@@ -6,7 +6,7 @@
 STORIES:
 
     DO:
-        Standardize css: All components have the cssHelper object in their styles
+        Make the shelf, popup, and main screen play nice with eachother z-index, 100% width             
         BUG: Click listeners for ItemSchedulerAddon are broken
         TimeWindow
             Scheduler option on block
@@ -18,6 +18,7 @@ STORIES:
         AddItem onClickListener
 
     DONE:
+        Standardize css: All components have the cssHelper object in their styles
         BUG: Layout doesn't fit mobile screen
                 block onLongClickListener
             Item Blocks
