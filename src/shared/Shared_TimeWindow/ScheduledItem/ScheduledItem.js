@@ -1,23 +1,24 @@
-import React, { createContext, useContext, useState } from "react"
-import { cssHelper } from "../../../api/cssHelper"
-import { getItem } from "../../../api/io"
-import { useGlobalContext } from "../../../App"
-import useLongPress from "../../../api/useLongPress"
-import ItemSchedulerAddon from "./ItemSchedulerAddon"
+import React, { createContext, useContext, useState } from 'react'
+import { cssHelper } from '../../../api/cssHelper'
+import { getItem } from '../../../api/io'
+// import { useGlobalContext } from '../../../App'
+import useLongPress from '../../../api/useLongPress'
+import ItemSchedulerAddon from './ItemSchedulerAddon'
 
 const scheduledItemCSS = (tempStartMillis, length) => {
-	const { scale } = useGlobalContext()
+	console.log(tempStartMillis, length)
+	// const { scale } = useGlobalContext()
 	const obj = {
 		...cssHelper,
-		position: "absolute",
-		top: `${(tempStartMillis / scale) * 100}px`,
-		left: "100px",
-		height: `${(length / scale) * 100}px`,
-		width: "70%",
-		textAlign: "center",
-		padding: "10px",
-		backgroundColor: "rgba(155, 255, 155, 1)",
-		borderRadius: "10px",
+		// position: "absolute",
+		// top: `${(tempStartMillis / scale) * 100}px`,
+		// left: "100px",
+		// height: `${(length / scale) * 100}px`,
+		// width: "70%",
+		// textAlign: "center",
+		// padding: "10px",
+		// backgroundColor: "rgba(155, 255, 155, 1)",
+		// borderRadius: "10px",
 	}
 
 	return obj
@@ -25,13 +26,8 @@ const scheduledItemCSS = (tempStartMillis, length) => {
 
 const ScheduledItemContext = createContext()
 
-export default function ScheduledItem({
-	name,
-	startMillisProp,
-	scheduling = false,
-}) {
-	const [tempStartMillis, setTempStartMillis] =
-		useState(startMillisProp)
+export default function ScheduledItem({ name, startMillisProp, scheduling = false }) {
+	const [tempStartMillis, setTempStartMillis] = useState(startMillisProp)
 	const item = getItem(name)
 	const { length } = item
 
@@ -51,10 +47,7 @@ export default function ScheduledItem({
 				setSchedulerVisible,
 			}}
 		>
-			<div
-				{...longPressProps}
-				style={scheduledItemCSS(tempStartMillis, length)}
-			>
+			<div {...longPressProps} style={scheduledItemCSS(tempStartMillis, length)}>
 				{schedulerVisible && <ItemSchedulerAddon />}
 				{name}
 			</div>
@@ -62,5 +55,4 @@ export default function ScheduledItem({
 	)
 }
 
-export const useScheduledItemContext = () =>
-	useContext(ScheduledItemContext)
+export const useScheduledItemContext = () => useContext(ScheduledItemContext)

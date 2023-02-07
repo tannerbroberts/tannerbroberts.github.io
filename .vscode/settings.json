@@ -1,9 +1,10 @@
 {
+	"editor.acceptSuggestionOnEnter": "on",
 	"editor.formatOnSave": true,
 	"editor.formatOnPaste": false,
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
 	"prettier.jsxSingleQuote": true,
-	"prettier.printWidth": 70,
+	"prettier.printWidth": 130,
 	"prettier.semi": false,
 	"prettier.useTabs": true,
 	"editor.foldingImportsByDefault": false,

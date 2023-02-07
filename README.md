@@ -6,7 +6,7 @@
 STORIES:
 
     DO:
-        Positioning of components using CSS. Seems like something to do with positioning? 
+        Standardize css: All components have the cssHelper object in their styles
         BUG: Click listeners for ItemSchedulerAddon are broken
         TimeWindow
             Scheduler option on block
@@ -18,6 +18,7 @@ STORIES:
         AddItem onClickListener
 
     DONE:
+        BUG: Layout doesn't fit mobile screen
                 block onLongClickListener
             Item Blocks
             TimeScale

@@ -1,7 +1,7 @@
-import React, { useState } from "react"
-import { cssHelper } from "../../../../api/cssHelper"
-import { getLibrary } from "../../../../api/io"
-import { useGlobalContext } from "../../../../App"
+import React, { useState } from 'react'
+import { cssHelper } from '../../../../api/cssHelper'
+import { getLibrary } from '../../../../api/io'
+import { useGlobalContext } from '../../../../App'
 
 const itemListCSS = () => {
 	const obj = { ...cssHelper }
@@ -9,21 +9,23 @@ const itemListCSS = () => {
 	return obj
 }
 
+const rowCSS = (backgroundColor) => {
+	const obj = {
+		...cssHelper,
+		backgroundColor,
+	}
+
+	return obj
+}
+
 const Row = ({ itemName, setSelectedItemName, selectedItemName }) => {
-	const [backgroundColor, setBackgroundColor] = useState("whitesmoke")
+	const [backgroundColor, setBackgroundColor] = useState('whitesmoke')
 
 	return (
 		<div
-			style={{
-				border: "1px solid black",
-				padding: "10px",
-				backgroundColor:
-					itemName === selectedItemName
-						? "lightgreen"
-						: backgroundColor,
-			}}
-			onMouseEnter={() => setBackgroundColor("lightgray")}
-			onMouseLeave={() => setBackgroundColor("whitesmoke")}
+			style={rowCSS(backgroundColor)}
+			onMouseEnter={() => setBackgroundColor('lightgray')}
+			onMouseLeave={() => setBackgroundColor('whitesmoke')}
 			onClick={() => {
 				if (selectedItemName === itemName) setSelectedItemName(null)
 				else setSelectedItemName(itemName)
@@ -40,7 +42,7 @@ export default function ItemList() {
 	return (
 		<div style={itemListCSS()}>
 			{library.map((itemName) => {
-				if (itemName != "*")
+				if (itemName != '*')
 					return (
 						<Row
 							key={Math.random()}

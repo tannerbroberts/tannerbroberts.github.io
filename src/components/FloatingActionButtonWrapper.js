@@ -3,7 +3,7 @@ import Box from '@mui/material/Box'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
-import { useGlobalContext } from '../../App'
+import { useGlobalContext } from '../App'
 
 const buttonCSS = {
 	position: 'absolute',
@@ -16,11 +16,7 @@ export default function FloatingActionButtonWrapper() {
 	return (
 		<div style={buttonCSS}>
 			<Box sx={{ '& > :not(style)': { m: 1 } }}>
-				<Fab
-					color='secondary'
-					aria-label='add'
-					onClick={() => setShelfOpen(!shelfOpen)}
-				>
+				<Fab color='secondary' aria-label='add' onClick={() => setShelfOpen(!shelfOpen)}>
 					{shelfOpen ? <RemoveIcon /> : <AddIcon />}
 				</Fab>
 			</Box>

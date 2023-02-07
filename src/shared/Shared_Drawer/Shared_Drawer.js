@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { cssHelper, SHARED } from "../../api/cssHelper"
+import React, { useState } from 'react'
+import { cssHelper, SHARED } from '../../api/cssHelper'
 
 const drawerCSS = () => {
 	const obj = { ...cssHelper, ...SHARED }
@@ -10,12 +10,12 @@ const drawerCSS = () => {
 const knobCSS = () => {
 	const obj = {
 		...cssHelper,
-		height: "50px",
-		...SHARED,
-		textAlign: "center",
-		fontSize: "30px",
-		fontFamily: "monospace",
-		lineHeight: "100%",
+		// height: '50px',
+		// ...SHARED,
+		// textAlign: 'center',
+		// fontSize: '30px',
+		// fontFamily: 'monospace',
+		// lineHeight: '100%',
 	}
 
 	return obj
@@ -28,7 +28,7 @@ export default function Shared_Drawer({ children, title }) {
 			<div style={knobCSS()} onClick={() => setOpen(!open)}>
 				{`•${title}•`}
 			</div>
-			{open ? children : ""}
+			{open ? children : ''}
 		</div>
 	)
 }

@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-const DELIMITER = "*"
+const DELIMITER = '*'
 const LIBRARY = `${DELIMITER}LIBRARY${DELIMITER}`
 const VARIABLE_NAME_SPACE = `${DELIMITER}ITEM${DELIMITER}`
 const ITEM_NAME_SPACE = `${DELIMITER}ITEM${DELIMITER}`
@@ -18,12 +18,10 @@ export const isIllegalString = (nameString) => {
 	try {
 		const library = getLibrary()
 		if (nameString) {
-			return (
-				nameString.includes(DELIMITER) || library.includes(nameString)
-			)
+			return nameString.includes(DELIMITER) || library.includes(nameString)
 		} else return true
 	} catch (err) {
-		console.log("ERROR: in f() isIllegalString:", err)
+		console.log('ERROR: in f() isIllegalString:', err)
 	}
 	return true
 }
@@ -47,9 +45,7 @@ export const postChildRemove = (itemObject) => {
 }
 
 export const getItem = (name) => {
-	const item = JSON.parse(
-		localStorage.getItem(`${ITEM_NAME_SPACE}${name}`)
-	)
+	const item = JSON.parse(localStorage.getItem(`${ITEM_NAME_SPACE}${name}`))
 	if (item) return item
 	return undefined
 }
@@ -64,27 +60,22 @@ export const deleteItem = (name) => {
 export const getLibrary = () => {
 	const library = JSON.parse(localStorage.getItem(LIBRARY))
 	if (library) return library
-	return ["*"]
+	return ['*']
 }
 
 export const saveState = (stateName, stateValue) => {
-	localStorage.setItem(
-		`${STATE_NAME_SPACE}${stateName}`,
-		JSON.stringify(stateValue)
-	)
+	localStorage.setItem(`${STATE_NAME_SPACE}${stateName}`, JSON.stringify(stateValue))
 }
 
 export const loadState = (stateName) => {
 	try {
-		const savedValue = localStorage.getItem(
-			`${STATE_NAME_SPACE}${stateName}`
-		)
+		const savedValue = localStorage.getItem(`${STATE_NAME_SPACE}${stateName}`)
 		if (savedValue) {
 			return JSON.parse(savedValue)
 		}
 		return null
 	} catch (err) {
-		console.log("ERROR in f() loadState:", err)
+		console.log('ERROR in f() loadState:', err)
 	}
 	return null
 }
@@ -99,8 +90,7 @@ export const loadState = (stateName) => {
  */
 
 const objectHasIllegalName = (objectWithNameProperty) => {
-	if (objectWithNameProperty?.name)
-		return isIllegalString(objectWithNameProperty?.name)
+	if (objectWithNameProperty?.name) return isIllegalString(objectWithNameProperty?.name)
 	else return true
 }
 
@@ -109,10 +99,7 @@ const saveLibrary = (libraryItemNameArray) => {
 }
 
 const saveItem = (itemObject, addToLibrary = true) => {
-	localStorage.setItem(
-		`${ITEM_NAME_SPACE}${itemObject.name}`,
-		JSON.stringify(itemObject)
-	)
+	localStorage.setItem(`${ITEM_NAME_SPACE}${itemObject.name}`, JSON.stringify(itemObject))
 	if (addToLibrary) saveLibrary([...getLibrary(), itemObject.name])
 }
 
@@ -124,9 +111,7 @@ const getVariable = (name) => {
 
 const saveVariable = (variableObject) => {
 	if (objectHasIllegalName(variableObject)) return false
-	localStorage.setItem(
-		`${VARIABLE_NAME_SPACE}${JSON.stringify(variableObject)}`
-	)
+	localStorage.setItem(`${VARIABLE_NAME_SPACE}${JSON.stringify(variableObject)}`)
 }
 
 const deleteVariable = (name) => {
@@ -135,14 +120,9 @@ const deleteVariable = (name) => {
 
 const match = (a, b) => {
 	try {
-		return (
-			valid(a) &&
-			valid(b) &&
-			a.name === b.name &&
-			a.lengh === b.length
-		)
+		return valid(a) && valid(b) && a.name === b.name && a.lengh === b.length
 	} catch (err) {
-		console.log("ERROR: in f() match:", err)
+		console.log('ERROR: in f() match:', err)
 	}
 	return false
 }
@@ -151,6 +131,6 @@ const valid = (obj) => {
 	try {
 		return obj.name && obj.length
 	} catch (err) {
-		console.log("ERROR: in f() valid:", err)
+		console.log('ERROR: in f() valid:', err)
 	}
 }

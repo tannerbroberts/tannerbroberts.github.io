@@ -1,1 +1,1 @@
-export { default } from "./TimeScale"
+export { default } from './TimeScale'

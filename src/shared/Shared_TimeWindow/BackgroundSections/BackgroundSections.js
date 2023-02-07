@@ -1,6 +1,6 @@
-import React from "react"
-import { useGlobalContext } from "../../../App"
-import BackgroundSection from "./BackgroundSection"
+import React from 'react'
+import { useGlobalContext } from '../../../App'
+import BackgroundSection from './BackgroundSection'
 
 export default function BackgroundSections({ length }) {
 	const sections = []

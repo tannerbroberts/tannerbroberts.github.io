@@ -34,22 +34,15 @@ export const STRUCTURE = {
 export const cssHelper = {
 	boxSizing: 'border-box',
 
-	// These two make each is a nice child of grid
-
-	// These two make each is a grid and spaces chidlren
 	padding: '10px',
-	gap: '10px',
 	display: 'grid',
+	gap: '10px',
 
-	width: '100%',
+	width: '50%',
+	overflowX: 'clip',
+	overflowY: 'clip',
 
-	backgroundColor: 'blue',
-
-	// Grid layout of children
-	// gridTemplateRows / gridTemplateColumns
-	gridTemplateColumns: '1fr',
-	gridTemplateRows: 'min-content',
-	alignItems: 'start',
+	backgroundColor: 'lightblue',
 
 	// Aesthetics
 	border: '1px solid black',

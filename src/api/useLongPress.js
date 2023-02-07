@@ -1,10 +1,6 @@
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useRef, useState } from 'react'
 
-export default function useLongPress(
-	onLongPress,
-	onClick,
-	{ shouldPreventDefault = true, delay = 300 } = {}
-) {
+export default function useLongPress(onLongPress, onClick, { shouldPreventDefault = true, delay = 300 } = {}) {
 	const [longPressTriggered, setLongPressTriggered] = useState(false)
 	const timeout = useRef()
 	const target = useRef()
@@ -12,7 +8,7 @@ export default function useLongPress(
 	const start = useCallback(
 		(event) => {
 			if (shouldPreventDefault && event.target) {
-				event.target.addEventListener("touchend", preventDefault, {
+				event.target.addEventListener('touchend', preventDefault, {
 					passive: false,
 				})
 				target.current = event.target
@@ -31,7 +27,7 @@ export default function useLongPress(
 			shouldTriggerClick && !longPressTriggered && onClick()
 			setLongPressTriggered(false)
 			if (shouldPreventDefault && target.current) {
-				target.current.removeEventListener("touchend", preventDefault)
+				target.current.removeEventListener('touchend', preventDefault)
 			}
 		},
 		[shouldPreventDefault, onClick, longPressTriggered]
@@ -47,7 +43,7 @@ export default function useLongPress(
 }
 
 const isTouchEvent = (event) => {
-	return "touches" in event
+	return 'touches' in event
 }
 
 const preventDefault = (event) => {

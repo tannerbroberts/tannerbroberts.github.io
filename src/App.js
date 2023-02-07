@@ -1,9 +1,4 @@
-import React, {
-	createContext,
-	useCallback,
-	useContext,
-	useState,
-} from 'react'
+import React, { createContext, useCallback, useContext, useState } from 'react'
 import { useLS } from './api/useLS'
 import ScreenStack from './components/ScreenStack'
 import Shelf from './components/Shelf'
@@ -12,15 +7,18 @@ import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
-import ShelfToggle from './components/FloatingActionButtonWrapper/FloatingActionButtonWrapper'
+import ShelfToggle from './components/FloatingActionButtonWrapper'
 import { getItem } from './api/io'
+import { cssHelper } from './api/cssHelper'
 // import { setls } from "./notes"
 // setls()
 
-const appCSS = {
-	position: 'relative',
-	display: 'flex',
-	flexFlow: 'row',
+const appCSS = () => {
+	const obj = {
+		...cssHelper,
+	}
+
+	return obj
 }
 
 const GlobalContext = createContext()
@@ -33,15 +31,13 @@ function App() {
 	// For the screen stack
 	const [stack, setStack] = useLS('stack', [{ path: 'calendar' }])
 	// For the library list of items
-	const [selectedItemName, setSelectedItemName] = useLS(
-		'selectedItemName',
-		null
-	)
+	const [selectedItemName, setSelectedItemName] = useLS('selectedItemName', null)
 	// For the scheduler
 	const [scale, setScale] = useLS('scale', 3_600_000)
 	const [unit, setUnit] = useLS('unit', 'hr')
 	// For the TimeWindow
 	const [children, setChildren] = useState([])
+	const [popupTitle, setPopupTitle] = useState('')
 
 	const openPopup = (child) => {
 		setPopupOpen(true)
@@ -63,11 +59,7 @@ function App() {
 	}
 
 	const popFrames = (popCount) => {
-		if (
-			stack.length > 1 &&
-			stack.length > popCount - 1 &&
-			popCount !== 0
-		) {
+		if (stack.length > 1 && stack.length > popCount - 1 && popCount !== 0) {
 			setStack(stack.slice(0, popCount * -1))
 		}
 	}
@@ -101,6 +93,8 @@ function App() {
 				popupOpen,
 				openPopup,
 				closePopup,
+				popupTitle,
+				setPopupTitle,
 				stack,
 				setStack,
 				popFrames,
@@ -116,10 +110,10 @@ function App() {
 				setChildren,
 			}}
 		>
-			<div style={appCSS}>
+			<div style={appCSS()}>
 				<ScreenStack />
 				<Shelf />
-				<Popup title='Item Creation Menu'>{popupChild}</Popup>
+				<Popup>{popupChild}</Popup>
 				<ShelfToggle />
 			</div>
 		</GlobalContext.Provider>

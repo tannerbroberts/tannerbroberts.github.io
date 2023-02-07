@@ -1,5 +1,5 @@
-import React from "react"
-import { cssHelper } from "../../../../api/cssHelper"
+import React from 'react'
+import { cssHelper } from '../../../../api/cssHelper'
 
 const itemFilterCSS = () => {
 	const obj = { ...cssHelper }
