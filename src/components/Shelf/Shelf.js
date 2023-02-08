@@ -8,16 +8,10 @@ const shelfCSS = (openStatus) => {
 	const obj = {
 		...cssHelper,
 		...STRUCTURE,
-		// gridTemplateRows: 'min-content',
-		// overflowY: 'scroll',
-		// // Just to make sure it fits the whole screen
-		// overflowX: 'hidden',
-		// position: 'absolute',
-		// top: 0,
-		// bottom: 0,
-		// left: 0,
-		// right: 0,
-		// zIndex: 1,
+		overflowY: 'scroll',
+		width: '100%',
+		height: '100%',
+		zIndex: 2,
 	}
 	openStatus ? null : (obj.display = 'none')
 

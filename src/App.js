@@ -9,13 +9,21 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import ShelfToggle from './components/FloatingActionButtonWrapper'
 import { getItem } from './api/io'
-import { cssHelper } from './api/cssHelper'
+import { cssHelper, STRUCTURE } from './api/cssHelper'
 // import { setls } from "./notes"
 // setls()
 
-const appCSS = () => {
+const appCSS = (shelfOpen) => {
 	const obj = {
 		...cssHelper,
+		...STRUCTURE,
+		width: '100%',
+		height: '100vh',
+		padding: 0,
+		border: 'none',
+	}
+	if(shelfOpen) {
+		obj.gridTemplateRows = "1fr 1fr"
 	}
 
 	return obj
@@ -110,7 +118,7 @@ function App() {
 				setChildren,
 			}}
 		>
-			<div style={appCSS()}>
+			<div style={appCSS(shelfOpen)}>
 				<ScreenStack />
 				<Shelf />
 				<Popup>{popupChild}</Popup>

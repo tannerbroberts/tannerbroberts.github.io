@@ -40,6 +40,8 @@ export const cssHelper = {
 
 	width: '50%',
 	overflowX: 'clip',
+
+	height: '50%',
 	overflowY: 'clip',
 
 	backgroundColor: 'lightblue',

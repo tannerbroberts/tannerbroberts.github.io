@@ -9,6 +9,11 @@ import { useGlobalContext } from '../../App'
 const screenStackCSS = () => {
 	return {
 		...cssHelper,
+		width: '100%',
+		height: '100%',
+		padding: 0,
+		gridTemplateRows: "5fr 95fr",
+		gap: 0,
 	}
 }
 
