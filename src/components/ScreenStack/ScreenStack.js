@@ -11,7 +11,7 @@ const screenStackCSS = () => {
 		...cssHelper,
 		width: '100%',
 		height: '100%',
-		gridTemplateRows: '5vh 1fr',
+		gridTemplateRows: 'max(50vh, 45px) 1fr',
 		padding: 0,
 		gap: 0,
 		border: 'none',

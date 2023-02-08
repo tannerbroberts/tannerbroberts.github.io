@@ -50,4 +50,5 @@ export const cssHelper = {
 	border: '1px solid black',
 	cursor: 'default',
 	userSelect: 'none',
+	fontFamily: 'monospace',
 }
