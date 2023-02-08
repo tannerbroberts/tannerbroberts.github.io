@@ -11,9 +11,10 @@ const screenStackCSS = () => {
 		...cssHelper,
 		width: '100%',
 		height: '100%',
+		gridTemplateRows: '5vh 1fr',
 		padding: 0,
-		gridTemplateRows: "5fr 95fr",
 		gap: 0,
+		border: 'none',
 	}
 }
 

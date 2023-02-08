@@ -38,10 +38,10 @@ export const cssHelper = {
 	display: 'grid',
 	gap: '10px',
 
-	width: '50%',
+	width: '100%',
 	overflowX: 'clip',
 
-	height: '50%',
+	height: '100%',
 	overflowY: 'clip',
 
 	backgroundColor: 'lightblue',

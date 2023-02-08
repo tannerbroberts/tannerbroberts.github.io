@@ -2,21 +2,19 @@
         FILL: The story needs talk with Tanner, || is yet to be written
         DO: These are ready to be done. They have enough description to make the developer happy
         DONE: ... It's done... I don't know what else to say
-
-STORIES:
-
-    DO:
-        Make the shelf, popup, and main screen play nice with eachother z-index, 100% width             
-        BUG: Click listeners for ItemSchedulerAddon are broken
-        TimeWindow
-            Scheduler option on block
-                appears onAddItem along with the item block
-                schedule submit button
-            BackgroundSection
-                onLongPressListener
-                partial sections
-        AddItem onClickListener
-
+    STORIES:
+        DO:
+            Make the shelf, popup, and main screen play nice with eachother z-index, 100% width
+            BUG: Click listeners for ItemSchedulerAddon are broken
+            TimeWindow
+                Scheduler option on block
+                    appears onAddItem along with the item block
+                    schedule submit button
+                BackgroundSection
+                    onLongPressListener
+                    partial sections
+            AddItem onClickListener
+            Move buttons to children of a list item
     DONE:
         Standardize css: All components have the cssHelper object in their styles
         BUG: Layout doesn't fit mobile screen
@@ -37,7 +35,6 @@ STORIES:
         GlobalContext
         ItemCreatePopup
         Popup
-
     FILL:
         Variables
             Variables can be added, removed, and combined
@@ -52,8 +49,17 @@ STORIES:
         Item Library is basically just no filter, any other preset filters live below
         Mobile View closes shelf onViewItemClick and onAddItem
 
-GamePlans:
-CSS: 1) Every visible component has a grid, and is a child of grid by default unless there's some wizardry that needs be done, in which case, it will be documented here:
-a) The main App uses flexbox so that the main window resizes to take up the whole screen when the side panel is closed. 2) Every component fills the height and width 100%
-Folder Structure: 1) Components that appear only once inside of one other component will exist in a folder of that component. 2) Shared components will live in the shared components folder
-State: 1) Derrive what I can from the minimum amount of state possible 2) absolutely no prop drilling!!! Okay, not really, but I really like context, so there's that. 3) Prop drilling for components inside of a map function just cause that's easier than thinking about the alternatives
+
+    GamePlans:
+        CSS:
+            1) Every visible component has a grid, and is a child of grid by default, no exceptions
+                a) The main App uses gridTemplateRows so the main window resizes to take up the whole screen when the side panel is closed.
+            2) Every component fills the height and width 100%, leaving the layout to the parent
+            3) Grid template positioning can use the following units: vh/vw (screen availability), fr (leftover space)
+        Folder Structure:
+            1) Components that appear only once inside of one other component will exist in a folder of that component.
+            2) Shared components will live in the shared components folder
+        State:
+            1) Derrive what I can from the minimum amount of state possible
+            2) absolutely no prop drilling!!! Okay, not really, but I really like context, so there's that.
+            3) Prop drilling for components inside of a map function just cause that's easier than thinking about the alternatives

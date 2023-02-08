@@ -20,11 +20,12 @@ const appCSS = (shelfOpen) => {
 		width: '100%',
 		height: '100vh',
 		padding: 0,
+		gap: 'none',
 		border: 'none',
 	}
-	if(shelfOpen) {
-		obj.gridTemplateRows = "1fr 1fr"
-	}
+	if (shelfOpen) {
+		obj.gridTemplateRows = '1fr 1fr'
+	} else delete obj.gridTemplateRows
 
 	return obj
 }

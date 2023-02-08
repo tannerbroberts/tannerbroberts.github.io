@@ -1,19 +1,17 @@
 import React from 'react'
-import { cssHelper, STRUCTURE } from '../../api/cssHelper'
+import { cssHelper } from '../../api/cssHelper'
 import ItemLibrary from './ItemLibrary'
 import Shared_Drawer from '../../shared/Shared_Drawer'
 import { useGlobalContext } from '../../App'
 
-const shelfCSS = (openStatus) => {
+const shelfCSS = (shelfOpen) => {
 	const obj = {
 		...cssHelper,
-		...STRUCTURE,
-		overflowY: 'scroll',
 		width: '100%',
 		height: '100%',
-		zIndex: 2,
+		overflowY: 'scroll',
 	}
-	openStatus ? null : (obj.display = 'none')
+	shelfOpen ? null : (obj.display = 'none')
 
 	return obj
 }

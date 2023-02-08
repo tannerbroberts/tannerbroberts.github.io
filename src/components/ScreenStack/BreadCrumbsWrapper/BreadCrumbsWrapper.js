@@ -13,7 +13,8 @@ const popFramesUsage = (index, array, popFrames) => {
 const breadcrumbsWrapperCSS = () => {
 	const obj = {
 		...cssHelper,
-		height: '5vh'
+		width: '100%',
+		height: '100%',
 	}
 
 	return obj

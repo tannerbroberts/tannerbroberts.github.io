@@ -1,8 +1,12 @@
 import React, { useState } from 'react'
 import { cssHelper, SHARED } from '../../api/cssHelper'
 
-const drawerCSS = () => {
-	const obj = { ...cssHelper, ...SHARED }
+const drawerCSS = (open) => {
+	const obj = { ...cssHelper, ...SHARED, height: 'min-content', width: '100%', padding: 0, border: 'none', gap: 'none' }
+
+	if (open) {
+		obj.gridTemplateRows = '10vh 1fr'
+	} else obj.gridTemplateRows = '10vh'
 
 	return obj
 }
@@ -10,12 +14,12 @@ const drawerCSS = () => {
 const knobCSS = () => {
 	const obj = {
 		...cssHelper,
-		// height: '50px',
-		// ...SHARED,
-		// textAlign: 'center',
-		// fontSize: '30px',
-		// fontFamily: 'monospace',
-		// lineHeight: '100%',
+		...SHARED,
+		height: '100%',
+		textAlign: 'center',
+		fontSize: '30px',
+		fontFamily: 'monospace',
+		lineHeight: '6vh',
 	}
 
 	return obj
@@ -24,7 +28,7 @@ const knobCSS = () => {
 export default function Shared_Drawer({ children, title }) {
 	const [open, setOpen] = useState(true)
 	return (
-		<div style={drawerCSS()}>
+		<div style={drawerCSS(open)}>
 			<div style={knobCSS()} onClick={() => setOpen(!open)}>
 				{`•${title}•`}
 			</div>
