@@ -2,11 +2,16 @@ import React, { useState } from 'react'
 import { cssHelper, SHARED } from '../../api/cssHelper'
 
 const drawerCSS = (open) => {
-	const obj = { ...cssHelper, ...SHARED, height: 'min-content', width: '100%', padding: 0, border: 'none', gap: 'none' }
-
-	if (open) {
-		obj.gridTemplateRows = '10vh 1fr'
-	} else obj.gridTemplateRows = '10vh'
+	const obj = { ...cssHelper,
+		...SHARED,
+		height: open ? '100vh' : 'min-content' ,
+		gridTemplateRows: open ? 'max(8vh, 50px) 1fr' : '8vh',
+		minHeight: '50px',
+		width: '100%',
+		padding: 0,
+		border: 'none',
+		gap: 'none'
+	}
 
 	return obj
 }
@@ -15,11 +20,12 @@ const knobCSS = () => {
 	const obj = {
 		...cssHelper,
 		...SHARED,
-		height: '100%',
+		height: open ? '100%' : 'max(50px, 10vh)',
+		minHeight: '50px',
 		textAlign: 'center',
-		fontSize: '30px',
+		fontSize: 'min(3vw, 30px)',
 		fontFamily: 'monospace',
-		lineHeight: '6vh',
+		lineHeight: 'max(4.5vh, 25px)',
 	}
 
 	return obj

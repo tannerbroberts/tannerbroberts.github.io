@@ -4,7 +4,7 @@
         DONE: ... It's done... I don't know what else to say
     STORIES:
         DO:
-            Make the shelf, popup, and main screen play nice with eachother z-index, 100% width
+            Make the shelf, popup, and main screen play nice with eachother, position: absolute, 100% width
             BUG: Click listeners for ItemSchedulerAddon are broken
             TimeWindow
                 Scheduler option on block
@@ -43,6 +43,8 @@
         Item RealTime view
         Accountability view
         ItemFilter: filterName filterProperties
+            ItemFilter in a form at the top of the Shelf component
+            ItemFilter for every drawer showing the active filters
             ItemFilter can filter based on length, variable condition, and name
         BaseCalendarView
         ViewItem
@@ -53,9 +55,9 @@
     GamePlans:
         CSS:
             1) Every visible component has a grid, and is a child of grid by default, no exceptions
-                a) The main App uses gridTemplateRows so the main window resizes to take up the whole screen when the side panel is closed.
+                a) Use gridTemplateRows for static sized components
+                b) 
             2) Every component fills the height and width 100%, leaving the layout to the parent
-            3) Grid template positioning can use the following units: vh/vw (screen availability), fr (leftover space)
         Folder Structure:
             1) Components that appear only once inside of one other component will exist in a folder of that component.
             2) Shared components will live in the shared components folder

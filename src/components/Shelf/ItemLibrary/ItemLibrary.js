@@ -2,12 +2,12 @@ import React from 'react'
 import { cssHelper, STRUCTURE } from '../../../api/cssHelper'
 import ItemFilter from './ItemFilter'
 import ItemList from './ItemList'
-import ButtonBar from './ButtonBar'
 
 const itemLibraryCSS = (openState) => {
 	const obj = {
 		...cssHelper,
 		...STRUCTURE,
+		gridTemplateRows: "50px 1fr"
 	}
 	if (openState) return obj
 
@@ -17,7 +17,6 @@ const itemLibraryCSS = (openState) => {
 export default function ItemLibrary() {
 	return (
 		<div style={itemLibraryCSS(true)}>
-			<ButtonBar />
 			<ItemFilter />
 			<ItemList />
 		</div>

@@ -28,7 +28,7 @@ export const STRUCTURE = {
 	backgroundColor: GREENISH,
 	border: `2px solid black`,
 	borderRadius: '5px',
-	padding: '5px',
+	padding: '10px',
 }
 
 export const cssHelper = {

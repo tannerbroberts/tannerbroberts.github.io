@@ -10,6 +10,9 @@ const shelfCSS = (shelfOpen) => {
 		width: '100%',
 		height: '100%',
 		overflowY: 'scroll',
+		// The following breaks pattern by allowing the children to say how much height they themselves will take
+		// This is because there will be a variable number of shelves in the future.
+		gridTemplateRows: 'min-content',
 	}
 	shelfOpen ? null : (obj.display = 'none')
 
@@ -20,6 +23,9 @@ export default function Shelf() {
 	const { shelfOpen } = useGlobalContext()
 	return (
 		<div style={shelfCSS(shelfOpen)}>
+			<Shared_Drawer title='Item Library'>
+				<ItemLibrary />
+			</Shared_Drawer>
 			<Shared_Drawer title='Item Library'>
 				<ItemLibrary />
 			</Shared_Drawer>
