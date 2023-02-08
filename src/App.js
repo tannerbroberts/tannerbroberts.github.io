@@ -23,9 +23,9 @@ const appCSS = (shelfOpen) => {
 		gap: 'none',
 		border: 'none',
 	}
-	if (shelfOpen) {
-		obj.gridTemplateRows = '1fr 1fr'
-	} else delete obj.gridTemplateRows
+
+	if (shelfOpen) obj.gridTemplateColumns = '1fr 1fr'
+	else delete obj.gridTemplateColumns
 
 	return obj
 }
