@@ -7,7 +7,6 @@ const itemLibraryCSS = (openState) => {
 	const obj = {
 		...cssHelper,
 		...STRUCTURE,
-		gridTemplateRows: "50px 1fr"
 	}
 	if (openState) return obj
 

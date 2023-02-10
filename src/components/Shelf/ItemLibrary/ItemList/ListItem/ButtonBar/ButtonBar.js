@@ -9,8 +9,7 @@ const buttonBarCSS = () => {
 	const obj = {
 		...cssHelper,
 		...STRUCTURE,
-		// gridTemplate: ' 1fr / 1fr 1fr',
-		// textAlign: 'center',
+		gridTemplateColumns: '1fr 1fr 1fr 1fr',
 	}
 
 	return obj

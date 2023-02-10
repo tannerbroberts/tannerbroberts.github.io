@@ -7,6 +7,7 @@ import ListItem from './ListItem/ListItem'
 const itemListCSS = () => {
 	const obj = {
 		...cssHelper,
+		height: '90vh',
 	}
 
 	return obj
@@ -18,14 +19,7 @@ export default function ItemList() {
 	return (
 		<div style={itemListCSS()}>
 			{library.map((itemName) => {
-				if (itemName != '*')
-					return (
-						<ListItem
-							key={Math.random()}
-							itemName={itemName}
-							focused={itemName === selectedItemName}
-						/>
-					)
+				if (itemName != '*') return <ListItem key={Math.random()} itemName={itemName} focused={itemName === selectedItemName} />
 			})}
 		</div>
 	)

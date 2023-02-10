@@ -1,8 +1,8 @@
 import React from 'react'
-import { cssHelper } from '../../../../api/cssHelper'
+import { cssHelper, ROW } from '../../../../api/cssHelper'
 
 const itemFilterCSS = () => {
-	const obj = { ...cssHelper }
+	const obj = { ...cssHelper, ...ROW }
 
 	return obj
 }
