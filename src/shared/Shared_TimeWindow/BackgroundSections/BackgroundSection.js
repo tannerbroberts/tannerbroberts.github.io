@@ -3,14 +3,12 @@ import { cssHelper } from '../../../api/cssHelper'
 import { useGlobalContext } from '../../../App'
 
 const backgroundSectionCSS = (index) => {
-	console.log(index)
 	const obj = {
 		...cssHelper,
-		// position: 'absolute',
-		// top: `${index * 100}px`,
-		// height: '100px',
-		// textAlign: 'left',
-		// padding: '10px',
+		top: `${index * 100}px`,
+		height: '100px',
+		textAlign: 'left',
+		padding: '10px',
 	}
 
 	return obj

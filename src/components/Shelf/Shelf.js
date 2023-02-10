@@ -3,6 +3,7 @@ import { cssHelper } from '../../api/cssHelper'
 import ItemLibrary from './ItemLibrary'
 import Shared_Drawer from '../../shared/Shared_Drawer'
 import { useGlobalContext } from '../../App'
+import NewItem from './NewItem/NewItem'
 
 const shelfCSS = (shelfOpen) => {
 	const obj = {
@@ -23,6 +24,7 @@ export default function Shelf() {
 	const { shelfOpen } = useGlobalContext()
 	return (
 		<div style={shelfCSS(shelfOpen)}>
+			<NewItem />
 			<Shared_Drawer title='Item Library'>
 				<ItemLibrary />
 			</Shared_Drawer>

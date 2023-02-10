@@ -4,9 +4,10 @@
         DONE: ... It's done... I don't know what else to say
     STORIES:
         DO:
-            Move new item button to shelf
             BUG: Click listeners for ItemSchedulerAddon are broken
             TimeWindow
+                Fix Time Window CSS
+                    Fix time picker CSS
                 Scheduler option on block
                     appears onAddItem along with the item block
                     schedule submit button
@@ -15,9 +16,8 @@
                     partial sections
             AddItem onClickListener
             Add title props and state for popup title
-            Fix Time Window CSS
-                Fix time picker CSS
         DONE:
+            Move new item button to shelf
             Move buttons to children of a list item
                 Create a common style for "elements that take a fixed screen height and have a label"
             Make the shelf, popup, and main screen play nice with eachother, position: absolute, 100% width
