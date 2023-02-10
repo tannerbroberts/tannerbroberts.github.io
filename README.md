@@ -1,13 +1,10 @@
-    key:
-        FILL: The story needs talk with Tanner, || is yet to be written
-        DO: These are ready to be done. They have enough description to make the developer happy
-        DONE: ... It's done... I don't know what else to say
+
     STORIES:
         DO:
-            BUG: Click listeners for ItemSchedulerAddon are broken
             TimeWindow
                 Fix Time Window CSS
                     Fix time picker CSS
+                BUG: Click listeners for ItemSchedulerAddon are broken
                 Scheduler option on block
                     appears onAddItem along with the item block
                     schedule submit button
@@ -19,17 +16,17 @@
         DONE:
             Move new item button to shelf
             Move buttons to children of a list item
-                Create a common style for "elements that take a fixed screen height and have a label"
+            Create a common style for "elements that take a fixed screen height and have a label"
             Make the shelf, popup, and main screen play nice with eachother, position: absolute, 100% width
             Standardize css: All components have the cssHelper object in their styles
             BUG: Layout doesn't fit mobile screen
-                block onLongClickListener
+            block onLongClickListener
             Item Blocks
             TimeScale
-                Scale input setter thing
-                ClickListeners
-                State
-                time block Labels
+            Scale input setter thing
+            ClickListeners
+            State
+            time block Labels
             BUG: BackgroundSections aren't rendering
             DeleteItem
             ItemList

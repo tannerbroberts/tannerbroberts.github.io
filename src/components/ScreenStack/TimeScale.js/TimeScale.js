@@ -2,10 +2,16 @@ import { Button } from '@mui/material'
 import React from 'react'
 import { cssHelper } from '../../../api/cssHelper'
 import { useGlobalContext } from '../../../App'
+import Shared_Drawer from '../../../shared/Shared_Drawer'
 
 const timeScaleCSS = () => {
 	const obj = {
 		...cssHelper,
+		border: 'none',
+		padding: 0,
+		gap: 0,
+		height: 'min-content',
+		gridTemplateColumns: '1fr',
 	}
 
 	return obj
@@ -14,6 +20,7 @@ const timeScaleCSS = () => {
 const scaleButtonCSS = () => {
 	const obj = {
 		...cssHelper,
+		padding: 0,
 	}
 
 	return obj
@@ -31,20 +38,22 @@ export default function TimeScale() {
 	const { setScale, setUnit } = useGlobalContext()
 
 	return (
-		<div style={timeScaleCSS()}>
-			{scaleButtonData.map((data) => (
-				<Button
-					key={data.lengthMillis}
-					style={scaleButtonCSS()}
-					variant={'outlined'}
-					onClick={() => {
-						setScale(data.lengthMillis)
-						setUnit(data.unit)
-					}}
-				>
-					{data.unit}
-				</Button>
-			))}
-		</div>
+		<Shared_Drawer title="time units">
+			<div style={timeScaleCSS()}>
+				{scaleButtonData.map((data) => (
+					<Button
+						key={data.lengthMillis}
+						style={scaleButtonCSS()}
+						variant={'outlined'}
+						onClick={() => {
+							setScale(data.lengthMillis)
+							setUnit(data.unit)
+						}}
+					>
+						{data.unit}
+					</Button>
+				))}
+			</div>
+		</Shared_Drawer>
 	)
 }

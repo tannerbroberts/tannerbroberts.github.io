@@ -52,7 +52,7 @@ export const cssHelper = {
 	height: '100%',
 	overflowY: 'clip',
 
-	backgroundColor: 'lightblue',
+	backgroundColor: 'lightyellow',
 
 	// Aesthetics
 	border: '1px solid black',

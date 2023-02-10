@@ -19,6 +19,7 @@ const appCSS = (shelfOpen) => {
 		...STRUCTURE,
 		width: '100%',
 		height: '100vh',
+		overflowY: 'hidden',
 		padding: 0,
 		gap: 'none',
 		border: 'none',

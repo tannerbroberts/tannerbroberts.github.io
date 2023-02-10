@@ -6,6 +6,7 @@ const drawerCSS = () => {
 	const obj = {
 		...cssHelper,
 		...SHARED,
+		gridTemplateRows: 'min-content',
 		width: '100%',
 		padding: 0,
 		border: 'none',
@@ -28,7 +29,7 @@ const knobCSS = () => {
 const childWrapper = () => {
 	const obj = {
 		...cssHelper,
-		height: '90vh',
+		height: 'min-content',
 		padding: 0,
 		border: 'none',
 	}
@@ -43,7 +44,7 @@ export default function Shared_Drawer({ children, title }) {
 			<div style={knobCSS()} onClick={() => setOpen(!open)}>
 				{`•${title}•`}
 			</div>
-			{open && <div style={childWrapper()}>{children}</div>}
+			{open ? <div style={childWrapper()}>{children}</div> : ''}
 		</div>
 	)
 }

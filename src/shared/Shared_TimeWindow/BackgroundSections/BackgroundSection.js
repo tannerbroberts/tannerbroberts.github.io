@@ -2,13 +2,14 @@ import React from 'react'
 import { cssHelper } from '../../../api/cssHelper'
 import { useGlobalContext } from '../../../App'
 
-const backgroundSectionCSS = (index) => {
+const backgroundSectionCSS = () => {
 	const obj = {
 		...cssHelper,
-		top: `${index * 100}px`,
 		height: '100px',
 		textAlign: 'left',
 		padding: '10px',
+		border: 'none',
+		borderBottom: '1px solid gray'
 	}
 
 	return obj

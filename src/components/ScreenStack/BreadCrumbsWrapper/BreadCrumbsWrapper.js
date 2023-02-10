@@ -14,7 +14,8 @@ const breadcrumbsWrapperCSS = () => {
 	const obj = {
 		...cssHelper,
 		width: '100%',
-		height: '100%',
+		height: 'min-content',
+		border: 'none',
 	}
 
 	return obj

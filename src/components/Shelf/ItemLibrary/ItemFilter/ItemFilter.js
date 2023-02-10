@@ -2,7 +2,7 @@ import React from 'react'
 import { cssHelper, ROW } from '../../../../api/cssHelper'
 
 const itemFilterCSS = () => {
-	const obj = { ...cssHelper, ...ROW }
+	const obj = { ...cssHelper, ...ROW, backgroundColor: 'white' }
 
 	return obj
 }

@@ -1,24 +1,24 @@
 import React, { createContext, useContext, useState } from 'react'
 import { cssHelper } from '../../../api/cssHelper'
 import { getItem } from '../../../api/io'
-// import { useGlobalContext } from '../../../App'
+import { useGlobalContext } from '../../../App'
 import useLongPress from '../../../api/useLongPress'
 import ItemSchedulerAddon from './ItemSchedulerAddon'
 
 const scheduledItemCSS = (tempStartMillis, length) => {
 	console.log(tempStartMillis, length)
-	// const { scale } = useGlobalContext()
+	const { scale } = useGlobalContext()
 	const obj = {
 		...cssHelper,
-		// position: "absolute",
-		// top: `${(tempStartMillis / scale) * 100}px`,
-		// left: "100px",
-		// height: `${(length / scale) * 100}px`,
-		// width: "70%",
-		// textAlign: "center",
-		// padding: "10px",
-		// backgroundColor: "rgba(155, 255, 155, 1)",
-		// borderRadius: "10px",
+		position: "absolute",
+		top: `${(tempStartMillis / scale) * 100}px`,
+		left: "100px",
+		height: `${(length / scale) * 100}px`,
+		width: "70%",
+		textAlign: "center",
+		padding: "10px",
+		backgroundColor: "rgba(155, 255, 155, 1)",
+		borderRadius: "10px",
 	}
 
 	return obj

@@ -3,9 +3,9 @@ import { useGlobalContext } from '../../../App'
 import BackgroundSection from './BackgroundSection'
 
 export default function BackgroundSections({ length }) {
-	console.log(`rendering ${length} background sections`)
 	const sections = []
 	const { scale } = useGlobalContext()
+	if(length / scale > 500) return <></>
 	for (let i = 0; i < length; i += scale) {
 		sections.push(<BackgroundSection key={i} index={i / scale} />)
 	}
