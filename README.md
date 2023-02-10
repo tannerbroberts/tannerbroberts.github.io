@@ -4,7 +4,7 @@
         DONE: ... It's done... I don't know what else to say
     STORIES:
         DO:
-            Make the shelf, popup, and main screen play nice with eachother, position: absolute, 100% width
+            Move new item button to shelf
             BUG: Click listeners for ItemSchedulerAddon are broken
             TimeWindow
                 Scheduler option on block
@@ -14,12 +14,15 @@
                     onLongPressListener
                     partial sections
             AddItem onClickListener
-    DONE:
-                Because I'm moving buttons, I need those moved to test the popup
+            Add title props and state for popup title
+            Fix Time Window CSS
+                Fix time picker CSS
+        DONE:
             Move buttons to children of a list item
                 Create a common style for "elements that take a fixed screen height and have a label"
-        Standardize css: All components have the cssHelper object in their styles
-        BUG: Layout doesn't fit mobile screen
+            Make the shelf, popup, and main screen play nice with eachother, position: absolute, 100% width
+            Standardize css: All components have the cssHelper object in their styles
+            BUG: Layout doesn't fit mobile screen
                 block onLongClickListener
             Item Blocks
             TimeScale
@@ -27,31 +30,31 @@
                 ClickListeners
                 State
                 time block Labels
-        BUG: BackgroundSections aren't rendering
-        DeleteItem
-        ItemList
-        ItemListChild
-        CreateNewItem
-        BreadCrumbs
-        Shelf
-        GlobalContext
-        ItemCreatePopup
-        Popup
-    FILL:
-        Variables
-            Variables can be added, removed, and combined
-            Variable Summaries
-            Quotas
-        Item RealTime view
-        Accountability view
-        ItemFilter: filterName filterProperties
-            ItemFilter in a form at the top of the Shelf component
-            ItemFilter for every drawer showing the active filters
-            ItemFilter can filter based on length, variable condition, and name
-        BaseCalendarView
-        ViewItem
-        Item Library is basically just no filter, any other preset filters live below
-        Mobile View closes shelf onViewItemClick and onAddItem
+            BUG: BackgroundSections aren't rendering
+            DeleteItem
+            ItemList
+            ItemListChild
+            CreateNewItem
+            BreadCrumbs
+            Shelf
+            GlobalContext
+            ItemCreatePopup
+            Popup
+        FILL:
+            Variables
+                Variables can be added, removed, and combined
+                Variable Summaries
+                Quotas
+            Item RealTime view
+            Accountability view
+            ItemFilter: filterName filterProperties
+                ItemFilter in a form at the top of the Shelf component
+                ItemFilter for every drawer showing the active filters
+                ItemFilter can filter based on length, variable condition, and name
+            BaseCalendarView
+            ViewItem
+            Item Library is basically just no filter, any other preset filters live below
+            Mobile View closes shelf onViewItemClick and onAddItem
 
 
     GamePlans:

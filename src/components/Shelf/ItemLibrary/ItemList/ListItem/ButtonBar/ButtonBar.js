@@ -2,7 +2,6 @@ import React from 'react'
 import { cssHelper, ROW } from '../../../../../../api/cssHelper'
 import AddItem from './AddItem/AddItem'
 import DeleteItem from './DeleteItem'
-import NewItem from './NewItem'
 import ViewItem from './ViewItem'
 
 const buttonBarCSS = () => {
@@ -26,7 +25,6 @@ const buttonBarCSS = () => {
 export default function ButtonBar() {
 	return (
 		<div style={buttonBarCSS()}>
-			<NewItem />
 			<DeleteItem />
 			<ViewItem />
 			<AddItem />

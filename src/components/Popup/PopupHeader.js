@@ -6,6 +6,8 @@ import { Button } from '@mui/material'
 const popupHeaderCSS = () => {
 	const obj = {
 		...cssHelper,
+		gridTemplateColumns: '100px 1fr',
+		height: 'min-content',
 	}
 
 	return obj
@@ -24,7 +26,7 @@ export default function PopupHeader() {
 			>
 				Close
 			</Button>
-			<h3 style={cssHelper}>{popupTitle}</h3>
+			<h3>{popupTitle}</h3>
 		</div>
 	)
 }

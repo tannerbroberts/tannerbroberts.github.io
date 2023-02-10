@@ -6,16 +6,13 @@ import PopupHeader from './PopupHeader'
 const popupCSS = (visible) => {
 	const obj = {
 		...cssHelper,
-		// fontSize: "32",
-		// position: "absolute",
-		// left: "2vw",
-		// top: "2vh",
-		// width: "96vw",
-		// height: "96vh",
-		// display: "grid",
-		// gap: "10px",
-		// overflowY: "scroll",
-		// gridTemplateColumns: "1fr",
+		fontSize: "32",
+		position: "absolute",
+		left: "12vw",
+		top: "12vh",
+		width: "76vw",
+		height: "76vh",
+		overflowY: "scroll",
 	}
 	if (!visible) obj.display = 'none'
 
@@ -28,7 +25,6 @@ export default function Popup({ children }) {
 	return (
 		<div style={popupCSS(popupOpen)}>
 			<PopupHeader />
-			<hr />
 			{children}
 		</div>
 	)

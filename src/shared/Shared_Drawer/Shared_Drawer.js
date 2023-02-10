@@ -28,7 +28,9 @@ const knobCSS = () => {
 const childWrapper = () => {
 	const obj = {
 		...cssHelper,
-		height: "90vh"
+		height: '90vh',
+		padding: 0,
+		border: 'none',
 	}
 
 	return obj
