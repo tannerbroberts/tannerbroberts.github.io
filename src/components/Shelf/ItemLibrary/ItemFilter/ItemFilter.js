@@ -8,5 +8,5 @@ const itemFilterCSS = () => {
 }
 
 export default function ItemFilter() {
-	return <div style={itemFilterCSS()}>Item Filter placeholder</div>
+	return <div style={itemFilterCSS()}>Filter placeholder</div>
 }

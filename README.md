@@ -4,9 +4,7 @@
         DONE: ... It's done... I don't know what else to say
     STORIES:
         DO:
-            Move buttons to children of a list item
             Make the shelf, popup, and main screen play nice with eachother, position: absolute, 100% width
-                Because I'm moving buttons, I need those moved to test the popup
             BUG: Click listeners for ItemSchedulerAddon are broken
             TimeWindow
                 Scheduler option on block
@@ -17,6 +15,8 @@
                     partial sections
             AddItem onClickListener
     DONE:
+                Because I'm moving buttons, I need those moved to test the popup
+            Move buttons to children of a list item
                 Create a common style for "elements that take a fixed screen height and have a label"
         Standardize css: All components have the cssHelper object in their styles
         BUG: Layout doesn't fit mobile screen
