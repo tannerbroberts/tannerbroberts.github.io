@@ -1,21 +1,33 @@
-import React from 'react'
-import { cssHelper } from '../../../../../api/cssHelper'
-import { useATP_DispatchContext } from '../../../../../providers/ATP_Context'
+import React, { useState } from 'react'
+import { cssHelper, ROW } from '../../../../../api/cssHelper'
+import { useGlobalContext } from '../../../../../App'
+import ButtonBar from './ButtonBar'
 
-const listItemCSS = (focused) => {
-	const obj = { ...cssHelper }
-	if (focused) {
-		obj.border = '2px solid black'
+const listItemCSS = (focused, backgroundColor) => {
+	const obj = {
+		...cssHelper,
+		...ROW,
+		backgroundColor: focused ? 'lightgreen' : backgroundColor,
 	}
 
 	return obj
 }
 
 export default function ListItem({ itemName, focused = false }) {
-	const dispatch = useATP_DispatchContext()
+	const [backgroundColor, setBackgroundColor] = useState('whitesmoke')
+	const { setSelectedItemName } = useGlobalContext()
 	return (
-		<div style={listItemCSS(focused)} onClick={() => dispatch({ type: 'SET_FOCUSED_ITEM', value: itemName })}>
+		<div
+			style={listItemCSS(focused, backgroundColor)}
+			onClick={() => {
+				if (focused) setSelectedItemName('')
+				else setSelectedItemName(itemName)
+			}}
+			onMouseEnter={() => setBackgroundColor('lightgray')}
+			onMouseLeave={() => setBackgroundColor('whitesmoke')}
+		>
 			{itemName}
+			{focused && <ButtonBar />}
 		</div>
 	)
 }

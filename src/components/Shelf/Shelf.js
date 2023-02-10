@@ -26,9 +26,6 @@ export default function Shelf() {
 			<Shared_Drawer title='Item Library'>
 				<ItemLibrary />
 			</Shared_Drawer>
-			<Shared_Drawer title='Item Library'>
-				<ItemLibrary />
-			</Shared_Drawer>
 		</div>
 	)
 }

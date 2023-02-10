@@ -4,7 +4,9 @@
         DONE: ... It's done... I don't know what else to say
     STORIES:
         DO:
+            Move buttons to children of a list item
             Make the shelf, popup, and main screen play nice with eachother, position: absolute, 100% width
+                Because I'm moving buttons, I need those moved to test the popup
             BUG: Click listeners for ItemSchedulerAddon are broken
             TimeWindow
                 Scheduler option on block
@@ -14,8 +16,8 @@
                     onLongPressListener
                     partial sections
             AddItem onClickListener
-            Move buttons to children of a list item
     DONE:
+                Create a common style for "elements that take a fixed screen height and have a label"
         Standardize css: All components have the cssHelper object in their styles
         BUG: Layout doesn't fit mobile screen
                 block onLongClickListener
@@ -56,8 +58,8 @@
         CSS:
             1) Every visible component has a grid, and is a child of grid by default, no exceptions
                 a) Use gridTemplateRows for static sized components
-                b) 
-            2) Every component fills the height and width 100%, leaving the layout to the parent
+                b)
+            2) Many components fill the height and width 100%, leaving the layout to the parent
         Folder Structure:
             1) Components that appear only once inside of one other component will exist in a folder of that component.
             2) Shared components will live in the shared components folder

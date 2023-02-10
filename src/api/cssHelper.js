@@ -31,6 +31,14 @@ export const STRUCTURE = {
 	padding: '10px',
 }
 
+export const ROW = {
+	justifyContent: 'center',
+	alignItems: 'center',
+	height: 'max(50px, 10vh)',
+	textAlign: 'center',
+	fontSize: 'min(3vw, 30px)',
+}
+
 export const cssHelper = {
 	boxSizing: 'border-box',
 
