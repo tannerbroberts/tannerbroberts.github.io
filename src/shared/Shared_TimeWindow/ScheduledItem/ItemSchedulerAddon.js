@@ -9,18 +9,25 @@ import { useScheduledItemContext } from './ScheduledItem'
 const itemSchedulerAddonCSS = () => {
 	const obj = {
 		...cssHelper,
-		// borderRadius: "0 0 10px 10px",
-		// backgroundColor: "lightgreen",
-		// position: "absolute",
-		// top: 0,
-		// padding: "10px",
+		border: 'none',
+		gap: 0,
+		padding: 0,
+
+		borderRadius: '0 0 10px 10px',
+		backgroundColor: 'lightgreen',
+		position: 'absolute',
+		top: 0,
+		height: 'max(10vh, 100px)',
+
+		justifyContent: 'center',
+		alignItems: 'center',
 	}
 
 	return obj
 }
 
 export default function ItemSchedulerAddon() {
-	const { scale, unit } = useGlobalContext()
+	const { scale } = useGlobalContext()
 	const { parentItem, removeTimeWindowStateChild } = useTimeWindowContext()
 	const { startMillis, tempStartMillis, setTempStartMillis, item, setSchedulerVisible } = useScheduledItemContext()
 
@@ -53,12 +60,11 @@ export default function ItemSchedulerAddon() {
 
 	return (
 		<div style={itemSchedulerAddonCSS()}>
-			** Select start time **
-			<br />
-			<div style={{ display: 'flex', flexFlow: 'row' }}>
+			<div style={{ display: 'flex', flexFlow: 'row', justifyContent: 'center', alignItems: 'center' }}>
+				<label>Start time:</label>
 				<TextField
 					type='number'
-					label={unit}
+					label='Start'
 					value={tempStartMillis / scale}
 					style={{
 						width: `${Math.floor(Math.log10(tempStartMillis / scale)) + 9}ch`,

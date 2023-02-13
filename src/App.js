@@ -42,7 +42,7 @@ function App() {
 	const [stack, setStack] = useLS('stack', [{ path: 'calendar' }])
 	// For the library list of items
 	const [selectedItemName, setSelectedItemName] = useLS('selectedItemName', null)
-	// For the scheduler
+	// For the schedule
 	const [scale, setScale] = useLS('scale', 3_600_000)
 	const [unit, setUnit] = useLS('unit', 'hr')
 	// For the TimeWindow

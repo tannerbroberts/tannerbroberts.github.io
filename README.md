@@ -1,10 +1,8 @@
-
     STORIES:
         DO:
             TimeWindow
-                Fix Time Window CSS
-                    Fix time picker CSS
                 BUG: Click listeners for ItemSchedulerAddon are broken
+                    BUG: Click listeners for addItem are broken, no ls data to work with for ItemSchedulerAddon
                 Scheduler option on block
                     appears onAddItem along with the item block
                     schedule submit button
@@ -14,6 +12,8 @@
             AddItem onClickListener
             Add title props and state for popup title
         DONE:
+            Fix Time Window CSS
+            Fix time picker CSS
             Move new item button to shelf
             Move buttons to children of a list item
             Create a common style for "elements that take a fixed screen height and have a label"

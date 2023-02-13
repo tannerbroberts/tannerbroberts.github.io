@@ -35,11 +35,13 @@ export const postItem = (itemObject) => {
 }
 
 export const postChildPositionChange = (itemObject) => {
+	console.log('here')
 	if (valid(itemObject)) saveItem(itemObject, false)
 	return true
 }
 
 export const postChildRemove = (itemObject) => {
+	console.log('here now')
 	if (valid(itemObject)) saveItem(itemObject, false)
 	return true
 }
