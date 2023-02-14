@@ -15,15 +15,10 @@ const STATE_NAME_SPACE = `${DELIMITER}STATE${DELIMITER}`
 */
 
 export const isIllegalString = (nameString) => {
-	try {
-		const library = getLibrary()
-		if (nameString) {
-			return nameString.includes(DELIMITER) || library.includes(nameString)
-		} else return true
-	} catch (err) {
-		console.log('ERROR: in f() isIllegalString:', err)
-	}
-	return true
+	const library = getLibrary()
+	if (nameString) {
+		return nameString.includes(DELIMITER) || library.includes(nameString)
+	} else return true
 }
 
 export const postItem = (itemObject) => {
@@ -34,22 +29,24 @@ export const postItem = (itemObject) => {
 	return false
 }
 
-export const postChildPositionChange = (itemObject) => {
-	console.log('here')
-	if (valid(itemObject)) saveItem(itemObject, false)
-	return true
-}
-
-export const postChildRemove = (itemObject) => {
-	console.log('here now')
-	if (valid(itemObject)) saveItem(itemObject, false)
+export const updateItem = (itemObject) => {
+	if (valid(itemObject)) {
+		saveItem(itemObject, false)
+	}
 	return true
 }
 
 export const getItem = (name) => {
-	const item = JSON.parse(localStorage.getItem(`${ITEM_NAME_SPACE}${name}`))
-	if (item) return item
-	return undefined
+	try {
+		const library = getLibrary()
+		if (library.includes(name)) {
+			const item = JSON.parse(localStorage.getItem(`${ITEM_NAME_SPACE}${name}`))
+			if (item) return item
+			return undefined
+		} else throw new Error(`ERROR in f() getItem : ItemName ${name} not within Library`)
+	} catch (e) {
+		console.log(e)
+	}
 }
 
 export const deleteItem = (name) => {
@@ -77,7 +74,7 @@ export const loadState = (stateName) => {
 		}
 		return null
 	} catch (err) {
-		console.log('ERROR in f() loadState:', err)
+		console.log('ERROR in f() loadState:', stateName, ':', err)
 	}
 	return null
 }
@@ -93,7 +90,7 @@ export const loadState = (stateName) => {
 
 const objectHasIllegalName = (objectWithNameProperty) => {
 	if (objectWithNameProperty?.name) return isIllegalString(objectWithNameProperty?.name)
-	else return true
+	else throw new Error('Item object has no name property... You need that..')
 }
 
 const saveLibrary = (libraryItemNameArray) => {

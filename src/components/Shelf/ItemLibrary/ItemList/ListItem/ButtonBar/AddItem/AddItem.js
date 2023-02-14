@@ -14,10 +14,10 @@ const addItemCSS = () => {
 }
 
 export default function AddItem() {
-	const { addItem } = useGlobalContext()
+	const { addSelectedItemToCurrentItemViewed } = useGlobalContext()
 
 	return (
-		<Button style={addItemCSS()} variant='contained' onClick={() => addItem()}>
+		<Button style={addItemCSS()} variant='contained' onClick={() => addSelectedItemToCurrentItemViewed()}>
 			Add Item
 		</Button>
 	)

@@ -6,6 +6,7 @@ const itemViweCSS = () => {
 	const obj = {
 		...cssHelper,
 		overflowY: 'hidden',
+		gridTemplateRows: 'min-content',
 		padding: 0,
 		gap: 0,
 	}
@@ -17,7 +18,6 @@ export default function ItemView() {
 	return (
 		<>
 			{/* Variable summary goes here */}
-			<h1 style={{ textAlign: 'center' }}>Item View</h1>
 			<div style={itemViweCSS()}>
 				<TimeWindow />
 			</div>

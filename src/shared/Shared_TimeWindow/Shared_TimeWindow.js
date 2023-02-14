@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react'
+import React from 'react'
 import { useGlobalContext } from '../../App'
 import { getItem } from '../../api/io'
 import ScheduledItem from './ScheduledItem'
@@ -11,6 +11,7 @@ const theLongTimeContainer = () => {
 		...cssHelper,
 		padding: 0,
 		gap: 0,
+		gridTemplateRows: 'min-content',
 		border: 'none',
 		position: 'relative',
 	}
@@ -21,6 +22,7 @@ const theLongTimeContainer = () => {
 const theWindowThatScrolls = () => {
 	const obj = {
 		...cssHelper,
+		height: '80vh',
 		overflowY: 'scroll',
 		border: 'none',
 		padding: 0,
@@ -30,10 +32,8 @@ const theWindowThatScrolls = () => {
 	return obj
 }
 
-const TimeWindowContext = createContext()
-
 export default function TimeWindow() {
-	const { stack, children } = useGlobalContext()
+	const { stack, timeWindowBaseItem } = useGlobalContext()
 	const index = stack.length - 1
 	const frame = stack[index]
 	const itemName = frame?.name
@@ -41,22 +41,18 @@ export default function TimeWindow() {
 	const itemLength = parentItem?.length
 
 	return (
-		<TimeWindowContext.Provider value={{ parentItem }}>
-			<div style={theWindowThatScrolls()}>
-				<div style={theLongTimeContainer()} id='textFieldInItemSchedulerAddon'>
-					<BackgroundSections length={itemLength} />
-					{children?.map((child) => (
-						<ScheduledItem
-							key={child?.name + child?.position}
-							name={child?.name}
-							startMillisProp={child?.position}
-							scheduling={child?.scheduling}
-						/>
-					))}
-				</div>
+		<div style={theWindowThatScrolls()}>
+			<div style={theLongTimeContainer()} id='textFieldInItemSchedulerAddon'>
+				<BackgroundSections length={itemLength} />
+				{timeWindowBaseItem?.children?.map((child) => (
+					<ScheduledItem
+						key={child?.name + child?.position}
+						name={child?.name}
+						startMillisProp={child?.position}
+						scheduling={child?.scheduling}
+					/>
+				))}
 			</div>
-		</TimeWindowContext.Provider>
+		</div>
 	)
 }
-
-export const useTimeWindowContext = () => useContext(TimeWindowContext)

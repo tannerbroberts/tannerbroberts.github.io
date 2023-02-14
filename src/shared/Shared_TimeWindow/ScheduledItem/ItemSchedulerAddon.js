@@ -1,9 +1,8 @@
 import { Button, TextField } from '@mui/material'
 import React from 'react'
 import { cssHelper } from '../../../api/cssHelper'
-import { postChildPositionChange, postChildRemove } from '../../../api/io'
+import { updateItem } from '../../../api/io'
 import { useGlobalContext } from '../../../App'
-import { useTimeWindowContext } from '../Shared_TimeWindow'
 import { useScheduledItemContext } from './ScheduledItem'
 
 const itemSchedulerAddonCSS = () => {
@@ -28,33 +27,41 @@ const itemSchedulerAddonCSS = () => {
 
 export default function ItemSchedulerAddon() {
 	const { scale } = useGlobalContext()
-	const { parentItem, removeTimeWindowStateChild } = useTimeWindowContext()
+	const { timeWindowBaseItem, setTimeWindowBaseItem } = useGlobalContext()
 	const { startMillis, tempStartMillis, setTempStartMillis, item, setSchedulerVisible } = useScheduledItemContext()
 
 	const onSaveListener = () => {
-		const newChildList = [
-			...parentItem.children.filter((childObj) => {
-				return childObj?.name !== item?.name || childObj?.position !== startMillis
-			}),
-			{ name: item.name, position: tempStartMillis },
-		]
-
-		postChildPositionChange({
-			...parentItem,
-			children: newChildList,
+		const filteredArray = timeWindowBaseItem.children.filter((childObj) => {
+			return !(childObj?.name === item?.name && childObj?.position === startMillis)
 		})
+		let newChildList
+		if (filteredArray instanceof Array) newChildList = [...filteredArray, { name: item.name, position: tempStartMillis }]
+		else throw new Error('whoops, guess I do need that bit of error checking')
+
+		const newCurrentItem = {
+			...timeWindowBaseItem,
+			children: newChildList,
+		}
+
+		updateItem(newCurrentItem)
+		setTimeWindowBaseItem(newCurrentItem)
+
 		setSchedulerVisible(false)
 	}
 
 	const onRemoveListener = () => {
-		const newChildList = parentItem.children.filter((childObj) => {
-			return childObj?.name !== item?.name || childObj?.position !== startMillis
-		})
-		postChildRemove({
-			...parentItem,
+		const newChildList =
+			timeWindowBaseItem.children.filter((childObj) => {
+				return childObj.name !== item.name || childObj.position !== startMillis
+			}) ?? []
+
+		const newItemViewed = {
+			...timeWindowBaseItem,
 			children: newChildList,
-		})
-		removeTimeWindowStateChild(item.name, startMillis)
+		}
+
+		updateItem(newItemViewed)
+		setTimeWindowBaseItem(newItemViewed)
 		setSchedulerVisible(false)
 	}
 

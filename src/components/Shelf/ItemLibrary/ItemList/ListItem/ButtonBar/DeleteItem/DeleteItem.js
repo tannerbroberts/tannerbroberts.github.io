@@ -1,7 +1,6 @@
 import React from 'react'
 import { Button } from '@mui/material'
 import { cssHelper } from '../../../../../../../api/cssHelper'
-import { deleteItem } from '../../../../../../../api/io'
 import { useGlobalContext } from '../../../../../../../App'
 
 const deleteItemCSS = () => {
@@ -15,16 +14,11 @@ const deleteItemCSS = () => {
 }
 
 export default function DeleteItem() {
-	const { stack, setStack, selectedItemName, setSelectedItemName } = useGlobalContext()
+	const { deleteSelectedItemFromLibrary } = useGlobalContext()
 
-	const deleteListener = () => {
-		setStack(stack.filter((frame) => frame.name !== selectedItemName || frame.path !== 'itemView'))
-		deleteItem(selectedItemName)
-		setSelectedItemName(null)
-	}
 
 	return (
-		<Button style={deleteItemCSS()} onClick={deleteListener}>
+		<Button style={deleteItemCSS()} onClick={deleteSelectedItemFromLibrary}>
 			Delete Item
 		</Button>
 	)

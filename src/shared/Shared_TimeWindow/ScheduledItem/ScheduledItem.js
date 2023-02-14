@@ -6,7 +6,6 @@ import useLongPress from '../../../api/useLongPress'
 import ItemSchedulerAddon from './ItemSchedulerAddon'
 
 const scheduledItemCSS = (tempStartMillis, length) => {
-	console.log(tempStartMillis, length)
 	const { scale } = useGlobalContext()
 	const obj = {
 		...cssHelper,

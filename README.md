@@ -12,6 +12,7 @@
             AddItem onClickListener
             Add title props and state for popup title
         DONE:
+            timeWindowBaseItem needs work
             Fix Time Window CSS
             Fix time picker CSS
             Move new item button to shelf

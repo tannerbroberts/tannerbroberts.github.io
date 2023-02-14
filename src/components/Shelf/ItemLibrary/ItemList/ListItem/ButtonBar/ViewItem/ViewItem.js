@@ -10,12 +10,12 @@ const viewItemCSS = () => {
 }
 
 export default function ViewItem() {
-	const { openItemView } = useGlobalContext()
+	const { pushItemViewFrame } = useGlobalContext()
 	return (
 		<Button
 			style={viewItemCSS()}
 			onClick={() => {
-				openItemView()
+				pushItemViewFrame()
 			}}
 		>
 			View Item

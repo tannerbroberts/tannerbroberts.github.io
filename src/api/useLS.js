@@ -13,6 +13,6 @@ export const useLS = (stateName, initialState) => {
 		}
 		return [state, reallySetState]
 	} catch (err) {
-		console.log('ERROR in hook: useLS():', err)
+		console.log(`ERROR in hook: useLS() Saving: ${stateName} Error: ${err}`)
 	}
 }
