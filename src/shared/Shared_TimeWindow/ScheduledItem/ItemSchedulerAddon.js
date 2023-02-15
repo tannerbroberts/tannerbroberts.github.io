@@ -37,7 +37,7 @@ export default function ItemSchedulerAddon() {
 		})
 		let newChildList
 		if (filteredArray instanceof Array) newChildList = [...filteredArray, { name: item.name, position: tempStartMillis }]
-		else throw new Error('whoops, guess I do need that bit of error checking')
+		else console.log('ERROR: in f(): ItemSchedulerAddon: onSaveListener')
 
 		const newCurrentItem = {
 			...timeWindowBaseItem,

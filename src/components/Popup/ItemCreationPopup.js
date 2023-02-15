@@ -3,28 +3,20 @@ import { TextField } from '@mui/material'
 import Button from '@mui/material/Button'
 import { isIllegalString, postItem } from '../../api/io'
 import { useGlobalContext } from '../../App'
+import TimeInput from '../../shared/Shared_TimeInput'
 
 export default function ItemCreationPopup() {
-	const { closePopup } = useGlobalContext()
+	const [millis, setMillis] = useState()
 	const [itemName, setItemName] = useState()
+	const { closePopup } = useGlobalContext()
 
 	const onSubmit = useCallback((e) => {
 		e.preventDefault()
 
-		const getLength = () => {
-			let length = 0
-			length += e.target.itemDays.value * 86_400_000
-			length += e.target.itemHours.value * 3_600_000
-			length += e.target.itemMinutes.value * 60_000
-			length += e.target.itemSeconds.value * 1_000
-
-			return length
-		}
-
 		// This object is everything that the item has when it first gets saved
 		const postSuccess = postItem({
 			name: e.target.itemName.value,
-			length: getLength(),
+			length: millis,
 		})
 
 		if (postSuccess) closePopup()
@@ -40,14 +32,7 @@ export default function ItemCreationPopup() {
 					onChange={(e) => setItemName(e.target.value)}
 					error={isIllegalString(itemName)}
 				/>
-			</div>
-			<div style={{ textAlign: 'center' }}>
-				<TextField id='itemDays' label='Days' type='number' />
-				<TextField id='itemHours' label='Hours' type='number' />
-			</div>
-			<div style={{ textAlign: 'center' }}>
-				<TextField id='itemMinutes' label='Minutes' type='number' />
-				<TextField id='itemSeconds' label='Seconds' type='number' />
+			<TimeInput setMillis={setMillis} millis={millis} />
 			</div>
 			<div style={{ textAlign: 'center' }}>
 				<Button variant='contained' type='submit'>

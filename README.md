@@ -1,5 +1,6 @@
     STORIES:
         DO:
+            Build a shared timeInput
             TimeWindow
                 appears onAddItem along with the item block
                 schedule submit button
