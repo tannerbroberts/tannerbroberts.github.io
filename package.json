@@ -1,6 +1,6 @@
 {
 	"name": "about-time",
-	"version": "0.5.8",
+	"version": "0.5.9",
 	"homepage": "https://tannerbroberts.github.io",
 	"private": true,
 	"dependencies": {
