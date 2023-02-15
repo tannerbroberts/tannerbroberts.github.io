@@ -8,14 +8,15 @@ import { useScheduledItemContext } from './ScheduledItem'
 const itemSchedulerAddonCSS = () => {
 	const obj = {
 		...cssHelper,
-		border: 'none',
 		gap: 0,
 		padding: 0,
 
-		borderRadius: '0 0 10px 10px',
-		backgroundColor: 'lightgreen',
 		position: 'absolute',
-		top: 0,
+
+		zIndex: 1,
+
+		borderRadius: '10px',
+		backgroundColor: 'rgba(155, 255, 155, 0.9)',
 		height: 'max(10vh, 100px)',
 
 		justifyContent: 'center',
@@ -74,7 +75,7 @@ export default function ItemSchedulerAddon() {
 					label='Start'
 					value={tempStartMillis / scale}
 					style={{
-						width: `${Math.floor(Math.log10(tempStartMillis / scale)) + 9}ch`,
+						width: `${Math.floor(Math.log10(tempStartMillis / scale)) + 12}ch`,
 					}}
 					onChange={(e) => {
 						setTempStartMillis(e.target.value * scale)

@@ -9,15 +9,19 @@ const scheduledItemCSS = (tempStartMillis, length) => {
 	const { scale } = useGlobalContext()
 	const obj = {
 		...cssHelper,
+		padding: 0,
+		gap: 0,
+		display: 'initial',
+
 		position: 'absolute',
 		top: `${(tempStartMillis / scale) * 100}px`,
 		left: '100px',
 		height: `${(length / scale) * 100}px`,
 		width: '70%',
 		textAlign: 'center',
-		padding: '10px',
 		backgroundColor: 'rgba(155, 255, 155, 1)',
 		borderRadius: '10px',
+		overflow: 'visible',
 	}
 
 	return obj
@@ -48,7 +52,7 @@ export default function ScheduledItem({ name, startMillisProp, scheduling = fals
 		>
 			<div {...longPressProps} style={scheduledItemCSS(tempStartMillis, length)}>
 				{schedulerVisible && <ItemSchedulerAddon />}
-				{name}
+				{!schedulerVisible && name}
 			</div>
 		</ScheduledItemContext.Provider>
 	)
