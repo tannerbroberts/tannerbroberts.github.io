@@ -7,6 +7,7 @@ const drawerCSS = () => {
 		...cssHelper,
 		...SHARED,
 		gridTemplateRows: 'min-content',
+		height: 'min-content',
 		width: '100%',
 		padding: 0,
 		border: 'none',

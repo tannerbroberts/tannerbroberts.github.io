@@ -9,6 +9,7 @@ const itemListCSS = () => {
 		...cssHelper,
 		height: '90vh',
 		gridTemplateRows: 'min-content',
+		alignContent: 'start',
 	}
 
 	return obj
