@@ -12,6 +12,7 @@ const theLongTimeContainer = () => {
 		padding: 0,
 		gap: 0,
 		gridTemplateRows: 'min-content',
+		alignContent: 'start',
 		border: 'none',
 		position: 'relative',
 	}

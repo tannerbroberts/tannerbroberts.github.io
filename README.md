@@ -1,17 +1,17 @@
     STORIES:
         DO:
             TimeWindow
-                BUG: Click listeners for ItemSchedulerAddon are broken
-                    BUG: Click listeners for addItem are broken, no ls data to work with for ItemSchedulerAddon
-                Scheduler option on block
-                    appears onAddItem along with the item block
-                    schedule submit button
+                appears onAddItem along with the item block
+                schedule submit button
                 BackgroundSection
                     onLongPressListener
                     partial sections
             AddItem onClickListener
             Add title props and state for popup title
         DONE:
+            Scheduler option on block
+            BUG: Click listeners for addItem are broken, no ls data to work with for ItemSchedulerAddon
+            BUG: Click listeners for ItemSchedulerAddon are broken
             timeWindowBaseItem needs work
             Fix Time Window CSS
             Fix time picker CSS
