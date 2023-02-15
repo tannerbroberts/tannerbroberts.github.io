@@ -1,12 +1,12 @@
 import React from 'react'
-import { cssHelper, STRUCTURE } from '../../../api/cssHelper'
+import { cssHelper, SHARED } from '../../../api/cssHelper'
 import ItemFilter from './ItemFilter'
 import ItemList from './ItemList'
 
 const itemLibraryCSS = (openState) => {
 	const obj = {
 		...cssHelper,
-		...STRUCTURE,
+		...SHARED,
 	}
 	if (openState) return obj
 
