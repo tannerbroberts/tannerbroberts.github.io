@@ -9,16 +9,15 @@ import { useScheduledItemContext } from './ScheduledItem'
 const itemSchedulerAddonCSS = () => {
 	const obj = {
 		...cssHelper,
-		gap: 0,
-		padding: 0,
+		gap: '2%',
+		padding: '2%',
 
 		position: 'absolute',
-
 		zIndex: 1,
 
 		borderRadius: '10px',
 		backgroundColor: 'rgba(155, 255, 155, 0.9)',
-		height: 'max(10vh, 100px)',
+		height: 'min-content',
 
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -31,7 +30,7 @@ export default function ItemSchedulerAddon() {
 	const { timeWindowBaseItem, setTimeWindowBaseItem } = useGlobalContext()
 	const { startMillis, tempStartMillis, setTempStartMillis, item, setSchedulerVisible } = useScheduledItemContext()
 
-	const onSaveListener = () => {
+	const onSubmit = () => {
 		const filteredArray = timeWindowBaseItem.children.filter((childObj) => {
 			return !(childObj?.name === item?.name && childObj?.position === startMillis)
 		})
@@ -66,18 +65,17 @@ export default function ItemSchedulerAddon() {
 		setSchedulerVisible(false)
 	}
 
-	console.log('addon tempStartMillis', tempStartMillis);
+	console.log('addon tempStartMillis', tempStartMillis)
 
 	return (
 		<div style={itemSchedulerAddonCSS()}>
 			<div style={{ display: 'flex', flexFlow: 'row', justifyContent: 'center', alignItems: 'center' }}>
-				<label>Start time:</label>
-				<Shared_TimeInput
-					millis={tempStartMillis}
-					setMillis={setTempStartMillis}
-				/>
-				<Button onClick={onSaveListener}>Save</Button>
-				<Button onClick={onRemoveListener}>Remove</Button>
+				<form onSubmit={onSubmit}>
+					<label>Start time:</label>
+					<Shared_TimeInput id='itemMillis' millis={tempStartMillis} setMillis={setTempStartMillis} />
+					<Button type='submit'>Save</Button>
+					<Button onClick={onRemoveListener}>Remove</Button>
+				</form>
 			</div>
 		</div>
 	)

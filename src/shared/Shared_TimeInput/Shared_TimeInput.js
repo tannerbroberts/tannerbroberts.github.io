@@ -6,20 +6,22 @@ import { cssHelper } from '../../api/cssHelper'
 const timeInputCSS = () => {
 	const obj = {
 		...cssHelper,
-		padding: 0,
 		gap: 0,
+		padding: '5%',
 		display: 'grid',
-		width: 'min(30vw, 300px)',
 
-		gridTemplateColumns: '1fr 1fr 1fr 1fr',
+		height: 'min-content',
 
-		overflow: 'visible',
+		gridTemplateColumns: screen.width > 500 ? '1fr 1fr 1fr 1fr' : '1fr 1fr',
 	}
 
 	return obj
 }
 
 export default function TimeInput({ millis, setMillis, id }) {
+	if (!id) console.log('ERROR, you need to have an id for the Shared_TimeInput component')
+	if (!id) console.log('ERROR, you need to have millis for the Shared_TimeInput component')
+	if (!id) console.log('ERROR, you need to have setMillis for the Shared_TimeInput component')
 	let leftoverMillis = millis
 	const [days, setDays] = useState(Math.floor(leftoverMillis / timeValues.day))
 	leftoverMillis = leftoverMillis % timeValues.day
