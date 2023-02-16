@@ -1,8 +1,9 @@
-import { Button, TextField } from '@mui/material'
+import { Button } from '@mui/material'
 import React from 'react'
 import { cssHelper } from '../../../api/cssHelper'
 import { updateItem } from '../../../api/io'
 import { useGlobalContext } from '../../../App'
+import Shared_TimeInput from '../../Shared_TimeInput'
 import { useScheduledItemContext } from './ScheduledItem'
 
 const itemSchedulerAddonCSS = () => {
@@ -27,7 +28,6 @@ const itemSchedulerAddonCSS = () => {
 }
 
 export default function ItemSchedulerAddon() {
-	const { scale } = useGlobalContext()
 	const { timeWindowBaseItem, setTimeWindowBaseItem } = useGlobalContext()
 	const { startMillis, tempStartMillis, setTempStartMillis, item, setSchedulerVisible } = useScheduledItemContext()
 
@@ -66,28 +66,15 @@ export default function ItemSchedulerAddon() {
 		setSchedulerVisible(false)
 	}
 
+	console.log('addon tempStartMillis', tempStartMillis);
+
 	return (
 		<div style={itemSchedulerAddonCSS()}>
 			<div style={{ display: 'flex', flexFlow: 'row', justifyContent: 'center', alignItems: 'center' }}>
 				<label>Start time:</label>
-				<TextField
-					type='number'
-					label='Start'
-					value={tempStartMillis / scale}
-					style={{
-						width: `${Math.floor(Math.log10(tempStartMillis / scale)) + 12}ch`,
-					}}
-					onChange={(e) => {
-						setTempStartMillis(e.target.value * scale)
-						const scrollingContainer =
-							e.target.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement
-
-						scrollingContainer.scrollTo({
-							top: e.target.value * 100,
-							left: 0,
-							behavior: 'smooth',
-						})
-					}}
+				<Shared_TimeInput
+					millis={tempStartMillis}
+					setMillis={setTempStartMillis}
 				/>
 				<Button onClick={onSaveListener}>Save</Button>
 				<Button onClick={onRemoveListener}>Remove</Button>

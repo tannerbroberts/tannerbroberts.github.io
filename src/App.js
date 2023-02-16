@@ -76,7 +76,6 @@ function App() {
 		if (stack.length > 1 && stack.length > popCount - 1 && popCount !== 0) {
 			const newStack = stack.slice(0, popCount * -1)
 			if (newStack[newStack.length - 1].path === 'itemView') {
-				console.log('newStack sets itemView')
 				setTimeWindowBaseItem(getItem(newStack[newStack.length - 1].name))
 			} else {
 				// This is where I'll set the calendar and accountability views

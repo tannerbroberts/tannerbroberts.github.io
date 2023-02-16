@@ -6,7 +6,7 @@ import { useGlobalContext } from '../../App'
 import TimeInput from '../../shared/Shared_TimeInput'
 
 export default function ItemCreationPopup() {
-	const [millis, setMillis] = useState()
+	const [millis, setMillis] = useState(0)
 	const [itemName, setItemName] = useState()
 	const { closePopup } = useGlobalContext()
 
@@ -14,9 +14,10 @@ export default function ItemCreationPopup() {
 		e.preventDefault()
 
 		// This object is everything that the item has when it first gets saved
+		console.log('posting stats:', e.target.itemName.value, e.target.itemMillis.value)
 		const postSuccess = postItem({
 			name: e.target.itemName.value,
-			length: millis,
+			length: e.target.itemMillis.value,
 		})
 
 		if (postSuccess) closePopup()
@@ -32,7 +33,7 @@ export default function ItemCreationPopup() {
 					onChange={(e) => setItemName(e.target.value)}
 					error={isIllegalString(itemName)}
 				/>
-			<TimeInput setMillis={setMillis} millis={millis} />
+				<TimeInput setMillis={setMillis} millis={millis} id='itemMillis' />
 			</div>
 			<div style={{ textAlign: 'center' }}>
 				<Button variant='contained' type='submit'>
