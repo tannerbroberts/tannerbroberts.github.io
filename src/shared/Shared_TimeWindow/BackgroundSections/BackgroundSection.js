@@ -7,7 +7,7 @@ const backgroundSectionCSS = () => {
 		...cssHelper,
 		height: '100px',
 		textAlign: 'left',
-		padding: '10px',
+		padding: '1vw',
 		border: 'none',
 		borderBottom: '1px solid gray'
 	}

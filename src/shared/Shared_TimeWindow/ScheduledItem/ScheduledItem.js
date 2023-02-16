@@ -15,7 +15,7 @@ const scheduledItemCSS = (tempStartMillis, length) => {
 
 		position: 'absolute',
 		top: `${(tempStartMillis / scale) * 100}px`,
-		left: '100px',
+		left: '10vw',
 		height: `${(length / scale) * 100}px`,
 		width: '70%',
 		textAlign: 'center',
