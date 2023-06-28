@@ -3,7 +3,7 @@ import { TextField } from '@mui/material'
 import Button from '@mui/material/Button'
 import { isIllegalString, postItem } from '../../api/io'
 import { useGlobalContext } from '../../App'
-import TimeInput from '../../shared/Shared_TimeInput'
+import SharedTimeInput from '../../shared/Shared_TimeInput'
 
 export default function ItemCreationPopup() {
 	const [millis, setMillis] = useState(0)
@@ -33,7 +33,7 @@ export default function ItemCreationPopup() {
 					onChange={(e) => setItemName(e.target.value)}
 					error={isIllegalString(itemName)}
 				/>
-				<TimeInput setMillis={setMillis} millis={millis} id='itemMillis' />
+				<SharedTimeInput setMillis={setMillis} millis={millis} id='itemMillis' />
 			</div>
 			<div style={{ textAlign: 'center' }}>
 				<Button variant='contained' type='submit'>
