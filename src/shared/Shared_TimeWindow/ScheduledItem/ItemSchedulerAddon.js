@@ -65,8 +65,6 @@ export default function ItemSchedulerAddon() {
 		setSchedulerVisible(false)
 	}
 
-	console.log('addon tempStartMillis', tempStartMillis)
-
 	return (
 		<div style={itemSchedulerAddonCSS()}>
 			<div style={{ display: 'flex', flexFlow: 'row', justifyContent: 'center', alignItems: 'center' }}>

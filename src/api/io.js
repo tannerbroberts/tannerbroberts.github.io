@@ -45,7 +45,7 @@ export const getItem = (name) => {
 			return undefined
 		} else throw new Error(`ERROR in f() getItem : ItemName ${name} not within Library`)
 	} catch (e) {
-		console.log(e)
+		console.log('ERROR in f() getItem:', e)
 	}
 }
 
@@ -108,13 +108,13 @@ const getVariable = (name) => {
 	return {}
 }
 
+const deleteVariable = (name) => {
+	localStorage.removeItem(`${VARIABLE_NAME_SPACE}${name}`)
+}
+
 const saveVariable = (variableObject) => {
 	if (objectHasIllegalName(variableObject)) return false
 	localStorage.setItem(`${VARIABLE_NAME_SPACE}${JSON.stringify(variableObject)}`)
-}
-
-const deleteVariable = (name) => {
-	localStorage.removeItem(`${VARIABLE_NAME_SPACE}${name}`)
 }
 
 const match = (a, b) => {

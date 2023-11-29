@@ -43,7 +43,7 @@ export default function TimeInput({ millis, setMillis, id }) {
 							setMillis(millis - days * timeValues.day + e.target.value * timeValues.day)
 							setDays(e.target.value)
 						} catch (e) {
-							console.log(e)
+							console.log('ERROR, something wrong with the Shared_TimeInput math')
 						}
 					}}
 					type='number'

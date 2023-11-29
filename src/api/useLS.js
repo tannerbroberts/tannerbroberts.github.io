@@ -7,7 +7,6 @@ export const useLS = (stateName, initialState) => {
 		savedState = loadState(stateName)
 		const [state, setState] = useState(savedState)
 		const reallySetState = (newValue) => {
-			console.log(`useLS hook saving - - - ${stateName}: ${newValue}`)
 			saveState(stateName, newValue)
 			setState(newValue)
 		}

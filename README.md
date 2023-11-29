@@ -1,3 +1,27 @@
+    FILL:
+        Variables
+            Variables can be added, edited, and removed
+            Variable Summaries are calculated and displayed
+                Shelf needs a variable display
+            Quotas
+        Accountability view
+        Shelf:
+            ItemFilter: filterName filterProperties
+                ItemFilter for every drawer showing the active filters for that drawer
+                ItemFilter can filter based on length, variables, and name
+                    Variable filtering can be multiple conditions (i.e. less than 600 calories, more than 60g protein)
+        BaseCalendarView
+            Item data has a place to live and a way of accessing it
+            Items can be added and removed
+            View modes:
+                A scroll-view for:
+                    day, week, month, and year
+                RealTime view
+                Any other view that people think would be nice
+        ViewItem
+            Time Units at the end of a schedule reflect partial units (30 minute item looks like half an hour on hour view)
+        Item Library is basically just no filter, any other preset filters live below
+        Mobile View closes shelf onViewItemClick and onAddItem
     STORIES:
         DO:
             Build a shared timeInput
@@ -39,22 +63,6 @@
             GlobalContext
             ItemCreatePopup
             Popup
-        FILL:
-            Variables
-                Variables can be added, removed, and combined
-                Variable Summaries
-                Quotas
-            Item RealTime view
-            Accountability view
-            ItemFilter: filterName filterProperties
-                ItemFilter in a form at the top of the Shelf component
-                ItemFilter for every drawer showing the active filters
-                ItemFilter can filter based on length, variable condition, and name
-            BaseCalendarView
-            ViewItem
-            Item Library is basically just no filter, any other preset filters live below
-            Mobile View closes shelf onViewItemClick and onAddItem
-
 
     GamePlans:
         CSS:
