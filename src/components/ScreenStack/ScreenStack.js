@@ -3,7 +3,6 @@ import Accounting from './Accounting'
 import Calendar from './Calendar'
 import ItemView from './ItemView'
 import { cssHelper } from '../../api/cssHelper'
-import BreadCrumbsWrapper from './BreadCrumbsWrapper/BreadCrumbsWrapper'
 import { useGlobalContext } from '../../App'
 import TimeScale from './TimeScale.js/TimeScale'
 
@@ -30,7 +29,6 @@ export default function ScreenStack() {
 
 	return (
 		<div style={screenStackCSS()}>
-			<BreadCrumbsWrapper objects={stack} />
 			<TimeScale />
 			{getTopPath() === 'accounting' && <Accounting />}
 			{getTopPath() === 'calendar' && <Calendar />}

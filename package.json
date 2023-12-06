@@ -18,7 +18,7 @@
 		"web-vitals": "^2.1.4"
 	},
 	"scripts": {
-		"start": "react-scripts start",
+		"start": "PORT=8001 react-scripts start",
 		"predeploy": "npm run build",
 		"deploy": "gh-pages -d build",
 		"preminor": "npm run build ; git add --all ; git commit -m 'minor version bump' ; git push ; npm version patch",

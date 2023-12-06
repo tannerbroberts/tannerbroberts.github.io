@@ -1,6 +1,6 @@
 import React from 'react'
 import { cssHelper } from '../../../api/cssHelper'
-import { getLibrary } from '../../../api/io'
+// import { getLibrary } from '../../../api/io'
 // import TimeWindow from '../../../shared/Shared_TimeWindow/Shared_TimeWindow'
 
 const calendarCSS = () => {
@@ -12,7 +12,7 @@ const calendarCSS = () => {
 }
 
 export default function Calendar() {
-	const library = getLibrary()
+	// const library = getLibrary()
 	return (
 		<div style={calendarCSS()}>
 			{/*

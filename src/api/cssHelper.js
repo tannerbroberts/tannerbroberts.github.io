@@ -1,31 +1,20 @@
-// This is where all the colors are declared
-// Green
-const GREENISH = 'rgb(97, 226, 148)'
-// const GREENISH_DARKER = "rgb(28, 155, 79)"
-// // Red/Orange
-// const RED_ORANGE = {
-// 	backgroundColor: "rgb(255, 133, 82)",
-// }
-// Light blue
-const LIGHT_BLUE = 'rgb(191, 219, 247)'
-// const LIGHT_BLUE_DARKER = "rgb(64, 147, 255)"
-// Graylike
-export const GRAYLIKE = {
-	backgroundColor: 'rgb(36, 123, 160)',
-}
-// Deep blue
-export const DEEP_BLUE = {
-	backgroundColor: 'rgb(9, 12, 155)',
+// A pallet of colors
+export const COLORS = {
+	ORANGE: 'rgb(184, 12, 9',
+	THISTLE: 'rgb(207, 179, 205)',
+	SKY: 'rgb(86, 203, 249)',
+	GREEN: 'rgb(196, 247, 161)',
+	CHARCOAL: 'rgb(47, 62, 70)',
 }
 
 export const SHARED = {
-	backgroundColor: LIGHT_BLUE,
+	backgroundColor: COLORS.SKY,
 	border: `2px solid black`,
 	borderRadius: '10px',
 }
 
 export const STRUCTURE = {
-	backgroundColor: GREENISH,
+	backgroundColor: 	COLORS.GREENISH,
 	border: `2px solid black`,
 	borderRadius: '5px',
 	padding: '10px',
