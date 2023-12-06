@@ -30,3 +30,6 @@ While I'm technically hosting this on Github for anyone to see, this first versi
       Variable key/value
       Tag
     filter presets
+
+## [0.6.3] - To Be Determined
+I just learned what semver is 😅
