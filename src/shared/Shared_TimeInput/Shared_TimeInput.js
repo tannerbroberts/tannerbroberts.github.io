@@ -1,6 +1,6 @@
 import { TextField } from '@mui/material'
 import React, { useState } from 'react'
-import { timeValues } from '../../api/constants'
+import { TIME_VALUES } from '../../api/constants'
 import { cssHelper } from '../../api/cssHelper'
 
 const timeInputCSS = () => {
@@ -23,13 +23,13 @@ export default function TimeInput({ millis, setMillis, id }) {
 	if (!id) console.log('ERROR, you need to have millis for the Shared_TimeInput component')
 	if (!id) console.log('ERROR, you need to have setMillis for the Shared_TimeInput component')
 	let leftoverMillis = millis
-	const [days, setDays] = useState(Math.floor(leftoverMillis / timeValues.day))
-	leftoverMillis = leftoverMillis % timeValues.day
-	const [hours, setHours] = useState(Math.floor(leftoverMillis / timeValues.hour))
-	leftoverMillis = leftoverMillis % timeValues.hour
-	const [minutes, setMinutes] = useState(Math.floor(leftoverMillis / timeValues.minute))
-	leftoverMillis = leftoverMillis % timeValues.minute
-	const [seconds, setSeconds] = useState(Math.floor(leftoverMillis / timeValues.second))
+	const [days, setDays] = useState(Math.floor(leftoverMillis / TIME_VALUES.day))
+	leftoverMillis = leftoverMillis % TIME_VALUES.day
+	const [hours, setHours] = useState(Math.floor(leftoverMillis / TIME_VALUES.hour))
+	leftoverMillis = leftoverMillis % TIME_VALUES.hour
+	const [minutes, setMinutes] = useState(Math.floor(leftoverMillis / TIME_VALUES.minute))
+	leftoverMillis = leftoverMillis % TIME_VALUES.minute
+	const [seconds, setSeconds] = useState(Math.floor(leftoverMillis / TIME_VALUES.second))
 
 	return (
 		<>
@@ -40,7 +40,7 @@ export default function TimeInput({ millis, setMillis, id }) {
 					value={days}
 					onChange={(e) => {
 						try {
-							setMillis(millis - days * timeValues.day + e.target.value * timeValues.day)
+							setMillis(millis - days * TIME_VALUES.day + e.target.value * TIME_VALUES.day)
 							setDays(e.target.value)
 						} catch (e) {
 							console.log('ERROR, something wrong with the Shared_TimeInput math')
@@ -52,7 +52,7 @@ export default function TimeInput({ millis, setMillis, id }) {
 					label='hours'
 					value={hours}
 					onChange={(e) => {
-						setMillis(millis - hours * timeValues.hour + e.target.value * timeValues.hour)
+						setMillis(millis - hours * TIME_VALUES.hour + e.target.value * TIME_VALUES.hour)
 						setHours(e.target.value)
 					}}
 					type='number'
@@ -61,7 +61,7 @@ export default function TimeInput({ millis, setMillis, id }) {
 					label='minutes'
 					value={minutes}
 					onChange={(e) => {
-						setMillis(millis - minutes * timeValues.minute + e.target.value * timeValues.minute)
+						setMillis(millis - minutes * TIME_VALUES.minute + e.target.value * TIME_VALUES.minute)
 						setMinutes(e.target.value)
 					}}
 					type='number'
@@ -70,7 +70,7 @@ export default function TimeInput({ millis, setMillis, id }) {
 					label='seconds'
 					value={seconds}
 					onChange={(e) => {
-						setMillis(millis - seconds * timeValues.second + e.target.value * timeValues.second)
+						setMillis(millis - seconds * TIME_VALUES.second + e.target.value * TIME_VALUES.second)
 						setSeconds(e.target.value)
 					}}
 					type='number'

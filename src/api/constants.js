@@ -1,4 +1,4 @@
-export const timeValues = {
+export const TIME_VALUES = {
   day: 86_400_000,
   hour: 3_600_000,
   minute: 60_000,
