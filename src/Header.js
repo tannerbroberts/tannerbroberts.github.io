@@ -5,6 +5,8 @@ import { useAppDispatchContext, useAppStateContext } from "./AppContext";
 import { CALENDAR_VIEWS } from "./api/constants";
 
 const headerCss = css`
+  box-sizing: border-box;
+  border-bottom: 1px solid lightgray;
   position: absolute;
   display: flex;
   flex-direction: row;
