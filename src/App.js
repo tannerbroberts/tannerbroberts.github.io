@@ -1,19 +1,12 @@
-import React, { createContext, useContext } from "react";
+import React from "react";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { css } from "@emotion/css";
+import { AppContextProvider } from "./AppContext";
 import ContextMenuShelf from "./ContextMenuShelf";
-
-export const AppContext = createContext();
-export const useAppContext = () => {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error("useAppContext must be used within a AppProvider");
-  }
-  return context;
-};
+import AboutTimeScheduleView from "./AboutTimeScheduleView";
 
 // Makes the app fill the entire screen
 const fullScreenCss = css`
@@ -25,24 +18,15 @@ const fullScreenCss = css`
   background-color: lightblue;
 `;
 
-const tempBaseCss = css`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-  background-color: green;
-`;
-
 function App() {
   return (
-    <AppContext.Provider value={{}}>
-      <div className={fullScreenCss}>
+    <div className={fullScreenCss}>
+      <AppContextProvider>
         <ContextMenuShelf>
-          <div className={tempBaseCss}>App</div>
+          <AboutTimeScheduleView />
         </ContextMenuShelf>
-      </div>
-    </AppContext.Provider>
+      </AppContextProvider>
+    </div>
   );
 }
 

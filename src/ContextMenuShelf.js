@@ -1,21 +1,15 @@
 import React from "react";
 import { css } from "@emotion/css";
-import { Squash as Hamburger } from "hamburger-react";
 import Shelf from "./Shelf";
+import { useAppStateContext } from "./AppContext";
+import Header from "./Header";
 
 const contextMenuShelfCss = css`
   position: absolute; // Parent of the shelf, must be absolute positioned
   flex-direction: column;
   height: 100%;
   width: 100%;
-  background-color: lightyellow;
-`;
-
-const headerCss = css`
-  position: absolute;
-  height: 50px;
-  width: 100%;
-  background-color: whitesmoke;
+  background-color: yellow;
 `;
 
 const contentCss = css`
@@ -27,13 +21,11 @@ const contentCss = css`
 `;
 
 const ContextMenuShelf = ({ children }) => {
-  const [shelfOpen, setShelfOpen] = React.useState(false);
+  const { shelfOpen } = useAppStateContext();
 
   return (
     <div className={contextMenuShelfCss}>
-      <div className={headerCss}>
-        <Hamburger onToggle={setShelfOpen} />
-      </div>
+      <Header />
       {shelfOpen && <Shelf />}
       <div className={contentCss}>{children}</div>
     </div>
