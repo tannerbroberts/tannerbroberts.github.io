@@ -3,4 +3,4 @@ export const TIME_VALUES = {
   hour: 3_600_000,
   minute: 60_000,
   second: 1_000,
-}
+};

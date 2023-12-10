@@ -1,20 +1,21 @@
 {
-	"editor.acceptSuggestionOnEnter": "on",
-	"editor.formatOnSave": true,
-	"editor.formatOnPaste": false,
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"prettier.jsxSingleQuote": true,
-	"prettier.printWidth": 130,
-	"prettier.semi": false,
-	"prettier.useTabs": true,
-	"editor.foldingImportsByDefault": false,
-	"files.exclude": {
-		"**/.DS_Store": false,
-		"**/.git": false,
-		"**/.hg": false,
-		"**/.svn": false,
-		"**/CVS": false,
-		"**/Thumbs.db": false
-	},
-	"workbench.editor.wrapTabs": true
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.formatOnSave": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "jsx-tags"
+  ],
+  "files.exclude": {
+    "**/.DS_Store": false,
+    "**/.git": false,
+    "**/.hg": false,
+    "**/.svn": false,
+    "**/CVS": false,
+    "**/Thumbs.db": false
+  },
+  "workbench.editor.wrapTabs": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
