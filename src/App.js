@@ -15,7 +15,7 @@ const fullScreenCss = css`
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: lightblue;
+  background-color: yellow;
 `;
 
 function App() {
