@@ -6,16 +6,26 @@ import { CALENDAR_VIEWS } from "./api/constants";
 
 const headerCss = css`
   position: absolute;
+  display: flex;
+  flex-direction: row;
   height: 50px;
   width: 100%;
   background-color: whitesmoke;
+`;
+
+const headerTextCss = css`
+  display: flex;
+  align-items: center;
+  margin-left: 15px;
+  font-size: 20px;
+  font-weight: bold;
 `;
 
 const Header = () => {
   const { shelfOpen, selectedView } = useAppStateContext();
   const dispatch = useAppDispatchContext();
 
-  let calendarType = "";
+  let calendarType = "asdf";
   switch (selectedView) {
     case CALENDAR_VIEWS.HEADS_UP:
       calendarType = "Heads Up";
@@ -40,7 +50,7 @@ const Header = () => {
         toggled={shelfOpen}
         onToggle={() => dispatch({ type: "TOGGLE_SHELF" })}
       />
-      {calendarType}
+      <div className={headerTextCss}>{calendarType}</div>
     </div>
   );
 };
