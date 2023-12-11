@@ -1,7 +1,7 @@
 import React from "react";
 import { css } from "@emotion/css";
 import Shelf from "./Shelf";
-import { useAppStateContext } from "./AppContext";
+import { useAppStateContext } from "../AppContext";
 import Header from "./Header";
 
 const contextMenuShelfCss = css`
@@ -20,7 +20,7 @@ const contentCss = css`
   background-color: yellow;
 `;
 
-const ContextMenuShelf = ({ children }) => {
+export default function ContextMenuShelfContainer({ children }) {
   const { shelfOpen } = useAppStateContext();
 
   return (
@@ -30,6 +30,4 @@ const ContextMenuShelf = ({ children }) => {
       <div className={contentCss}>{children}</div>
     </div>
   );
-};
-
-export default ContextMenuShelf;
+}

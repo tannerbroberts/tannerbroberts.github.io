@@ -1,8 +1,8 @@
 import React from "react";
 import { Squash as Hamburger } from "hamburger-react";
 import { css } from "@emotion/css";
-import { useAppDispatchContext, useAppStateContext } from "./AppContext";
-import { CALENDAR_VIEWS } from "./api/constants";
+import { useAppDispatchContext, useAppStateContext } from "../AppContext";
+import { CALENDAR_VIEWS } from "../api/constants";
 
 const headerCss = css`
   box-sizing: border-box;

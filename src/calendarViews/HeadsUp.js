@@ -10,10 +10,13 @@ const headsUpCss = css`
   background-color: whitesmoke;
 `;
 
+// Time until start
+// Time left in event
+// Parent events
+
 export default function HeadsUp() {
   return (
     <div className={headsUpCss}>
-      <h1>Heads Up</h1>
     </div>
   );
 }
