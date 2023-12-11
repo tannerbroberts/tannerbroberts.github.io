@@ -24,9 +24,8 @@ const shelfCss = css`
   display: flex;
   flex-direction: column;
   background-color: whitesmoke;
-  // Make the shelf float above the rest of the app but not the header
-  box-shadow: 0 50px 50px 0 rgba(0, 0, 0, 0.5);
-  border: 1px solid lightgray;
+  box-shadow: 0 0 30px 0 rgba(0, 0, 0, 1);
+  border-right: 1px solid lightgray;
 `;
 
 export default function Shelf() {

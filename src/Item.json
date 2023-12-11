@@ -1,0 +1,13 @@
+{
+  "name": "TemplateName",
+  "variables": {
+    "name": "Variable Name"
+  },
+  "children": [
+    {
+      "name": "My Child Template",
+      "position": 360000
+    }
+  ],
+  "parents": ["Parent1", "Parent2", "Parent3"]
+}

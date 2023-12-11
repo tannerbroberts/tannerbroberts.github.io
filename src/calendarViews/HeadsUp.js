@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { css } from "@emotion/css";
 
 const headsUpCss = css`
@@ -10,13 +10,16 @@ const headsUpCss = css`
   background-color: whitesmoke;
 `;
 
-// Time until start
-// Time left in event
-// Parent events
-
 export default function HeadsUp() {
+  let items = ["test", "test2", "test3"];
+  useEffect(() => {
+    // Load from local storage, the scheduled events that intersect with the current moment
+  }, []);
   return (
     <div className={headsUpCss}>
+      {items.map((item) => {
+        return <div>{item}</div>;
+      })}
     </div>
   );
 }
