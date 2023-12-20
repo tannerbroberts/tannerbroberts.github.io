@@ -12,7 +12,7 @@ import CalendarViewWeekSharpIcon from "@mui/icons-material/CalendarViewWeekSharp
 import ViewDaySharpIcon from "@mui/icons-material/ViewDaySharp";
 import SupportAgentSharpIcon from "@mui/icons-material/SupportAgentSharp";
 import { useAppDispatchContext, useAppStateContext } from "../AppContext";
-import { CALENDAR_VIEWS } from "../api/constants";
+import { CALENDAR_VIEWS } from "../../utils/constants";
 
 const shelfCss = css`
   box-sizing: border-box;

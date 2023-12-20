@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
+import App from "./components/App";
 
 // Base element styling outside of React
 const rootCss = document.getElementById("root");

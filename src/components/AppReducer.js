@@ -1,5 +1,5 @@
-import { CALENDAR_VIEWS } from "./api/constants";
-import { saveState } from "./api/localStorageHelpers";
+import { CALENDAR_VIEWS } from "../utils/constants";
+import { saveState } from "../utils/localStorageHelpers";
 
 // Initial state
 export const initialState = {

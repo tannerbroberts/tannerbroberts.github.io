@@ -20,7 +20,7 @@ const contentCss = css`
   background-color: yellow;
 `;
 
-export default function ContextMenuShelfContainer({ children }) {
+export default function ContextMenuShelfNavigation({ children }) {
   const { shelfOpen } = useAppStateContext();
 
   return (

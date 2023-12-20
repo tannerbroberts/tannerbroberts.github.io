@@ -1,6 +1,6 @@
 import React from "react";
 import { useAppStateContext } from "../AppContext";
-import { CALENDAR_VIEWS } from "../api/constants";
+import { CALENDAR_VIEWS } from "../../utils/constants";
 import { css } from "@emotion/css";
 import HeadsUp from "./HeadsUp";
 import Day from "./Day";

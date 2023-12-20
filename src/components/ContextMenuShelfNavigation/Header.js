@@ -2,7 +2,7 @@ import React from "react";
 import { Squash as Hamburger } from "hamburger-react";
 import { css } from "@emotion/css";
 import { useAppDispatchContext, useAppStateContext } from "../AppContext";
-import { CALENDAR_VIEWS } from "../api/constants";
+import { CALENDAR_VIEWS } from "../../utils/constants";
 
 const headerCss = css`
   z-index: 2;
