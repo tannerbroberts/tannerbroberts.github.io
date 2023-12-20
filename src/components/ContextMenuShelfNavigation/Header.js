@@ -1,7 +1,7 @@
 import React from "react";
 import { Squash as Hamburger } from "hamburger-react";
 import { css } from "@emotion/css";
-import { useAppDispatchContext, useAppStateContext } from "../AppContext";
+import { useAppDispatchContext, useAppStateContext } from "../App/AppContext";
 import { CALENDAR_VIEWS } from "../../utils/constants";
 
 const headerCss = css`

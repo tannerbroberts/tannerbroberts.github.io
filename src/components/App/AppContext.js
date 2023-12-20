@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect } from "react";
 import AppReducer, { initialState } from "./AppReducer";
-import { loadState } from "../utils/localStorageHelpers";
+import { loadState } from "../../utils/localStorageHelpers";
 
 const AppStateContext = createContext();
 const AppDispatchContext = createContext();

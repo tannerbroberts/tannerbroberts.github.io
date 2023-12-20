@@ -5,8 +5,8 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { css } from "@emotion/css";
 import { AppContextProvider } from "./AppContext";
-import ContextMenuShelfContainer from "./ContextMenuShelfNavigation";
-import ViewHandler from "./calendarViews/ViewHandler";
+import ContextMenuShelfContainer from "../ContextMenuShelfNavigation";
+import CalendarView from "../CalendarView/CalendarView";
 
 // Makes the app fill the entire screen
 const fullScreenCss = css`
@@ -23,7 +23,7 @@ function App() {
     <AppContextProvider>
       <div className={fullScreenCss}>
         <ContextMenuShelfContainer>
-          <ViewHandler />
+          <CalendarView />
         </ContextMenuShelfContainer>
       </div>
     </AppContextProvider>

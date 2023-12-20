@@ -15,6 +15,11 @@ export default function HeadsUp() {
   useEffect(() => {
     // Load from local storage, the scheduled events that intersect with the current moment
   }, []);
+
+  // Get the current time
+
+  // Get the next item that intersects with the current time
+
   return (
     <div className={headsUpCss}>
       {items.map((item) => {

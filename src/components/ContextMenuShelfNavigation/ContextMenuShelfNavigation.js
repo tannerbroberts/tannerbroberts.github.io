@@ -1,7 +1,7 @@
 import React from "react";
 import { css } from "@emotion/css";
 import Shelf from "./Shelf";
-import { useAppStateContext } from "../AppContext";
+import { useAppStateContext } from "../App/AppContext";
 import Header from "./Header";
 
 const contextMenuShelfCss = css`
