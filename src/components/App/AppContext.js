@@ -1,21 +1,13 @@
-import React, { createContext, useContext, useEffect } from "react";
-import AppReducer, { initialState } from "./AppReducer";
-import { loadState } from "../../utils/localStorageHelpers";
+import React, { createContext, useContext } from "react";
 
 const AppStateContext = createContext();
 const AppDispatchContext = createContext();
 
 export function AppContextProvider({ children }) {
-  const [state, dispatch] = React.useReducer(AppReducer, initialState);
-  useEffect(() => {
-    const localStorageState = loadState("AppReducer");
-    localStorageState &&
-      dispatch({ type: "LOAD_STATE", value: localStorageState });
-  }, []);
 
   return (
-    <AppStateContext.Provider value={state}>
-      <AppDispatchContext.Provider value={dispatch}>
+    <AppStateContext.Provider value={'test value'}>
+      <AppDispatchContext.Provider value={() => console.log('app dispatch called, but no implementation is there')}>
         {children}
       </AppDispatchContext.Provider>
     </AppStateContext.Provider>

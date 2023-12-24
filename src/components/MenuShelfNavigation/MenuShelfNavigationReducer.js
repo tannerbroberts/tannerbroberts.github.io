@@ -8,7 +8,7 @@ export const initialState = {
 };
 
 // LocalStorage wrapper
-export default function AppReducer(state, action) {
+export default function MenuShelfNavigationReducer(state, action) {
   let newState;
   switch (action.type) {
     case "LOAD_STATE":

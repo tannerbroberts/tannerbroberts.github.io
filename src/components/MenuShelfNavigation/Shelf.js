@@ -11,7 +11,10 @@ import CalendarMonthSharpIcon from "@mui/icons-material/CalendarMonthSharp";
 import CalendarViewWeekSharpIcon from "@mui/icons-material/CalendarViewWeekSharp";
 import ViewDaySharpIcon from "@mui/icons-material/ViewDaySharp";
 import SupportAgentSharpIcon from "@mui/icons-material/SupportAgentSharp";
-import { useAppDispatchContext, useAppStateContext } from "../App/AppContext";
+import {
+  useMenuShelfNavigationDispatchContext,
+  useMenuShelfNavigationStateContext,
+} from "./MenuShelfNavigationContext";
 import { CALENDAR_VIEWS } from "../../utils/constants";
 
 const shelfCss = css`
@@ -29,8 +32,8 @@ const shelfCss = css`
 `;
 
 export default function Shelf() {
-  const dispatch = useAppDispatchContext();
-  const { selectedView } = useAppStateContext();
+  const dispatch = useMenuShelfNavigationDispatchContext();
+  const { selectedView } = useMenuShelfNavigationStateContext();
   return (
     <div className={shelfCss}>
       <List>

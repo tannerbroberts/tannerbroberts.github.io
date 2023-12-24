@@ -1,8 +1,8 @@
 import React from "react";
-import { useAppStateContext } from "../App";
+import { useMenuShelfNavigationStateContext } from "../MenuShelfNavigation/MenuShelfNavigationContext";
 import { CALENDAR_VIEWS } from "../../utils/constants";
 import { css } from "@emotion/css";
-import HeadsUp from "./HeadsUp";
+import HeadsUp from "./HeadsUp/HeadsUp";
 import Day from "./Day";
 import Week from "./Week";
 import Month from "./Month";
@@ -17,7 +17,7 @@ const calendarViewCss = css`
 `;
 
 export default function CalendarView() {
-  const { selectedView } = useAppStateContext();
+  const { selectedView } = useMenuShelfNavigationStateContext();
 
   return (
     <div className={calendarViewCss}>

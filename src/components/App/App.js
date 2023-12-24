@@ -5,7 +5,7 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { css } from "@emotion/css";
 import { AppContextProvider } from "./AppContext";
-import ContextMenuShelfContainer from "../ContextMenuShelfNavigation";
+import ContextMenuShelfContainer from "../MenuShelfNavigation";
 import CalendarView from "../CalendarView/CalendarView";
 
 // Makes the app fill the entire screen

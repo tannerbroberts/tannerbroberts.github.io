@@ -1,7 +1,10 @@
 import React from "react";
 import { Squash as Hamburger } from "hamburger-react";
 import { css } from "@emotion/css";
-import { useAppDispatchContext, useAppStateContext } from "../App/AppContext";
+import {
+  useMenuShelfNavigationDispatchContext,
+  useMenuShelfNavigationStateContext,
+} from "./MenuShelfNavigationContext";
 import { CALENDAR_VIEWS } from "../../utils/constants";
 
 const headerCss = css`
@@ -25,8 +28,8 @@ const headerTextCss = css`
 `;
 
 const Header = () => {
-  const { shelfOpen, selectedView } = useAppStateContext();
-  const dispatch = useAppDispatchContext();
+  const { shelfOpen, selectedView } = useMenuShelfNavigationStateContext();
+  const dispatch = useMenuShelfNavigationDispatchContext();
 
   let calendarType = "asdf";
   switch (selectedView) {
