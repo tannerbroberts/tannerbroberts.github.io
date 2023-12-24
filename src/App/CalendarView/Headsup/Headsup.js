@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
 import { css } from "@emotion/css";
+import HeadsupCard, { HeadsupCardProvider } from "./HeadsupCard";
 
 const headsUpCss = css`
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100%;
@@ -10,20 +12,22 @@ const headsUpCss = css`
   background-color: whitesmoke;
 `;
 
-export default function HeadsUp() {
+export default function Headsup() {
   let items = ["test", "test2", "test3"];
+
   useEffect(() => {
     // Load from local storage, the scheduled events that intersect with the current moment
   }, []);
 
-  // Get the current time
-
-  // Get the next item that intersects with the current time
-
   return (
     <div className={headsUpCss}>
-      {items.map((item) => {
-        return <div>{item}</div>;
+      {items.map((item, index, array) => {
+        return (
+          <HeadsupCardProvider key={item} value={item}>
+            <HeadsupCard />
+            {array.length - 1 !== index && <br />}
+          </HeadsupCardProvider>
+        );
       })}
     </div>
   );

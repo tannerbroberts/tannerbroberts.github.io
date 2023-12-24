@@ -1,8 +1,8 @@
 import React from "react";
-import { useMenuShelfNavigationStateContext } from "../MenuShelfNavigation/MenuShelfNavigationContext";
+import { useMenuShelfNavigationStateContext } from "../MenuShelfNavigation";
 import { CALENDAR_VIEWS } from "../../utils/constants";
 import { css } from "@emotion/css";
-import HeadsUp from "./HeadsUp/HeadsUp";
+import Headsup from "./Headsup";
 import Day from "./Day";
 import Week from "./Week";
 import Month from "./Month";
@@ -21,7 +21,7 @@ export default function CalendarView() {
 
   return (
     <div className={calendarViewCss}>
-      {selectedView === CALENDAR_VIEWS.HEADS_UP && <HeadsUp />}
+      {selectedView === CALENDAR_VIEWS.HEADS_UP && <Headsup />}
       {selectedView === CALENDAR_VIEWS.DAY && <Day />}
       {selectedView === CALENDAR_VIEWS.WEEK && <Week />}
       {selectedView === CALENDAR_VIEWS.MONTH && <Month />}
