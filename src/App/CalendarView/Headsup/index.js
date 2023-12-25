@@ -1,1 +1,1 @@
-export { default } from "./Headsup";
+export { default } from "./Headsup"

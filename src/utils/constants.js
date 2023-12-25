@@ -1,8 +1,8 @@
 export const TIME_VALUES = {
-  day: 86_400_000,
-  hour: 3_600_000,
-  minute: 60_000,
-  second: 1_000,
+  DAY: 86_400_000,
+  HOUR: 3_600_000,
+  MINUTE: 60_000,
+  SECOND: 1_000,
 };
 
 export const CALENDAR_VIEWS = {

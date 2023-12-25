@@ -9,6 +9,7 @@ export function MenuShelfNavigationContext({ children, state, dispatch }) {
     const localStorageState = loadState("AppReducer");
     localStorageState &&
       dispatch({ type: "LOAD_STATE", value: localStorageState });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <MenuShelfNavigationStateContext.Provider value={state}>

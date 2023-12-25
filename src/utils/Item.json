@@ -1,13 +1,28 @@
 {
-  "name": "TemplateName",
-  "variables": {
-    "name": "Variable Name"
+  "Item": {
+    "name": "TemplateName",
+    "variables": {
+      "name": "Variable Name"
+    },
+    "children": [
+      {
+        "name": "My Child Template",
+        "position": 360000
+      }
+    ],
+    "parents": [
+      { "name": "ParentName0", "position": 360000 },
+      { "name": "ParentName1", "position": 360000 },
+      { "name": "ParentName2", "position": 360000 },
+      { "name": "ParentName3", "position": 360000 }
+    ]
   },
-  "children": [
-    {
-      "name": "My Child Template",
-      "position": 360000
-    }
-  ],
-  "parents": ["Parent1", "Parent2", "Parent3"]
+
+  "Tag": {
+    "name": "TagName",
+    "count": 3,
+    "appliedTo": ["TemplateName0", "TemplateName1", "TemplateName2"]
+  },
+
+  "Library": ["ItemName0", "ItemName1", "ItemName2", "ItemName3"]
 }

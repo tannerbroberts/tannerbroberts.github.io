@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { css } from "@emotion/css";
 import HeadsupCard, { HeadsupCardProvider } from "./HeadsupCard";
+import { TIME_VALUES } from "../../../utils/constants";
 
 const headsUpCss = css`
   display: flex;
@@ -13,10 +14,16 @@ const headsUpCss = css`
 `;
 
 export default function Headsup() {
-  let items = ["test", "test2", "test3"];
+  let items = [
+    {
+      name: "first ever item name",
+      startTime: new Date(),
+      length: TIME_VALUES.DAY,
+    },
+  ];
 
   useEffect(() => {
-    // Load from local storage, the scheduled events that intersect with the current moment
+    // Load from local storage, the scheduled events that intersect with the current time window
   }, []);
 
   return (
