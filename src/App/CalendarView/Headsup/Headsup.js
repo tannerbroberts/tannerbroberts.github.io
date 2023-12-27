@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { css } from "@emotion/css";
 import HeadsupCard, { HeadsupCardProvider } from "./HeadsupCard";
 import { TIME_VALUES } from "../../../utils/constants";
+import Row from "../../../components/Row";
+import { useAppContext } from "../../App";
 
 const headsUpCss = css`
   display: flex;
@@ -14,11 +16,17 @@ const headsUpCss = css`
 `;
 
 export default function Headsup() {
+  const { library } = useAppContext();
   let items = [
     {
       name: "first ever item name",
       startTime: new Date(),
       length: TIME_VALUES.DAY,
+    },
+    {
+      name: "second ever item name",
+      startTime: new Date(),
+      length: TIME_VALUES.DAY + TIME_VALUES.HOUR,
     },
   ];
 
@@ -30,12 +38,23 @@ export default function Headsup() {
     <div className={headsUpCss}>
       {items.map((item, index, array) => {
         return (
-          <HeadsupCardProvider key={item} value={item}>
+          <HeadsupCardProvider key={item.name} value={item}>
             <HeadsupCard />
             {array.length - 1 !== index && <br />}
           </HeadsupCardProvider>
         );
       })}
+      <h1>Library:</h1>
+      <Row>
+        {library.map((itemName, index, array) => (
+          <div key={itemName}>
+            {index !== array.length - 1 && (
+              <div key={itemName}>{itemName},</div>
+            )}
+            {index === array.length - 1 && <div key={itemName}>{itemName}</div>}
+          </div>
+        ))}
+      </Row>
     </div>
   );
 }

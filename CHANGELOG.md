@@ -32,10 +32,18 @@ While I'm technically hosting this on Github for anyone to see, this first versi
     filter presets
     
 
-## [0.11.0] December 25th, 2023
+## [0.13.0] December 27th, 2023
+We're cooking with gas now. I've got the loading mechanism all set up for localStorage
+I can add and remove items from the library.
+I'm displaying items created in either test item in the library
+The library updates perfectly with all the clearing and adding and such
+It'll be a bother when eventually, there are hundreds, thousands, tens of thousands of items in a library
+But until then, I'm happy to keep using this super small minded version.
+
+## [0.11.0] December 27th, 2023
 useLocalStorage hook installed from uidotdev package... Better than writing it myself, amIRight?!
 
-## [0.10.0] December 25th, 2023
+## [0.10.0] December 26th, 2023
 useLocalStorageState introduced. It'll help with keeping up-to-date state values when dealing with state and localStorage.
 
 ## [0.8.0] December 25th, 2023

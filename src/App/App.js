@@ -1,12 +1,12 @@
-import React from "react";
+import React, { createContext, useContext } from "react";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { css } from "@emotion/css";
-import { AppContextProvider } from "./AppContext";
 import ContextMenuShelfContainer from "./MenuShelfNavigation";
 import CalendarView from "./CalendarView/CalendarView";
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 // Makes the app fill the entire screen
 const fullScreenCss = css`
@@ -18,16 +18,25 @@ const fullScreenCss = css`
   background-color: yellow;
 `;
 
-function App() {
+export const AppContext = createContext();
+
+export default function App() {
+  const [library, setLibrary] = useLocalStorage("library", []);
   return (
-      <AppContextProvider>
-        <div className={fullScreenCss}>
-          <ContextMenuShelfContainer>
-            <CalendarView />
-          </ContextMenuShelfContainer>
-        </div>
-      </AppContextProvider>
+    <AppContext.Provider value={{ library, setLibrary }}>
+      <div className={fullScreenCss}>
+        <ContextMenuShelfContainer>
+          <CalendarView />
+        </ContextMenuShelfContainer>
+      </div>
+    </AppContext.Provider>
   );
 }
 
-export default App;
+export function useAppContext() {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error("useAppContext must be used within an AppContextProvider");
+  }
+  return context;
+}
