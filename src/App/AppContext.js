@@ -1,16 +1,17 @@
 import React, { createContext, useContext } from "react";
+import { useLocalStorageState } from "./LocalStorageDataStore/useLocalStorageState";
 
 const AppStateContext = createContext();
 const AppDispatchContext = createContext();
 
 export function AppContextProvider({ children }) {
-
+  const [state, setState] = useLocalStorageState("library", []);
   return (
-    <AppStateContext.Provider value={'test value'}>
-      <AppDispatchContext.Provider value={() => console.log('app dispatch called, but no implementation is there')}>
-        {children}
-      </AppDispatchContext.Provider>
-    </AppStateContext.Provider>
+      <AppStateContext.Provider value={state}>
+        <AppDispatchContext.Provider value={setState}>
+          {children}
+        </AppDispatchContext.Provider>
+      </AppStateContext.Provider>
   );
 }
 

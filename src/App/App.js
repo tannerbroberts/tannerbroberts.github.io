@@ -7,6 +7,7 @@ import { css } from "@emotion/css";
 import { AppContextProvider } from "./AppContext";
 import ContextMenuShelfContainer from "./MenuShelfNavigation";
 import CalendarView from "./CalendarView/CalendarView";
+import LocalStorageProvider from "./LocalStorageDataStore/LocalStorageProvider";
 
 // Makes the app fill the entire screen
 const fullScreenCss = css`
@@ -20,13 +21,15 @@ const fullScreenCss = css`
 
 function App() {
   return (
-    <AppContextProvider>
-      <div className={fullScreenCss}>
-        <ContextMenuShelfContainer>
-          <CalendarView />
-        </ContextMenuShelfContainer>
-      </div>
-    </AppContextProvider>
+    <LocalStorageProvider>
+      <AppContextProvider>
+        <div className={fullScreenCss}>
+          <ContextMenuShelfContainer>
+            <CalendarView />
+          </ContextMenuShelfContainer>
+        </div>
+      </AppContextProvider>
+    </LocalStorageProvider>
   );
 }
 

@@ -58,5 +58,10 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.31.8",
     "gh-pages": "^4.0.0"
+  },
+  "jest": {
+    "setupFiles": [
+      "<rootDir>/src/__mocks__/browserMocks.js"
+    ]
   }
 }

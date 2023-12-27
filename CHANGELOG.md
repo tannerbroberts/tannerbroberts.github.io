@@ -31,5 +31,8 @@ While I'm technically hosting this on Github for anyone to see, this first versi
       Tag
     filter presets
 
-## [0.6.3] - To Be Determined
+## [0.8.0] December 25th, 2023
+Merry Christmas!
+
+## [0.6.3] - December 5th, 2023
 I just learned what semver is 😅

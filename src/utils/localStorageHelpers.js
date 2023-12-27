@@ -24,38 +24,6 @@ export const saveState = (stateName, stateValue) => {
 export const loadState = (stateName) => {
   if (!stateName) throw new Error("stateName is undefined");
   const savedValue = localStorage.getItem(`${STATE_NAME_SPACE}${stateName}`);
-  if (savedValue) {
-    return JSON.parse(savedValue);
-  } else {
-    throw new Error(`State ${stateName} not found`);
-  }
-};
-/**
- * @throws Error if item is undefined
- * @throws Error if item.name is undefined
- */
-export const saveItem = (item) => {
-  if (!item) throw new Error("Item is undefined");
-  if (!item.name) throw new Error("Item requires a name attribute");
-  localStorage.setItem(`${ITEM_NAME_SPACE}${item.name}`, JSON.stringify(item));
-};
-/**
- * @throws Error if item is not found
- * @throws Error if name is undefined
- */
-export const loadItem = (name) => {
-  if (!name) throw new Error("Item name is undefined");
-  const savedValue = localStorage.getItem(`${ITEM_NAME_SPACE}${name}`);
-  if (savedValue) {
-    return JSON.parse(savedValue);
-  } else {
-    throw new Error(`Item ${name} not found`);
-  }
-};
-
-/**
- * 
- */
-export const saveLibrary = (library) => {
-  localStorage.setItem(`${ITEM_NAME_SPACE}library`, JSON.stringify(library));
+  if (savedValue) return JSON.parse(savedValue);
+  return null;
 };
