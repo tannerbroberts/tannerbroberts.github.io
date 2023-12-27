@@ -1,11 +1,11 @@
 import React, { createContext, useContext } from "react";
-import { useLocalStorageState } from "./LocalStorageDataStore/useLocalStorageState";
+import { useLocalStorage } from "@uidotdev/usehooks"
 
 const AppStateContext = createContext();
 const AppDispatchContext = createContext();
 
 export function AppContextProvider({ children }) {
-  const [state, setState] = useLocalStorageState("library", []);
+  const [state, setState] = useLocalStorage("library", []);
   return (
       <AppStateContext.Provider value={state}>
         <AppDispatchContext.Provider value={setState}>
