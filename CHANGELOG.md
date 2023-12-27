@@ -31,6 +31,9 @@ While I'm technically hosting this on Github for anyone to see, this first versi
       Tag
     filter presets
 
+## [0.10.0] December 25th, 2023
+useLocalStorageState introduced. It'll help with keeping up-to-date state values when dealing with state and localStorage.
+
 ## [0.8.0] December 25th, 2023
 Merry Christmas!
 
