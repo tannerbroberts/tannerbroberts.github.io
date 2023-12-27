@@ -30,6 +30,10 @@ While I'm technically hosting this on Github for anyone to see, this first versi
       Variable key/value
       Tag
     filter presets
+    
+
+## [0.11.0] December 25th, 2023
+useLocalStorage hook installed from uidotdev package... Better than writing it myself, amIRight?!
 
 ## [0.10.0] December 25th, 2023
 useLocalStorageState introduced. It'll help with keeping up-to-date state values when dealing with state and localStorage.
