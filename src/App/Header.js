@@ -6,7 +6,7 @@ import { useLeftDrawerContext } from "./LeftDrawer";
 import { useCalendarViewContext } from "./CalendarView/CalendarView";
 
 const headerCss = css`
-  z-index: 2;
+  z-index: 1;
   box-sizing: border-box;
   border-bottom: 1px solid lightgray;
   position: absolute;

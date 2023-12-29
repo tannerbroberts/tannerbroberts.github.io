@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext } from "react";
 import { CALENDAR_VIEWS } from "../../utils/constants";
 import { css } from "@emotion/css";
 import Headsup from "./Headsup";
 import Day from "./Day";
 import Week from "./Week";
 import Month from "./Month";
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 const calendarViewCss = css`
   position: relative;
@@ -29,7 +30,8 @@ const useCalendarViewContext = () => {
 };
 
 const CalendarViewProvider = ({ children }) => {
-  const [selectedCalendarView, setSelectedCalendarView] = useState(
+  const [selectedCalendarView, setSelectedCalendarView] = useLocalStorage(
+    "selectedCalendarView",
     CALENDAR_VIEWS.HEADS_UP
   );
   return (

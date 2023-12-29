@@ -10,6 +10,7 @@ import CalendarView, {
 import { useLocalStorage } from "@uidotdev/usehooks";
 import AddItemFloatingActionButton from "./AddItemFloatingActionButton";
 import LeftDrawer, { LeftDrawerProvider } from "./LeftDrawer";
+import BottomDrawer, { BottomDrawerProvider } from "./BottomDrawer";
 import Header from "./Header";
 
 // Makes the app fill the entire screen
@@ -38,12 +39,15 @@ export default function App() {
     <AppProvider>
       <CalendarViewProvider>
         <LeftDrawerProvider>
-          <div className={fullScreenCss}>
-            <Header />
-            <CalendarView />
-            <LeftDrawer />
-            <AddItemFloatingActionButton />
-          </div>
+          <BottomDrawerProvider>
+            <div className={fullScreenCss}>
+              <Header />
+              <CalendarView />
+              <LeftDrawer />
+              <BottomDrawer />
+              <AddItemFloatingActionButton />
+            </div>
+          </BottomDrawerProvider>
         </LeftDrawerProvider>
       </CalendarViewProvider>
     </AppProvider>

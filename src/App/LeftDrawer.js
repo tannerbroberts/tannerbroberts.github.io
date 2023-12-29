@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useState } from "react";
+import React, { createContext, useCallback } from "react";
 import {
   Drawer,
   List,
@@ -13,6 +13,7 @@ import CalendarViewWeekSharpIcon from "@mui/icons-material/CalendarViewWeekSharp
 import CalendarMonthSharpIcon from "@mui/icons-material/CalendarMonthSharp";
 import { CALENDAR_VIEWS } from "../utils/constants";
 import { useCalendarViewContext } from "./CalendarView/CalendarView";
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 const DrawerContext = createContext();
 
@@ -25,9 +26,18 @@ const useLeftDrawerContext = () => {
 };
 
 const LeftDrawerProvider = ({ children }) => {
-  const [leftDrawerIsOpen, setLeftDrawerIsOpen] = useState(true);
-  const closeLeftDrawer = useCallback(() => setLeftDrawerIsOpen(false), []);
-  const openLeftDrawer = useCallback(() => setLeftDrawerIsOpen(true), []);
+  const [leftDrawerIsOpen, setLeftDrawerIsOpen] = useLocalStorage(
+    "leftDrawerIsOpen",
+    false
+  );
+  const closeLeftDrawer = useCallback(
+    () => setLeftDrawerIsOpen(false),
+    [setLeftDrawerIsOpen]
+  );
+  const openLeftDrawer = useCallback(
+    () => setLeftDrawerIsOpen(true),
+    [setLeftDrawerIsOpen]
+  );
 
   return (
     <DrawerContext.Provider

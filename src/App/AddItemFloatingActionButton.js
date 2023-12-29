@@ -1,7 +1,8 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { Add } from "@mui/icons-material";
 import { css } from "@emotion/css";
 import { Fab } from "@mui/material";
+import { useBottomDrawerContext } from "./BottomDrawer/BottomDrawer";
 
 const fabStyle = css`
   position: absolute;
@@ -10,13 +11,15 @@ const fabStyle = css`
 `;
 
 export default function AddItemFloatingActionButton() {
-  const toggleAddItemDialog = useCallback(() => {}, []);
+  const { bottomDrawerIsOpen, openBottomDrawer } = useBottomDrawerContext();
 
-  return (
-    <div className={fabStyle}>
-      <Fab color="primary" aria-label="add">
-        <Add onClick={toggleAddItemDialog} />
-      </Fab>
-    </div>
-  );
+  if (!bottomDrawerIsOpen)
+    return (
+      <div className={fabStyle}>
+        <Fab color="primary" aria-label="add" onClick={openBottomDrawer}>
+          <Add />
+        </Fab>
+      </div>
+    );
+  return null;
 }
