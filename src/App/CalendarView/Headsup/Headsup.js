@@ -19,14 +19,14 @@ export default function Headsup() {
   const { library } = useAppContext();
   let items = [
     {
-      name: "first ever item name",
+      name: "First",
       startTime: new Date(),
       length: TIME_VALUES.DAY,
     },
     {
-      name: "second ever item name",
+      name: "Second",
       startTime: new Date(),
-      length: TIME_VALUES.DAY + TIME_VALUES.HOUR,
+      length: TIME_VALUES.HOUR,
     },
   ];
 

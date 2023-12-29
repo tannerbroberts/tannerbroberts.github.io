@@ -4,9 +4,9 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { css } from "@emotion/css";
-import ContextMenuShelfContainer from "./MenuShelfNavigation";
 import CalendarView from "./CalendarView/CalendarView";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import AddItemFloatingActionButton from "./AddItemFloatingActionButton";
 
 // Makes the app fill the entire screen
 const fullScreenCss = css`
@@ -25,9 +25,8 @@ export default function App() {
   return (
     <AppContext.Provider value={{ library, setLibrary }}>
       <div className={fullScreenCss}>
-        <ContextMenuShelfContainer>
-          <CalendarView />
-        </ContextMenuShelfContainer>
+        <CalendarView />
+        <AddItemFloatingActionButton />
       </div>
     </AppContext.Provider>
   );

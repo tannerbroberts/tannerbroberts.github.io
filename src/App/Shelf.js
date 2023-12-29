@@ -11,11 +11,6 @@ import CalendarMonthSharpIcon from "@mui/icons-material/CalendarMonthSharp";
 import CalendarViewWeekSharpIcon from "@mui/icons-material/CalendarViewWeekSharp";
 import ViewDaySharpIcon from "@mui/icons-material/ViewDaySharp";
 import SupportAgentSharpIcon from "@mui/icons-material/SupportAgentSharp";
-import {
-  useMenuShelfNavigationDispatchContext,
-  useMenuShelfNavigationStateContext,
-} from "./MenuShelfNavigationContext";
-import { CALENDAR_VIEWS } from "../../utils/constants";
 
 const shelfCss = css`
   box-sizing: border-box;
@@ -32,45 +27,31 @@ const shelfCss = css`
 `;
 
 export default function Shelf() {
-  const dispatch = useMenuShelfNavigationDispatchContext();
-  const { selectedView } = useMenuShelfNavigationStateContext();
   return (
     <div className={shelfCss}>
       <List>
-        <ListItemButton
-          selected={selectedView === CALENDAR_VIEWS.HEADS_UP}
-          onClick={() => dispatch({ type: "SELECT_HEADS_UP" })}
-        >
+        <ListItemButton>
           <ListItemIcon>
             <SupportAgentSharpIcon />
           </ListItemIcon>
           <ListItemText primary="Heads Up" />
         </ListItemButton>
 
-        <ListItemButton
-          selected={selectedView === CALENDAR_VIEWS.DAY}
-          onClick={() => dispatch({ type: "SELECT_DAY" })}
-        >
+        <ListItemButton>
           <ListItemIcon>
             <ViewDaySharpIcon />
           </ListItemIcon>
           <ListItemText primary="Day" />
         </ListItemButton>
 
-        <ListItemButton
-          selected={selectedView === CALENDAR_VIEWS.WEEK}
-          onClick={() => dispatch({ type: "SELECT_WEEK" })}
-        >
+        <ListItemButton>
           <ListItemIcon>
             <CalendarViewWeekSharpIcon />
           </ListItemIcon>
           <ListItemText primary="Week" />
         </ListItemButton>
 
-        <ListItemButton
-          selected={selectedView === CALENDAR_VIEWS.MONTH}
-          onClick={() => dispatch({ type: "SELECT_MONTH" })}
-        >
+        <ListItemButton>
           <ListItemIcon>
             <CalendarMonthSharpIcon />
           </ListItemIcon>

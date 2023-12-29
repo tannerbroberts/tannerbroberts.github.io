@@ -2,9 +2,8 @@ import React, { useCallback, useState, useEffect } from "react";
 import { useHeadsupCardContext } from "./HeadsupCardContext";
 import { css } from "@emotion/css";
 import { formatMillis } from "../../../../utils/format";
-import Button from "../../../../components/Button";
 import Row from "../../../../components/Row";
-import { Input } from "@mui/material";
+import { Input, Button } from "@mui/material";
 import { useAppContext } from "../../../App";
 
 const headsupCss = css`
@@ -23,7 +22,7 @@ export default function HeadsupCard() {
   const { library, setLibrary } = useAppContext();
   const [input, setInput] = useState("");
 
-  const onAddItem = useCallback(() => {
+  const onAddItemListener = useCallback(() => {
     if (!input) return;
     setLibrary([...library, input]);
     setInput("");
@@ -32,10 +31,10 @@ export default function HeadsupCard() {
   const onEnterListener = useCallback(
     (e) => {
       if (e.key === "Enter") {
-        onAddItem();
+        onAddItemListener();
       }
     },
-    [onAddItem]
+    [onAddItemListener]
   );
 
   useEffect(() => {
@@ -43,7 +42,7 @@ export default function HeadsupCard() {
     return () => window.removeEventListener("keydown", onEnterListener);
   });
 
-  const onChange = useCallback((e) => setInput(e.target.value), []);
+  const onChangeListener = useCallback((e) => setInput(e.target.value), []);
 
   const item = useHeadsupCardContext();
   return (
@@ -52,9 +51,18 @@ export default function HeadsupCard() {
       <h3>Start: {item.startTime.toLocaleTimeString()}</h3>
       <h3>Duration: {formatMillis(item.length)}</h3>
       <Row>
-        <Input placeholder="Item Name" value={input} onChange={onChange} />
-        <Button onClick={onAddItem}>Add To Library</Button>
-        <Button onClick={() => setLibrary([])}>Clear Library</Button>
+        <Input
+          style={{ fontSize: "16px" }}
+          placeholder="Item Name"
+          value={input}
+          onChange={onChangeListener}
+          onFocus={(e) => {
+            e.preventDefault();
+            return false;
+          }}
+        />
+        <Button variant="contained" onClick={onAddItemListener}>Add To Library</Button>
+        <Button variant="contained" onClick={() => setLibrary([])}>Clear Library</Button>
       </Row>
     </div>
   );

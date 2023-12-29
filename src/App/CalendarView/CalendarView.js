@@ -1,5 +1,4 @@
 import React from "react";
-import { useMenuShelfNavigationStateContext } from "../MenuShelfNavigation";
 import { CALENDAR_VIEWS } from "../../utils/constants";
 import { css } from "@emotion/css";
 import Headsup from "./Headsup";
@@ -8,6 +7,7 @@ import Week from "./Week";
 import Month from "./Month";
 
 const calendarViewCss = css`
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -17,7 +17,7 @@ const calendarViewCss = css`
 `;
 
 export default function CalendarView() {
-  const { selectedView } = useMenuShelfNavigationStateContext();
+  const selectedView = CALENDAR_VIEWS.HEADS_UP;
 
   return (
     <div className={calendarViewCss}>

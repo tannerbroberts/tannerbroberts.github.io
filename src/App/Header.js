@@ -1,11 +1,7 @@
 import React from "react";
 import { Squash as Hamburger } from "hamburger-react";
 import { css } from "@emotion/css";
-import {
-  useMenuShelfNavigationDispatchContext,
-  useMenuShelfNavigationStateContext,
-} from "./MenuShelfNavigationContext";
-import { CALENDAR_VIEWS } from "../../utils/constants";
+import { CALENDAR_VIEWS } from "../utils/constants";
 
 const headerCss = css`
   z-index: 2;
@@ -28,11 +24,8 @@ const headerTextCss = css`
 `;
 
 const Header = () => {
-  const { shelfOpen, selectedView } = useMenuShelfNavigationStateContext();
-  const dispatch = useMenuShelfNavigationDispatchContext();
-
   let calendarType = "asdf";
-  switch (selectedView) {
+  switch (1) {
     case CALENDAR_VIEWS.HEADS_UP:
       calendarType = "Heads Up";
       break;
@@ -52,10 +45,7 @@ const Header = () => {
 
   return (
     <div className={headerCss}>
-      <Hamburger
-        toggled={shelfOpen}
-        onToggle={() => dispatch({ type: "TOGGLE_SHELF" })}
-      />
+      <Hamburger toggled={false} />
       <div className={headerTextCss}>{calendarType}</div>
     </div>
   );
