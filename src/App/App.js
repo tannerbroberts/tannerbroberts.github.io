@@ -4,9 +4,13 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { css } from "@emotion/css";
-import CalendarView from "./CalendarView/CalendarView";
+import CalendarView, {
+  CalendarViewProvider,
+} from "./CalendarView/CalendarView";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import AddItemFloatingActionButton from "./AddItemFloatingActionButton";
+import LeftDrawer, { LeftDrawerProvider } from "./LeftDrawer";
+import Header from "./Header";
 
 // Makes the app fill the entire screen
 const fullScreenCss = css`
@@ -20,15 +24,29 @@ const fullScreenCss = css`
 
 export const AppContext = createContext();
 
-export default function App() {
+export const AppProvider = ({ children }) => {
   const [library, setLibrary] = useLocalStorage("library", []);
   return (
     <AppContext.Provider value={{ library, setLibrary }}>
-      <div className={fullScreenCss}>
-        <CalendarView />
-        <AddItemFloatingActionButton />
-      </div>
+      {children}
     </AppContext.Provider>
+  );
+};
+
+export default function App() {
+  return (
+    <AppProvider>
+      <CalendarViewProvider>
+        <LeftDrawerProvider>
+          <div className={fullScreenCss}>
+            <Header />
+            <CalendarView />
+            <LeftDrawer />
+            <AddItemFloatingActionButton />
+          </div>
+        </LeftDrawerProvider>
+      </CalendarViewProvider>
+    </AppProvider>
   );
 }
 

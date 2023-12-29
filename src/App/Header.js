@@ -2,6 +2,8 @@ import React from "react";
 import { Squash as Hamburger } from "hamburger-react";
 import { css } from "@emotion/css";
 import { CALENDAR_VIEWS } from "../utils/constants";
+import { useLeftDrawerContext } from "./LeftDrawer";
+import { useCalendarViewContext } from "./CalendarView/CalendarView";
 
 const headerCss = css`
   z-index: 2;
@@ -24,8 +26,10 @@ const headerTextCss = css`
 `;
 
 const Header = () => {
+  const { leftDrawerIsOpen, openLeftDrawer } = useLeftDrawerContext();
+  const { selectedCalendarView } = useCalendarViewContext();
   let calendarType = "asdf";
-  switch (1) {
+  switch (selectedCalendarView) {
     case CALENDAR_VIEWS.HEADS_UP:
       calendarType = "Heads Up";
       break;
@@ -45,7 +49,7 @@ const Header = () => {
 
   return (
     <div className={headerCss}>
-      <Hamburger toggled={false} />
+      <Hamburger toggled={leftDrawerIsOpen} toggle={openLeftDrawer} />
       <div className={headerTextCss}>{calendarType}</div>
     </div>
   );
