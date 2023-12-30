@@ -42,6 +42,9 @@ const Header = () => {
     case CALENDAR_VIEWS.MONTH:
       calendarType = "Month";
       break;
+    case CALENDAR_VIEWS.CHANGELOG:
+      calendarType = "Software Change Log";
+      break;
     default:
       calendarType = "Invalid view.";
       break;

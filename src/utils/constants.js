@@ -10,4 +10,5 @@ export const CALENDAR_VIEWS = {
   DAY: 2,
   WEEK: 3,
   MONTH: 4,
+  CHANGELOG: 5,
 };

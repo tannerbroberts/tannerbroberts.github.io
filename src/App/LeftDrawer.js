@@ -11,6 +11,7 @@ import SupportAgentSharpIcon from "@mui/icons-material/SupportAgentSharp";
 import ViewDaySharpIcon from "@mui/icons-material/ViewDaySharp";
 import CalendarViewWeekSharpIcon from "@mui/icons-material/CalendarViewWeekSharp";
 import CalendarMonthSharpIcon from "@mui/icons-material/CalendarMonthSharp";
+import Code from "@mui/icons-material/Code";
 import { CALENDAR_VIEWS } from "../utils/constants";
 import { useCalendarViewContext } from "./CalendarView/CalendarView";
 import { useLocalStorage } from "@uidotdev/usehooks";
@@ -110,6 +111,19 @@ const LeftDrawer = () => {
             <CalendarMonthSharpIcon />
           </ListItemIcon>
           <ListItemText primary="Month" />
+        </ListItemButton>
+
+        <ListItemButton
+          selected={selectedCalendarView === CALENDAR_VIEWS.CHANGELOG}
+          onClick={() => {
+            closeLeftDrawer();
+            setSelectedCalendarView(CALENDAR_VIEWS.CHANGELOG);
+          }}
+        >
+          <ListItemIcon>
+            <Code />
+          </ListItemIcon>
+          <ListItemText primary="Dev Log" />
         </ListItemButton>
 
         <Divider />

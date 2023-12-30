@@ -6,6 +6,7 @@ import Day from "./Day";
 import Week from "./Week";
 import Month from "./Month";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import Changelog from "./Changelog";
 
 const calendarViewCss = css`
   position: relative;
@@ -55,6 +56,7 @@ const CalendarView = () => {
       {selectedCalendarView === CALENDAR_VIEWS.DAY && <Day />}
       {selectedCalendarView === CALENDAR_VIEWS.WEEK && <Week />}
       {selectedCalendarView === CALENDAR_VIEWS.MONTH && <Month />}
+      {selectedCalendarView === CALENDAR_VIEWS.CHANGELOG && <Changelog />}
     </div>
   );
 };
