@@ -12,6 +12,8 @@ import AddItemFloatingActionButton from "./AddItemFloatingActionButton";
 import LeftDrawer, { LeftDrawerProvider } from "./LeftDrawer";
 import BottomDrawer, { BottomDrawerProvider } from "./BottomDrawer";
 import Header from "./Header";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 // Makes the app fill the entire screen
 const fullScreenCss = css`
@@ -36,21 +38,23 @@ export const AppProvider = ({ children }) => {
 
 export default function App() {
   return (
-    <AppProvider>
-      <CalendarViewProvider>
-        <LeftDrawerProvider>
-          <BottomDrawerProvider>
-            <div className={fullScreenCss}>
-              <Header />
-              <CalendarView />
-              <LeftDrawer />
-              <BottomDrawer />
-              <AddItemFloatingActionButton />
-            </div>
-          </BottomDrawerProvider>
-        </LeftDrawerProvider>
-      </CalendarViewProvider>
-    </AppProvider>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <AppProvider>
+        <CalendarViewProvider>
+          <LeftDrawerProvider>
+            <BottomDrawerProvider>
+              <div className={fullScreenCss}>
+                <Header />
+                <CalendarView />
+                <LeftDrawer />
+                <BottomDrawer />
+                <AddItemFloatingActionButton />
+              </div>
+            </BottomDrawerProvider>
+          </LeftDrawerProvider>
+        </CalendarViewProvider>
+      </AppProvider>
+    </LocalizationProvider>
   );
 }
 

@@ -1,6 +1,9 @@
 import React, { createContext, useCallback } from "react";
-import { Drawer, List, ListItemButton } from "@mui/material";
+import { Drawer, List, ListItemButton, Divider } from "@mui/material";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import NewItemTimePicker, {
+  NewItemTimePickerProvider,
+} from "./NewItemTimePicker";
 
 const BottomDrawerContext = createContext();
 
@@ -44,16 +47,15 @@ const BottomDrawer = () => {
       open={bottomDrawerIsOpen}
       onClose={closeBottomDrawer}
     >
-      <List>
-        <ListItemButton>Testing</ListItemButton>
-        <ListItemButton>Testing</ListItemButton>
-        <ListItemButton>Testing</ListItemButton>
-        <ListItemButton>Testing</ListItemButton>
-        <ListItemButton>Testing</ListItemButton>
-        <ListItemButton>Testing</ListItemButton>
-        <ListItemButton>Testing</ListItemButton>
-        <ListItemButton>Testing 123</ListItemButton>
-      </List>
+      <NewItemTimePickerProvider>
+        <List>
+          <NewItemTimePicker />
+          <Divider />
+          <ListItemButton>Testing</ListItemButton>
+          <ListItemButton>Testing</ListItemButton>
+          <ListItemButton>Testing</ListItemButton>
+        </List>
+      </NewItemTimePickerProvider>
     </Drawer>
   );
 };
