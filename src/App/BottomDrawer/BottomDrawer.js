@@ -1,12 +1,11 @@
 import React, { createContext, useCallback } from "react";
-import { Drawer, List, ListItemButton, Divider } from "@mui/material";
+import { Dialog, Drawer, useMediaQuery } from "@mui/material";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import NewItemTimePicker, {
-  NewItemTimePickerProvider,
-} from "./NewItemTimePicker";
+import BottomDrawerContents from "./BottomDrawerContents";
 
 const BottomDrawerContext = createContext();
 
+/** @returns {{ bottomDrawerIsOpen: boolean, openBottomDrawer: Function, closeBottomDrawer: Function, toggleBottomDrawer: Function}} */
 const useBottomDrawerContext = () => {
   const context = React.useContext(BottomDrawerContext);
   if (!context) {
@@ -28,10 +27,19 @@ const BottomDrawerProvider = ({ children }) => {
     () => setBottomDrawerOpen(false),
     [setBottomDrawerOpen]
   );
+  const toggleBottomDrawer = useCallback(
+    () => setBottomDrawerOpen(!bottomDrawerIsOpen),
+    [bottomDrawerIsOpen, setBottomDrawerOpen]
+  );
 
   return (
     <BottomDrawerContext.Provider
-      value={{ bottomDrawerIsOpen, openBottomDrawer, closeBottomDrawer }}
+      value={{
+        bottomDrawerIsOpen,
+        openBottomDrawer,
+        closeBottomDrawer,
+        toggleBottomDrawer,
+      }}
     >
       {children}
     </BottomDrawerContext.Provider>
@@ -39,24 +47,25 @@ const BottomDrawerProvider = ({ children }) => {
 };
 
 const BottomDrawer = () => {
+  const isMobile = useMediaQuery("(max-width: 600px)");
   const { bottomDrawerIsOpen, closeBottomDrawer } = useBottomDrawerContext();
 
+  if (isMobile) {
+    return (
+      <Drawer
+        anchor="bottom"
+        open={bottomDrawerIsOpen}
+        onClose={closeBottomDrawer}
+      >
+        <BottomDrawerContents />
+      </Drawer>
+    );
+  }
+
   return (
-    <Drawer
-      anchor="bottom"
-      open={bottomDrawerIsOpen}
-      onClose={closeBottomDrawer}
-    >
-      <NewItemTimePickerProvider>
-        <List>
-          <NewItemTimePicker />
-          <Divider />
-          <ListItemButton>Testing</ListItemButton>
-          <ListItemButton>Testing</ListItemButton>
-          <ListItemButton>Testing</ListItemButton>
-        </List>
-      </NewItemTimePickerProvider>
-    </Drawer>
+    <Dialog onClose={closeBottomDrawer} open={bottomDrawerIsOpen}>
+      <BottomDrawerContents />
+    </Dialog>
   );
 };
 

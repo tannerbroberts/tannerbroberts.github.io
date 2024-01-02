@@ -19,6 +19,9 @@ export const NewItemTimePickerProvider = ({ children }) => {
   );
 };
 
+/**
+ * @returns {{ newItemStartTime: dayjs.Dayjs, setNewItemStartTime: Function }}
+ */
 const useNewItemTimePickerContext = () => {
   const context = React.useContext(NewItemTimePickerContext);
   if (context === undefined) {
@@ -33,12 +36,12 @@ const NewItemTimePicker = () => {
   const { newItemStartTime } = useNewItemTimePickerContext();
   return (
     <ListItem>
-      <Stack width={"100%"} spacing={2}>
-        <Stack width={"100%"} justifyContent="space-between" direction="row">
+      <Stack>
+        <Stack justifyContent="space-around" direction="row">
           {newItemStartTime.format("dddd, MMM YYYY")}
           <Button variant="elevated">{newItemStartTime.format("h A")}</Button>
         </Stack>
-        <Stack width={"100%"} justifyContent="space-between" direction="row">
+        <Stack justifyContent="space-around" direction="row">
           {newItemStartTime.format("dddd, MMM YYYY")}
           <Button variant="elevated">{newItemStartTime.format("h A")}</Button>
         </Stack>

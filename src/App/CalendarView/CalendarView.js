@@ -10,6 +10,7 @@ import Changelog from "./Changelog";
 
 const calendarViewCss = css`
   position: relative;
+  top: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,6 +21,7 @@ const calendarViewCss = css`
 
 const CalendarViewContext = createContext();
 
+/** @returns {{ selectedCalendarView: string, setSelectedCalendarView: Function }} */
 const useCalendarViewContext = () => {
   const context = useContext(CalendarViewContext);
   if (!context) {

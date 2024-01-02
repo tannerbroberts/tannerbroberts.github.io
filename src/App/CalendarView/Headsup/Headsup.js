@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { Stack } from "@mui/material";
 import { css } from "@emotion/css";
 import HeadsupCard, { HeadsupCardProvider } from "./HeadsupCard";
 import { TIME_VALUES } from "../../../utils/constants";
-import Row from "../../../components/Row";
 import { useAppContext } from "../../App";
 
 const headsUpCss = css`
@@ -30,9 +30,7 @@ export default function Headsup() {
     },
   ];
 
-  useEffect(() => {
-    // Load from local storage, the scheduled events that intersect with the current time window
-  }, []);
+  // Load from local storage, the scheduled events that intersect with the current time window
 
   return (
     <div className={headsUpCss}>
@@ -45,7 +43,7 @@ export default function Headsup() {
         );
       })}
       <h1>Library:</h1>
-      <Row>
+      <Stack direction="row">
         {library.map((itemName, index, array) => (
           <div key={itemName}>
             {index !== array.length - 1 && (
@@ -54,7 +52,7 @@ export default function Headsup() {
             {index === array.length - 1 && <div key={itemName}>{itemName}</div>}
           </div>
         ))}
-      </Row>
+      </Stack>
     </div>
   );
 }

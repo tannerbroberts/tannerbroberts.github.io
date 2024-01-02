@@ -17,6 +17,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 // Makes the app fill the entire screen
 const fullScreenCss = css`
+  overflow: hidden;
   position: absolute;
   top: 0;
   bottom: 0;
@@ -58,6 +59,7 @@ export default function App() {
   );
 }
 
+/** @returns {{ library: [string], setLibrary: LocalStorageSetter }} */
 export function useAppContext() {
   const context = useContext(AppContext);
   if (!context) {

@@ -18,6 +18,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 
 const DrawerContext = createContext();
 
+/** @returns {{ leftDrawerIsOpen: boolean, closeLeftDrawer: Function, openLeftDrawer: Function }} */
 const useLeftDrawerContext = () => {
   const context = React.useContext(DrawerContext);
   if (!context) {

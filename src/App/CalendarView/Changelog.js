@@ -1,5 +1,21 @@
 import React from "react";
 import Markdown from "markdown-to-jsx";
+import { css } from "@emotion/css";
+
+const containerStyles = css`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: whitesmoke;
+`;
+
+const markdownStyles = css`
+  margin-left: min(25%, 50px);
+  margin-right: min(25%, 50px);
+  margin-top: min(25%, 50px);
+  margin-bottom: min(25%, 100px);
+`;
 
 const Changelog = () => {
   const [changelog, setChangelog] = React.useState("");
@@ -8,7 +24,6 @@ const Changelog = () => {
     fetch("/CHANGELOG.md")
       .then((response) => response.text())
       .then((data) => {
-        console.log("data", data);
         setChangelog(data);
       })
       .catch((err) => {
@@ -17,18 +32,8 @@ const Changelog = () => {
   }, []);
 
   return (
-    <div
-      style={{
-        position: "relative",
-        top: "50px",
-        width: "100%",
-        height: "100%",
-        overflow: "auto",
-        backgroundColor: "whitesmoke",
-        padding: "10px",
-      }}
-    >
-      <Markdown>{changelog}</Markdown>
+    <div className={containerStyles}>
+      <Markdown className={markdownStyles}>{changelog}</Markdown>
     </div>
   );
 };

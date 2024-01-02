@@ -1,10 +1,35 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { useHeadsupCardContext } from "./HeadsupCardContext";
+import React, {
+  useCallback,
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+} from "react";
 import { css } from "@emotion/css";
 import { formatMillis } from "../../../../utils/format";
-import Row from "../../../../components/Row";
-import { Input, Button } from "@mui/material";
+import { Input, Button, Stack } from "@mui/material";
 import { useAppContext } from "../../../App";
+
+export const HeadsupCardContext = createContext();
+
+export function HeadsupCardProvider({ children }) {
+  return (
+    <HeadsupCardContext.Provider value={{}}>
+      {children}
+    </HeadsupCardContext.Provider>
+  );
+}
+
+/** @returns {{ value: Item }} */
+export const useHeadsupCardContext = () => {
+  const context = useContext(HeadsupCardContext);
+  if (context === undefined) {
+    throw new Error(
+      "useHeadsupCardContext must be used within a HeadsupCardProvider"
+    );
+  }
+  return context;
+};
 
 const headsupCss = css`
   box-sizing: border-box;
@@ -50,7 +75,7 @@ export default function HeadsupCard() {
       <h2>{item.name}</h2>
       <h3>Start: {item.startTime.toLocaleTimeString()}</h3>
       <h3>Duration: {formatMillis(item.length)}</h3>
-      <Row>
+      <Stack direction="row">
         <Input
           style={{ fontSize: "16px" }}
           placeholder="Item Name"
@@ -61,9 +86,13 @@ export default function HeadsupCard() {
             return false;
           }}
         />
-        <Button variant="contained" onClick={onAddItemListener}>Add To Library</Button>
-        <Button variant="contained" onClick={() => setLibrary([])}>Clear Library</Button>
-      </Row>
+        <Button variant="contained" onClick={onAddItemListener}>
+          Add To Library
+        </Button>
+        <Button variant="contained" onClick={() => setLibrary([])}>
+          Clear Library
+        </Button>
+      </Stack>
     </div>
   );
 }
