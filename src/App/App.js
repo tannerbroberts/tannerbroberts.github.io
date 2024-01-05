@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useCallback, useContext } from "react";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
@@ -27,11 +27,35 @@ const fullScreenCss = css`
 `;
 
 export const AppContext = createContext();
-
 export const AppProvider = ({ children }) => {
   const [library, setLibrary] = useLocalStorage("library", []);
+  const addToLibrary = useCallback(
+    (newItem) => {
+      setLibrary((library) => [...library, newItem]);
+    },
+    [setLibrary]
+  );
+  const removeFromLibrary = useCallback(
+    (itemToRemove) => {
+      setLibrary((library) => {
+        const index = library.indexOf(itemToRemove);
+        if (index === -1) {
+          return library;
+        }
+        const newLibrary = [...library];
+        newLibrary.splice(index, 1);
+        return newLibrary;
+      });
+    },
+    [setLibrary]
+  );
+  const clearLibrary = useCallback(() => {
+    setLibrary([]);
+  }, [setLibrary]);
   return (
-    <AppContext.Provider value={{ library, setLibrary }}>
+    <AppContext.Provider
+      value={{ library, addToLibrary, removeFromLibrary, clearLibrary }}
+    >
       {children}
     </AppContext.Provider>
   );
@@ -59,7 +83,7 @@ export default function App() {
   );
 }
 
-/** @returns {{ library: [string], setLibrary: LocalStorageSetter }} */
+/** @returns {{ library: [string], addToLibrary: Function, removeFromLibrary: Function }} */
 export function useAppContext() {
   const context = useContext(AppContext);
   if (!context) {

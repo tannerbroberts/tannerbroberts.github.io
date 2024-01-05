@@ -63,7 +63,7 @@ const BottomDrawer = () => {
   }
 
   return (
-    <Dialog onClose={closeBottomDrawer} open={bottomDrawerIsOpen}>
+    <Dialog maxWidth="lg" onClose={closeBottomDrawer} open={bottomDrawerIsOpen}>
       <BottomDrawerContents />
     </Dialog>
   );

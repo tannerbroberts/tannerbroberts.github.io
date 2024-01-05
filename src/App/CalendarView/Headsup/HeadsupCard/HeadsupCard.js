@@ -1,20 +1,26 @@
-import React, {
-  useCallback,
-  useState,
-  useEffect,
-  createContext,
-  useContext,
-} from "react";
+import React, { createContext, useContext } from "react";
 import { css } from "@emotion/css";
 import { formatMillis } from "../../../../utils/format";
-import { Input, Button, Stack } from "@mui/material";
+import { Button, Stack } from "@mui/material";
 import { useAppContext } from "../../../App";
+
+const headsupCss = css`
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  padding: 10px;
+
+  background-color: lightblue;
+`;
 
 export const HeadsupCardContext = createContext();
 
-export function HeadsupCardProvider({ children }) {
+export function HeadsupCardProvider({ children, value }) {
   return (
-    <HeadsupCardContext.Provider value={{}}>
+    <HeadsupCardContext.Provider value={value}>
       {children}
     </HeadsupCardContext.Provider>
   );
@@ -31,43 +37,8 @@ export const useHeadsupCardContext = () => {
   return context;
 };
 
-const headsupCss = css`
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  width: 100%;
-  padding: 10px;
-
-  background-color: lightblue;
-`;
-
 export default function HeadsupCard() {
-  const { library, setLibrary } = useAppContext();
-  const [input, setInput] = useState("");
-
-  const onAddItemListener = useCallback(() => {
-    if (!input) return;
-    setLibrary([...library, input]);
-    setInput("");
-  }, [input, library, setLibrary]);
-
-  const onEnterListener = useCallback(
-    (e) => {
-      if (e.key === "Enter") {
-        onAddItemListener();
-      }
-    },
-    [onAddItemListener]
-  );
-
-  useEffect(() => {
-    window.addEventListener("keydown", onEnterListener);
-    return () => window.removeEventListener("keydown", onEnterListener);
-  });
-
-  const onChangeListener = useCallback((e) => setInput(e.target.value), []);
+  const { clearLibrary } = useAppContext();
 
   const item = useHeadsupCardContext();
   return (
@@ -76,20 +47,7 @@ export default function HeadsupCard() {
       <h3>Start: {item.startTime.toLocaleTimeString()}</h3>
       <h3>Duration: {formatMillis(item.length)}</h3>
       <Stack direction="row">
-        <Input
-          style={{ fontSize: "16px" }}
-          placeholder="Item Name"
-          value={input}
-          onChange={onChangeListener}
-          onFocus={(e) => {
-            e.preventDefault();
-            return false;
-          }}
-        />
-        <Button variant="contained" onClick={onAddItemListener}>
-          Add To Library
-        </Button>
-        <Button variant="contained" onClick={() => setLibrary([])}>
+        <Button variant="contained" onClick={clearLibrary}>
           Clear Library
         </Button>
       </Stack>

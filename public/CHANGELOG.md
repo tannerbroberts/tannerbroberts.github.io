@@ -32,6 +32,10 @@ While I'm technically hosting this on Github for anyone to see, this first versi
   - Getting other companies to add, these conversion factors seems like the end goal for price/variable functionality. This, however, requires that my app interface with live data on the Internet, which is far beyond the scope of the initial release.
 
 
+# [0.17.0] January 5th, 2024
+
+The bottomsheet is prooving to be one of the more complex issues. Of course, I didn't realize just how many details there are associated with the creation of a new template/item. The entire point of the app is that the details be handled seamlessly, so I really should have seen this comming. Anyhow, it's been a bit of a slog because my expectations were too high to begin with. I now unserstand that it's going to take a long time, and I've adjusted my expectations. Ahh.. Sweet therapy.
+
 # [0.16.0] December 29th, 2023
 
 I started using the dayjs library. Apparently material UI works really well with it. I've started the very beginning of the time picker in the bottom drawer. I've also added the changelog as a visible part to the app.

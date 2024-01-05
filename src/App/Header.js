@@ -28,7 +28,7 @@ const headerTextCss = css`
 const Header = () => {
   const { leftDrawerIsOpen, openLeftDrawer } = useLeftDrawerContext();
   const { selectedCalendarView } = useCalendarViewContext();
-  let calendarType = "asdf";
+  let calendarType = "";
   switch (selectedCalendarView) {
     case CALENDAR_VIEWS.HEADS_UP:
       calendarType = "Heads Up";

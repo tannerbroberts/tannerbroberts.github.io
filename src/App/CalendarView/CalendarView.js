@@ -37,11 +37,33 @@ const CalendarViewProvider = ({ children }) => {
     "selectedCalendarView",
     CALENDAR_VIEWS.HEADS_UP
   );
+
+  let selectedCalendarViewString = "Missing Context Value";
+  switch (selectedCalendarView) {
+    case 1:
+      selectedCalendarViewString = "Headsup";
+      break;
+    case 2:
+      selectedCalendarViewString = "Day";
+      break;
+    case 3:
+      selectedCalendarViewString = "Week";
+      break;
+    case 4:
+      selectedCalendarViewString = "Month";
+      break;
+    case 5:
+      selectedCalendarViewString = "Changelog";
+      break;
+    default:
+  }
+
   return (
     <CalendarViewContext.Provider
       value={{
         selectedCalendarView,
         setSelectedCalendarView,
+        selectedCalendarViewString
       }}
     >
       {children}
