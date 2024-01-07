@@ -31,6 +31,10 @@ While I'm technically hosting this on Github for anyone to see, this first versi
   - I wrote a decent blog post about it, but I'm not going to tell you where it is, because that's what lazy developers do, and I hope you suffer the way a junior developer does in badly written code.
 
 
+# [0.18.0] January 6th, 2024
+
+Adds name and template validation, giving special consideration to the overlap between template and name updates.
+
 # [0.17.0] January 5th, 2024
 
 The bottomsheet is prooving to be one of the more complex issues. Of course, I didn't realize just how many details there are associated with the creation of a new template/item. The entire point of the app is that the details be handled seamlessly, so I really should have seen this comming. Anyhow, it's been a bit of a slog because my expectations were too high to begin with. I now unserstand that it's going to take a long time, and I've adjusted my expectations. Ahh.. Sweet therapy.
