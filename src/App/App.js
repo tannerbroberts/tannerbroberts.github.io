@@ -11,6 +11,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import AddItemFloatingActionButton from "./AddItemFloatingActionButton";
 import LeftDrawer, { LeftDrawerProvider } from "./LeftDrawer";
 import BottomDrawer, { BottomDrawerProvider } from "./BottomDrawer";
+import { NewItemCreationProvider } from "./BottomDrawer/NewItemCreation/NewItemCreation";
 import Header from "./Header";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -30,15 +31,15 @@ export const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const [library, setLibrary] = useLocalStorage("library", []);
   const addToLibrary = useCallback(
-    (newItem) => {
-      setLibrary((library) => [...library, newItem]);
+    (nameString) => {
+      setLibrary((library) => [...library, nameString]);
     },
     [setLibrary]
   );
   const removeFromLibrary = useCallback(
-    (itemToRemove) => {
+    (stringToRemove) => {
       setLibrary((library) => {
-        const index = library.indexOf(itemToRemove);
+        const index = library.indexOf(stringToRemove);
         if (index === -1) {
           return library;
         }
@@ -52,9 +53,15 @@ export const AppProvider = ({ children }) => {
   const clearLibrary = useCallback(() => {
     setLibrary([]);
   }, [setLibrary]);
+
   return (
     <AppContext.Provider
-      value={{ library, addToLibrary, removeFromLibrary, clearLibrary }}
+      value={{
+        library,
+        addToLibrary,
+        removeFromLibrary,
+        clearLibrary,
+      }}
     >
       {children}
     </AppContext.Provider>
@@ -65,19 +72,21 @@ export default function App() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <AppProvider>
-        <CalendarViewProvider>
-          <LeftDrawerProvider>
-            <BottomDrawerProvider>
-              <div className={fullScreenCss}>
-                <Header />
-                <CalendarView />
-                <LeftDrawer />
-                <BottomDrawer />
-                <AddItemFloatingActionButton />
-              </div>
-            </BottomDrawerProvider>
-          </LeftDrawerProvider>
-        </CalendarViewProvider>
+        <NewItemCreationProvider>
+          <CalendarViewProvider>
+            <LeftDrawerProvider>
+              <BottomDrawerProvider>
+                <div className={fullScreenCss}>
+                  <Header />
+                  <CalendarView />
+                  <LeftDrawer />
+                  <BottomDrawer />
+                  <AddItemFloatingActionButton />
+                </div>
+              </BottomDrawerProvider>
+            </LeftDrawerProvider>
+          </CalendarViewProvider>
+        </NewItemCreationProvider>
       </AppProvider>
     </LocalizationProvider>
   );

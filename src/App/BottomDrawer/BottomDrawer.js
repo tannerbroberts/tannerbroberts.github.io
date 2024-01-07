@@ -1,7 +1,7 @@
 import React, { createContext, useCallback } from "react";
 import { Dialog, Drawer, useMediaQuery } from "@mui/material";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import BottomDrawerContents from "./BottomDrawerContents";
+import NewItemCreation from "./NewItemCreation/NewItemCreation";
 
 const BottomDrawerContext = createContext();
 
@@ -57,14 +57,14 @@ const BottomDrawer = () => {
         open={bottomDrawerIsOpen}
         onClose={closeBottomDrawer}
       >
-        <BottomDrawerContents />
+        <NewItemCreation />
       </Drawer>
     );
   }
 
   return (
     <Dialog maxWidth="lg" onClose={closeBottomDrawer} open={bottomDrawerIsOpen}>
-      <BottomDrawerContents />
+      <NewItemCreation />
     </Dialog>
   );
 };
