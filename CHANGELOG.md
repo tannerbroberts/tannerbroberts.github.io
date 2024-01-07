@@ -26,11 +26,14 @@ While I'm technically hosting this on Github for anyone to see, this first versi
 - Schedule view types:
   - Scrollable linear timeline view (any time length)
 - More technical details
-  - Whether or not the creation of an item creates a corresponding template by default still needs to be tested. I'm not sure what user expectations would be. The concept is fairly novel in a calendar world. The only correlate that I can think of is a repeating task. Repeating calendar task in Google calendar. Will ask you if you would like to edit the entire series of tasks or just that one task if you attempt to edit any of the tasks within a particular series that repeats.
-  - When an item is updated, it should automatically update its parent containers. Specifically, I'm talking about the variable summaries. If Change a variable within an item, for example, I update bacon and eggs, so that it requires three eggs instead of two, then I will want any meal plans that include that particular meal to update as well.
-  - The idea of conversion factors seems like it may be a messy one. The price of eggs is one such conversion factor. If I change an item to use three eggs instead of two, and if I want to see how much that item costs me, I'm going to have to use eggs and or dollars in that calculation. When I decide to convert from eggs to dollars is a question that I have not yet answered. The mechanism by which I interpret eggs and their relationship to dollars, has not yet been discovered. One thought that occurs to me, is to have a library of conversion factors. Whenever I want to display data, dollars spent for example, I will need to know the conversion factor from every variable that may cost money.
-  - Getting other companies to add, these conversion factors seems like the end goal for price/variable functionality. This, however, requires that my app interface with live data on the Internet, which is far beyond the scope of the initial release.
+  - The idea of vertical layers of development in the clean architecture mindset is that a user interacting with a feature on the outside will interact with only certain blocks of code, And that the developers mindset should account for that. The developers should organize their code in a way that makes thinking about user-identifiable features second nature. For example, the creation of an item is a very complicated thing, lots to remember, but a user thinks about separate ideas within the scope of creating a new item. So especially when the concept starts getting more involved for me as a developer, what I should do is start thinking of features from the users', perspective, building out a full user-identifiable feature, hooking it into the necessary context and API's, and making sure that feature is separated in all possible ways from other features.
+  - Let's take the idea of a item name. The name will end up being very important because it serves as both an identifier for the user in that moment, but also as an identifier for the app at all times afterwards.
+  - I wrote a decent blog post about it, but I'm not going to tell you where it is, because that's what lazy developers do, and I hope you suffer the way a junior developer does in badly written code.
 
+
+# [0.18.0] January 6th, 2024
+
+Adds name and template validation, giving special consideration to the overlap between template and name updates.
 
 # [0.17.0] January 5th, 2024
 
