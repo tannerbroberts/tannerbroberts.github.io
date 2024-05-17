@@ -1,9 +1,9 @@
-import React, { createContext, useCallback } from "react";
+import React from "react";
 import { Dialog, Drawer, useMediaQuery } from "@mui/material";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import NewItemCreation from "./NewItemCreation/NewItemCreation";
 
-const BottomDrawerContext = createContext();
+const BottomDrawerContext = React.createContext();
 
 /** @returns {{ bottomDrawerIsOpen: boolean, openBottomDrawer: Function, closeBottomDrawer: Function, toggleBottomDrawer: Function}} */
 const useBottomDrawerContext = () => {
@@ -19,15 +19,15 @@ const BottomDrawerProvider = ({ children }) => {
     "bottomDrawerIsOpen",
     false
   );
-  const openBottomDrawer = useCallback(
+  const openBottomDrawer = React.useCallback(
     () => setBottomDrawerOpen(true),
     [setBottomDrawerOpen]
   );
-  const closeBottomDrawer = useCallback(
+  const closeBottomDrawer = React.useCallback(
     () => setBottomDrawerOpen(false),
     [setBottomDrawerOpen]
   );
-  const toggleBottomDrawer = useCallback(
+  const toggleBottomDrawer = React.useCallback(
     () => setBottomDrawerOpen(!bottomDrawerIsOpen),
     [bottomDrawerIsOpen, setBottomDrawerOpen]
   );

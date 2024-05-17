@@ -1,1 +1,2 @@
-export { default, HeadsupCardProvider } from "./HeadsupCard";
+export { default } from "./HeadsupCard";
+export { HeadsupCardProvider, useHeadsupCardContext } from "./HeadsupCardProvider";

@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from "react";
+import React from "react";
 import { CALENDAR_VIEWS } from "../../utils/constants";
 import { css } from "@emotion/css";
 import Headsup from "./Headsup";
@@ -19,11 +19,11 @@ const calendarViewCss = css`
   background-color: yellow;
 `;
 
-const CalendarViewContext = createContext();
+const CalendarViewContext = React.createContext();
 
 /** @returns {{ selectedCalendarView: string, setSelectedCalendarView: Function }} */
 const useCalendarViewContext = () => {
-  const context = useContext(CalendarViewContext);
+  const context = React.useContext(CalendarViewContext);
   if (!context) {
     throw new Error(
       "useCalendarViewContext must be used within a CalendarViewProvider"

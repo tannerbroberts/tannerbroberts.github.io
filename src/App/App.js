@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext } from "react";
+import React from "react";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
@@ -27,16 +27,16 @@ const fullScreenCss = css`
   background-color: yellow;
 `;
 
-export const AppContext = createContext();
+export const AppContext = React.createContext();
 export const AppProvider = ({ children }) => {
   const [library, setLibrary] = useLocalStorage("library", []);
-  const addToLibrary = useCallback(
+  const addToLibrary = React.useCallback(
     (nameString) => {
       setLibrary((library) => [...library, nameString]);
     },
     [setLibrary]
   );
-  const removeFromLibrary = useCallback(
+  const removeFromLibrary = React.useCallback(
     (stringToRemove) => {
       setLibrary((library) => {
         const index = library.indexOf(stringToRemove);
@@ -50,7 +50,7 @@ export const AppProvider = ({ children }) => {
     },
     [setLibrary]
   );
-  const clearLibrary = useCallback(() => {
+  const clearLibrary = React.useCallback(() => {
     setLibrary([]);
   }, [setLibrary]);
 
@@ -94,7 +94,7 @@ export default function App() {
 
 /** @returns {{ library: [string], addToLibrary: Function, removeFromLibrary: Function }} */
 export function useAppContext() {
-  const context = useContext(AppContext);
+  const context = React.useContext(AppContext);
   if (!context) {
     throw new Error("useAppContext must be used within an AppContextProvider");
   }

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { Button } from "@mui/material";
 import { useAppContext } from "../../../App";
 import { useNewItemCreationContext } from "../NewItemCreation";
@@ -14,7 +14,7 @@ export default function NewTemplateButton() {
   const { addToLibrary } = useAppContext();
   const { closeBottomDrawer } = useBottomDrawerContext();
 
-  const handleSubmitNewItemTemplate = useCallback(() => {
+  const handleSubmitNewItemTemplate = React.useCallback(() => {
     if (!newItemName || newItemNameIsTaken || newItemNameIsInvalid) return;
     else {
       addToLibrary(newItemName);

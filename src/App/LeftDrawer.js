@@ -1,4 +1,4 @@
-import React, { createContext, useCallback } from "react";
+import React from "react";
 import {
   Drawer,
   List,
@@ -16,7 +16,7 @@ import { CALENDAR_VIEWS } from "../utils/constants";
 import { useCalendarViewContext } from "./CalendarView/CalendarView";
 import { useLocalStorage } from "@uidotdev/usehooks";
 
-const DrawerContext = createContext();
+const DrawerContext = React.createContext();
 
 /** @returns {{ leftDrawerIsOpen: boolean, closeLeftDrawer: Function, openLeftDrawer: Function }} */
 const useLeftDrawerContext = () => {
@@ -32,11 +32,11 @@ const LeftDrawerProvider = ({ children }) => {
     "leftDrawerIsOpen",
     false
   );
-  const closeLeftDrawer = useCallback(
+  const closeLeftDrawer = React.useCallback(
     () => setLeftDrawerIsOpen(false),
     [setLeftDrawerIsOpen]
   );
-  const openLeftDrawer = useCallback(
+  const openLeftDrawer = React.useCallback(
     () => setLeftDrawerIsOpen(true),
     [setLeftDrawerIsOpen]
   );

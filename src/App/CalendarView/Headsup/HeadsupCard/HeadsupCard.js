@@ -1,8 +1,9 @@
-import React, { createContext, useContext } from "react";
+import React from "react";
 import { css } from "@emotion/css";
 import { formatMillis } from "../../../../utils/format";
-import { Button, Stack } from "@mui/material";
-import { useAppContext } from "../../../App";
+import { Stack } from "@mui/material";
+import { useHeadsupCardContext } from "./HeadsupCardProvider";
+
 
 const headsupCss = css`
   box-sizing: border-box;
@@ -16,30 +17,7 @@ const headsupCss = css`
   background-color: lightblue;
 `;
 
-export const HeadsupCardContext = createContext();
-
-export function HeadsupCardProvider({ children, value }) {
-  return (
-    <HeadsupCardContext.Provider value={value}>
-      {children}
-    </HeadsupCardContext.Provider>
-  );
-}
-
-/** @returns {{ value: Item }} */
-export const useHeadsupCardContext = () => {
-  const context = useContext(HeadsupCardContext);
-  if (context === undefined) {
-    throw new Error(
-      "useHeadsupCardContext must be used within a HeadsupCardProvider"
-    );
-  }
-  return context;
-};
-
 export default function HeadsupCard() {
-  const { clearLibrary } = useAppContext();
-
   const item = useHeadsupCardContext();
   return (
     <div className={headsupCss}>
@@ -47,9 +25,6 @@ export default function HeadsupCard() {
       <h3>Start: {item.startTime.toLocaleTimeString()}</h3>
       <h3>Duration: {formatMillis(item.length)}</h3>
       <Stack direction="row">
-        <Button variant="contained" onClick={clearLibrary}>
-          Clear Library
-        </Button>
       </Stack>
     </div>
   );
