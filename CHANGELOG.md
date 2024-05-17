@@ -51,7 +51,7 @@ I added the beginnings of bottom drawer. It was just the same as left drawer, wh
 
 I discovered that I want to declare my state variables inside of the providers that expose those variables. Doing so intentionally de-couples the initialization of that state from the components. I'm going to go ahead and say that that's a good thing. One benefit that I've seen is that I can move my context provider component freely. If I realize that I need my context, one level higher, it's a simple matter of moving that line, one level, higher, or cutting the provider out of the current file, and putting it in the file of its parent. The point is, the API is blazingly fast For updating provider scope.
 
-I'm also very happy with my ability to replace the use state hook with use local storage. The local storage hook proves to do exactly the same thing as useState, except now I can sync a state variable with a data store from local storage. This is a game changer for me, because it provides the mechanism for loading, saving, updating, deleting items from multiple places in my app. All these updates are done for me so long as I use the "use local storage" hook in every place that consumes item data.
+I'm also very happy with my ability to replace the use state hook with use local storage. The local storage hook proves to do exactly the same thing as React.useState, except now I can sync a state variable with a data store from local storage. This is a game changer for me, because it provides the mechanism for loading, saving, updating, deleting items from multiple places in my app. All these updates are done for me so long as I use the "use local storage" hook in every place that consumes item data.
 
 ### [0.13.0] December 27th, 2023
 
