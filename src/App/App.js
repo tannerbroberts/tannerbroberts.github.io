@@ -29,30 +29,7 @@ const fullScreenCss = css`
 
 export const AppContext = React.createContext();
 export const AppProvider = ({ children }) => {
-  const [library, setLibrary] = useLocalStorage("library", []);
-  const addToLibrary = React.useCallback(
-    (nameString) => {
-      setLibrary((library) => [...library, nameString]);
-    },
-    [setLibrary]
-  );
-  const removeFromLibrary = React.useCallback(
-    (stringToRemove) => {
-      setLibrary((library) => {
-        const index = library.indexOf(stringToRemove);
-        if (index === -1) {
-          return library;
-        }
-        const newLibrary = [...library];
-        newLibrary.splice(index, 1);
-        return newLibrary;
-      });
-    },
-    [setLibrary]
-  );
-  const clearLibrary = React.useCallback(() => {
-    setLibrary([]);
-  }, [setLibrary]);
+  const { library, setLibrary } = useLibrary();
 
   return (
     <AppContext.Provider
@@ -60,12 +37,13 @@ export const AppProvider = ({ children }) => {
         library,
         addToLibrary,
         removeFromLibrary,
+        updateItemInLibrary: addToLibrary,
         clearLibrary,
       }}
     >
       {children}
     </AppContext.Provider>
-  );
+  );L
 };
 
 export default function App() {
