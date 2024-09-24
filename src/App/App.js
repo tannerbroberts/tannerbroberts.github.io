@@ -52,22 +52,23 @@ export const appReducer = (state, action) => {
 };
 
 const AppContext = React.createContext();
-export const AppProvider = ({ children }) => {
+export const AppProvider = ({ children, value }) => {
   const library = useLibrary();
-  const [appState, appDispatch] = React.useReducer(appReducer, defaultAppState);
 
   return (
-    <AppContext.Provider value={{ library, appState, appDispatch }} >
+    <AppContext.Provider value={{ library, appState: value.appState, appDispatch: value.appDispatch }} >
       {children}
     </AppContext.Provider>
   );
 };
 
 export default function App() {
+  const [appState, appDispatch] = React.useReducer(appReducer, defaultAppState);
+
   return (
     <ErrorBoundary>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <AppProvider>
+        <AppProvider value={{ appState, appDispatch }}>
           <div className={fullScreenCss}>
             <Header />
             <ViewHandler />

@@ -1,52 +1,18 @@
 import React from "react";
 import { Dialog, Drawer, useMediaQuery } from "@mui/material";
-import { useLocalStorage } from "@uidotdev/usehooks";
 import NewItemCreation from "./NewItemCreation/NewItemCreation";
 
 const BottomDrawerContext = React.createContext();
-
-/** @returns {{ bottomDrawerIsOpen: boolean, openBottomDrawer: Function, closeBottomDrawer: Function, toggleBottomDrawer: Function}} */
-const useBottomDrawerContext = () => {
-  const context = React.useContext(BottomDrawerContext);
-  if (!context) {
-    throw new Error("useDrawer must be used within a DrawerProvider");
-  }
-  return context;
-};
-
-const BottomDrawerProvider = ({ children }) => {
-  const [bottomDrawerIsOpen, setBottomDrawerOpen] = useLocalStorage(
-    "bottomDrawerIsOpen",
-    false
-  );
-  const openBottomDrawer = React.useCallback(
-    () => setBottomDrawerOpen(true),
-    [setBottomDrawerOpen]
-  );
-  const closeBottomDrawer = React.useCallback(
-    () => setBottomDrawerOpen(false),
-    [setBottomDrawerOpen]
-  );
-  const toggleBottomDrawer = React.useCallback(
-    () => setBottomDrawerOpen(!bottomDrawerIsOpen),
-    [bottomDrawerIsOpen, setBottomDrawerOpen]
-  );
+export function BottomDrawerProvider({ children }) {
 
   return (
-    <BottomDrawerContext.Provider
-      value={{
-        bottomDrawerIsOpen,
-        openBottomDrawer,
-        closeBottomDrawer,
-        toggleBottomDrawer,
-      }}
-    >
+    <BottomDrawerContext.Provider value="No value" >
       {children}
     </BottomDrawerContext.Provider>
   );
 };
 
-const BottomDrawer = () => {
+export default function BottomDrawer() {
   const isMobile = useMediaQuery("(max-width: 600px)");
   const { bottomDrawerIsOpen, closeBottomDrawer } = useBottomDrawerContext();
 
@@ -69,4 +35,10 @@ const BottomDrawer = () => {
   );
 };
 
-export { BottomDrawer, BottomDrawerProvider, useBottomDrawerContext };
+const useBottomDrawerContext = () => {
+  const context = React.useContext(BottomDrawerContext);
+  if (!context) {
+    throw new Error("useDrawer must be used within a DrawerProvider");
+  }
+  return context;
+};
