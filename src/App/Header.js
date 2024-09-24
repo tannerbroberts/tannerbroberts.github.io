@@ -1,9 +1,8 @@
 import React from "react";
 import { Squash as Hamburger } from "hamburger-react";
 import { css } from "@emotion/css";
-import { CALENDAR_VIEWS } from "../utils/constants";
-import { useLeftDrawerContext } from "./LeftDrawer";
-import { useCalendarViewContext } from "./CalendarView/CalendarView";
+import { useAppContext } from "./App";
+import t from "../translation";
 
 const headerCss = css`
   z-index: 1;
@@ -25,37 +24,16 @@ const headerTextCss = css`
   font-weight: bold;
 `;
 
-const Header = () => {
-  const { leftDrawerIsOpen, openLeftDrawer } = useLeftDrawerContext();
-  const { selectedCalendarView } = useCalendarViewContext();
-  let calendarType = "";
-  switch (selectedCalendarView) {
-    case CALENDAR_VIEWS.HEADS_UP:
-      calendarType = "Heads Up";
-      break;
-    case CALENDAR_VIEWS.DAY:
-      calendarType = "Day";
-      break;
-    case CALENDAR_VIEWS.WEEK:
-      calendarType = "Week";
-      break;
-    case CALENDAR_VIEWS.MONTH:
-      calendarType = "Month";
-      break;
-    case CALENDAR_VIEWS.CHANGELOG:
-      calendarType = "Software Change Log";
-      break;
-    default:
-      calendarType = "Invalid view.";
-      break;
-  }
+export default function Header() {
+  const { appState: { selectedView, selectedItem, sideDrawerOpen }, appDispatch } = useAppContext();
+  const calendarType = t(selectedView);
+
+  const openLeftDrawer = () => { appDispatch({ type: "TOGGLE_SIDE_DRAWER" }); };
 
   return (
     <div className={headerCss}>
-      <Hamburger toggled={leftDrawerIsOpen} toggle={openLeftDrawer} />
-      <div className={headerTextCss}>{calendarType}</div>
+      <Hamburger toggled={sideDrawerOpen} toggle={openLeftDrawer} />
+      <div className={headerTextCss}>{`${calendarType}  ${selectedItem}`}</div>
     </div>
   );
 };
-
-export default Header;

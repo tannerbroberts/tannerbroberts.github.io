@@ -4,26 +4,27 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 /**
  * Returns an object from localStorage that holds item names as keys and item objects as values.
  */
-export function useLibrary() {
-  const [library, setLibrary] = useLocalStorage("library", {});
+export default function useLibrary() {
+  const [items, setItems] = useLocalStorage("items", {});
 
   const setItem = React.useCallback((item) => {
-    if (!item.name) throw new Error("Attempted to set item in library without a name.");
-    if (!item.length) throw new Error("Attempted to set item in library without a length.");
-    setLibrary((prevLibrary) => ({
+    if (!item.name) throw new Error("Attempted to set item in items without a name.");
+    if (!item.length) throw new Error("Attempted to set item in items without a length.");
+
+    setItems((prevLibrary) => ({
       ...prevLibrary,
       [item.name]: item,
     }));
-  }, [setLibrary]);
+  }, [setItems]);
 
   const deleteItem = React.useCallback((name) => {
-    setLibrary((prevLibrary) => {
+    setItems((prevLibrary) => {
       const newLibrary = { ...prevLibrary };
-      if (!newLibrary[name]) throw new Error(`Attempted to delete item ${name}, but the item does not exist in the library.`);
+      if (!newLibrary[name]) throw new Error(`Attempted to delete item ${name}, but the item does not exist in the items.`);
       delete newLibrary[name];
       return newLibrary;
     });
-  }, [setLibrary]);
+  }, [setItems]);
 
-  return { setItem, deleteItem, library };
+  return { setItem, deleteItem, items };
 }

@@ -4,17 +4,16 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { css } from "@emotion/css";
-import CalendarView, {
-  CalendarViewProvider,
-} from "./CalendarView/CalendarView";
-import { useLocalStorage } from "@uidotdev/usehooks";
+import ViewHandler from "./ViewHandler";
+import useLibrary from "./useLibrary";
 import AddItemFloatingActionButton from "./AddItemFloatingActionButton";
-import LeftDrawer, { LeftDrawerProvider } from "./LeftDrawer";
-import BottomDrawer, { BottomDrawerProvider } from "./BottomDrawer";
-import { NewItemCreationProvider } from "./BottomDrawer/NewItemCreation/NewItemCreation";
-import Header from "./Header";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { ErrorBoundary } from 'react-error-boundary';
+import { CALENDAR_VIEWS } from "./ViewHandler/ViewHandler";
+import { isValidItem, isValidView } from "../utils";
+import Header from "./Header";
+import SideDrawer from "./SideDrawer";
 
 // Makes the app fill the entire screen
 const fullScreenCss = css`
@@ -27,50 +26,60 @@ const fullScreenCss = css`
   background-color: yellow;
 `;
 
-export const AppContext = React.createContext();
+export const defaultAppState = {
+  bottomDrawerOpen: false,
+  sideDrawerOpen: false,
+  selectedItem: null,
+  selectedView: CALENDAR_VIEWS.UP_NEXT,
+};
+
+export const appReducer = (state, action) => {
+  if (Array.isArray(action)) return action.reduce(appReducer, state);
+  switch (action.type) {
+    case "TOGGLE_BOTTOM_DRAWER":
+      return { ...state, bottomDrawerOpen: !state.bottomDrawerOpen };
+    case "TOGGLE_SIDE_DRAWER":
+      return { ...state, sideDrawerOpen: !state.sideDrawerOpen };
+    case "SET_SELECTED_ITEM":
+      if (!isValidItem(action.value)) throw new Error("Invalid item");
+      return { ...state, selectedItem: action.value };
+    case "SET_SELECTED_VIEW":
+      if (!isValidView(action.value)) throw new Error("Invalid view");
+      return { ...state, selectedView: action.value };
+    default:
+      throw new Error(`Unhandled action type: ${action.type}`);
+  }
+};
+
+const AppContext = React.createContext();
 export const AppProvider = ({ children }) => {
-  const { library, setLibrary } = useLibrary();
+  const library = useLibrary();
+  const [appState, appDispatch] = React.useReducer(appReducer, defaultAppState);
 
   return (
-    <AppContext.Provider
-      value={{
-        library,
-        addToLibrary,
-        removeFromLibrary,
-        updateItemInLibrary: addToLibrary,
-        clearLibrary,
-      }}
-    >
+    <AppContext.Provider value={{ library, appState, appDispatch }} >
       {children}
     </AppContext.Provider>
-  );L
+  );
 };
 
 export default function App() {
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <AppProvider>
-        <NewItemCreationProvider>
-          <CalendarViewProvider>
-            <LeftDrawerProvider>
-              <BottomDrawerProvider>
-                <div className={fullScreenCss}>
-                  <Header />
-                  <CalendarView />
-                  <LeftDrawer />
-                  <BottomDrawer />
-                  <AddItemFloatingActionButton />
-                </div>
-              </BottomDrawerProvider>
-            </LeftDrawerProvider>
-          </CalendarViewProvider>
-        </NewItemCreationProvider>
-      </AppProvider>
-    </LocalizationProvider>
+    <ErrorBoundary>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <AppProvider>
+          <div className={fullScreenCss}>
+            <Header />
+            <ViewHandler />
+            <SideDrawer />
+            <AddItemFloatingActionButton />
+          </div>
+        </AppProvider>
+      </LocalizationProvider>
+    </ErrorBoundary>
   );
 }
 
-/** @returns {{ library: [string], addToLibrary: Function, removeFromLibrary: Function }} */
 export function useAppContext() {
   const context = React.useContext(AppContext);
   if (!context) {
