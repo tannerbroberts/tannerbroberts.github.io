@@ -1,9 +1,6 @@
 import React from 'react';
 
 export default function UpNext() {
-  return (
-    <div>
-      {/* Your content goes here */}
-    </div>
-  );
+  // Show the tasks that are due next in the calendar
+  // Show variable summaries and things
 };

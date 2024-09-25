@@ -16,15 +16,19 @@ export default function AddItemFloatingActionButton() {
   const openBottomDrawer = React.useCallback(() => appDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' }), [appDispatch]);
 
   React.useEffect(() => {
-    window.addEventListener("keydown", (event) => {
+    const listenForPlusKey = (event) => {
       if (event.key === "+" && !appState.bottomDrawerOpen) {
+        console.log('key pressed', event.key);
         appDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' });
       }
       if (event.key === '-' && appState.bottomDrawerOpen) {
         appDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' });
       }
-    });
-  }, [appState, appDispatch]);
+    }
+    window.addEventListener("keydown", listenForPlusKey);
+    return () => window.removeEventListener("keydown", listenForPlusKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className={fabStyle}>
