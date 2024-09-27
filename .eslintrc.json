@@ -1,5 +1,9 @@
 {
-  "extends": ["react-app", "react-app/jest", "prettier"],
+  "extends": [
+    "react-app",
+    "react-app/jest",
+    "prettier"
+  ],
   "settings": {
     "react": {
       "version": "detect"
