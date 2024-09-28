@@ -21,7 +21,6 @@ export default function BottomDrawer() {
         open={AboutTimeState.bottomDrawerOpen}
         anchorOrigin={{ vertical: 'center', horizontal: 'center' }}
       >
-        <div style={{ padding: '20px' }}></div>
         <Button onClick={closeBottomDrawer}>Close</Button>
       </Popover>
     </BottomDrawerProvider>
