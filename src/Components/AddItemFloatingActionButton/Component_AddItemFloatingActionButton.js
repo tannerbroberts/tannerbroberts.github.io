@@ -24,10 +24,6 @@ export default function AddItemFloatingActionButton() {
   React.useEffect(() => {
     const listenForPlusKey = (event) => {
       if (event.key === "+" && !AboutTimeState.bottomDrawerOpen) {
-        console.log('key pressed', event.key);
-        AboutTimeDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' });
-      }
-      if (event.key === '-' && AboutTimeState.bottomDrawerOpen) {
         AboutTimeDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' });
       }
     }
