@@ -25,7 +25,7 @@ const actionsMap = {
   SET_SELECTED_VIEW: (state, action) => {
     if (!isValidView(action.value)) throw new Error("Invalid view");
     return { ...state, selectedView: action.value };
-  }
+  },
 };
 
 export const AboutTimeReducerActions = Object.keys(actionsMap);

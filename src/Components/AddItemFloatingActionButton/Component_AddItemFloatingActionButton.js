@@ -17,7 +17,9 @@ export default function AddItemFloatingActionButton() {
 
   const { AboutTimeState, AboutTimeDispatch } = useAboutTimeContext();
 
-  const openBottomDrawer = React.useCallback(() => AboutTimeDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' }), [AboutTimeDispatch]);
+  const openBottomDrawer = React.useCallback(() => {
+    AboutTimeDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' })
+  }, [AboutTimeDispatch]);
 
   React.useEffect(() => {
     const listenForPlusKey = (event) => {
