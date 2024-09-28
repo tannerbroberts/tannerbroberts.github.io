@@ -2,7 +2,7 @@ import React from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
 
 /**
- * Returns an object from localStorage that holds item names as keys and item objects as values.
+ * Returns the object from localStorage, which object holds item names as keys and item objects as values.
  */
 export default function useLibrary() {
   const [items, setItems] = useLocalStorage("items", {});

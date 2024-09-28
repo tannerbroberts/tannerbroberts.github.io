@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App/App";
+import AboutTime from "./Components/AboutTime";
 
 // Base element styling outside of React
 const rootCss = document.getElementById("root");
@@ -33,6 +33,6 @@ html.style.fontFamily = "monospace";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <App />
+    <AboutTime />
   </React.StrictMode>
 );

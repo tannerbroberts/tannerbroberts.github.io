@@ -1,0 +1,7 @@
+export const CALENDAR_VIEWS = {
+  UP_NEXT: "UP_NEXT",
+  DAY: "DAY",
+  WEEK: "WEEK",
+  MONTH: "MONTH",
+  CHANGELOG: "CHANGELOG",
+};

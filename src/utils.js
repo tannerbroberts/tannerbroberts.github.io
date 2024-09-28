@@ -1,4 +1,4 @@
-import { CALENDAR_VIEWS } from "./App/ViewHandler/ViewHandler";
+import { CALENDAR_VIEWS } from './constants';
 
 export function isValidItem(item) {
   return item && item.name && item.length;
