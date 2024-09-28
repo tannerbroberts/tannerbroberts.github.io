@@ -4,7 +4,7 @@ import { isValidItem, isValidView } from "../../utils";
 export const AboutTimeInitialState = {
   bottomDrawerOpen: false,
   sideDrawerOpen: false,
-  selectedItem: null,
+  selectedItem: "[No Selection]",
   selectedView: CALENDAR_VIEWS.UP_NEXT,
 };
 

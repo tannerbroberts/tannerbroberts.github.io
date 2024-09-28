@@ -11,6 +11,7 @@ import Header from '../Header';
 import ViewHandler from '../ViewHandler';
 import SideDrawer from '../SideDrawer';
 import AddItemFloatingActionButton from '../AddItemFloatingActionButton';
+import BottomDrawer from '../BottomDrawer';
 
 // Makes the app fill the entire screen
 const fullScreenCss = css`
@@ -36,6 +37,7 @@ export default function AboutTime() {
             <Header />
             <ViewHandler />
             <SideDrawer />
+            <BottomDrawer />
             <AddItemFloatingActionButton />
           </div>
         </LocalizationProvider>

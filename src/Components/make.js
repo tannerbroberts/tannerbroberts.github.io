@@ -1,6 +1,6 @@
 /**
   A Node application that generates a folder structure for a new react component
-  1) Asks for the name of the component
+
   1.1) Searches the src folder for the component name
   1.2) If the folder exists, asks for a different name
   2) Creates a folder with the component name
@@ -11,28 +11,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const readline = require('readline');
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-// 1
-function askForComponentName() {
-  rl.question('What is the name of the component? ', (input) => {
-    // 1.1
-    const capitalizedInput = input.charAt(0).toUpperCase() + input.slice(1);
-    if (fs.existsSync(path.join('/Users/tannerbrobers/dev/tannerbroberts.github.io/src/Components', `./${capitalizedInput}`))) {
-      // 1.2
-      console.log('A component with that name already exists. Please choose a different name.');
-      askForComponentName();
-    } else {
-      // 2
-      make(capitalizedInput);
-      rl.close();
-    }
-  });
-}
 
 // 2
 function make(name) {
@@ -134,4 +112,16 @@ export function use${name}Context() {
   fs.writeFileSync(providerFile, providerContent);
 }
 
-askForComponentName();
+const name = process.argv[2];
+// Validation
+if (!name) {
+  console.log('Please provide a component name');
+  process.exit(1);
+}
+if (fs.existsSync(path.join('/Users/tannerbrobers/dev/tannerbroberts.github.io/src/Components', `./${name}`))) {
+  console.log('Component already exists');
+  process.exit(1);
+}
+const upperCaseName = name.charAt(0).toUpperCase() + name.slice(1);
+
+make(upperCaseName);
