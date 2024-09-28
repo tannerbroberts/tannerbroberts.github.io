@@ -2,7 +2,7 @@ import React from 'react';
 import HeaderProvider from './Provider_Header';
 import HeaderReducer, { HeaderInitialState } from './Reducer_Header';
 import Hamburger from 'hamburger-react';
-import { css } from '@emotion/react';
+import { css } from '@emotion/css';
 import { useAboutTimeContext } from '../AboutTime/Provider_AboutTime';
 import t from '../../translation';
 

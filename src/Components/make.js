@@ -53,13 +53,20 @@ function writeComponentFile(name) {
     `import React from 'react';
 import ${name}Provider from './Provider_${name}';
 import ${name}Reducer, { ${name}InitialState } from './Reducer_${name}';
+import { css } from '@emotion/css';
+
+const ${name}Css = css\`
+  background-color: yellow;
+\`;
 
 export default function ${name}() {
   const [state, dispatch] = React.useReducer(${name}Reducer, ${name}InitialState);
 
   return (
   <${name}Provider {...{ state, dispatch }}>
-    <h1>${name}</h1>
+    <div> className={${name}Css}>
+      <h1>${name}</h1>
+    </div>
   </${name}Provider>
   );
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import ChangelogProvider from './Provider_Changelog';
 import ChangelogReducer, { ChangelogInitialState } from './Reducer_Changelog';
-import { css } from '@emotion/react';
+import { css } from '@emotion/css';
 import Markdown from 'markdown-to-jsx';
 
 const containerStyles = css`
@@ -34,10 +34,10 @@ export default function Changelog() {
   }, []);
 
   return (
-  <ChangelogProvider {...{ state, dispatch }}>
-    <div className={containerStyles}>
-      <Markdown className={markdownStyles}>{state.changeLog}</Markdown>
-    </div>
-  </ChangelogProvider>
+    <ChangelogProvider {...{ state, dispatch }}>
+      <div className={containerStyles}>
+        <Markdown className={markdownStyles}>{state.changeLog}</Markdown>
+      </div>
+    </ChangelogProvider>
   );
 }
