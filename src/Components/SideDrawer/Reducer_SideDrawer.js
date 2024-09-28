@@ -16,6 +16,6 @@ export default function SideDrawerReducer(state, action) {
   if (actionsMap[action.type]) {
     return actionsMap[action.type](state, action);
   } else {
-    throw new Error(`Action type not found in SideDrawerReducer`);
+    throw new Error(`Action type ${action.type} not found in SideDrawerReducer`);
   }
 }

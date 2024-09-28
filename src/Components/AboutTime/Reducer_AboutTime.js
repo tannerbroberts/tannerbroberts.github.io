@@ -35,6 +35,6 @@ export default function AboutTimeReducer(state, action) {
   if (actionsMap[action.type]) {
     return actionsMap[action.type](state, action);
   } else {
-    throw new Error(`Action type not found in AboutTimeReducer`);
+    throw new Error(`Action type ${action.type} not found in AboutTimeReducer`);
   }
 }

@@ -19,6 +19,6 @@ export default function ChangelogReducer(state, action) {
   if (actionsMap[action.type]) {
     return actionsMap[action.type](state, action);
   } else {
-    throw new Error(`Action type not found in ChangelogReducer`);
+    throw new Error(`Action type ${action.type} not found in ChangelogReducer`);
   }
 }

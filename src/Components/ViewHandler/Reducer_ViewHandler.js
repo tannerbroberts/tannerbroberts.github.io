@@ -16,6 +16,6 @@ export default function ViewHandlerReducer(state, action) {
   if (actionsMap[action.type]) {
     return actionsMap[action.type](state, action);
   } else {
-    throw new Error(`Action type not found in ViewHandlerReducer`);
+    throw new Error(`Action type ${action.type} not found in ViewHandlerReducer`);
   }
 }
