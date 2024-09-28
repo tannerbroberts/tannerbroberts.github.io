@@ -39,7 +39,7 @@ export default function ${name}() {
 
   return (
   <${name}Provider {...{ state, dispatch }}>
-    <div> className={${name}Css}>
+    <div className={${name}Css}>
       <h1>${name}</h1>
     </div>
   </${name}Provider>
