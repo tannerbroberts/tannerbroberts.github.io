@@ -9,7 +9,6 @@
   2.3) Creates a reducer.js file in the folder
  */
 
-
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
@@ -23,15 +22,13 @@ function askForComponentName() {
   rl.question('What is the name of the component? ', (input) => {
     // 1.1
     const capitalizedInput = input.charAt(0).toUpperCase() + input.slice(1);
-    if (fs.existsSync(path.join(__dirname, `./${capitalizedInput}`))) {
+    if (fs.existsSync(path.join('/Users/tannerbrobers/dev/tannerbroberts.github.io/src/Components', `./${capitalizedInput}`))) {
       // 1.2
       console.log('A component with that name already exists. Please choose a different name.');
       askForComponentName();
     } else {
       // 2
       make(capitalizedInput);
-      // change directory to the parent directory before finishing up
-      process.chdir(path.join(__dirname, '..'));
       rl.close();
     }
   });
@@ -39,7 +36,7 @@ function askForComponentName() {
 
 // 2
 function make(name) {
-  fs.mkdirSync(path.join(__dirname, `./${name}`));
+  fs.mkdirSync(path.join('/Users/tannerbrobers/dev/tannerbroberts.github.io/src/Components', `./${name}`));
   writeComponentFile(name);
   writeIndexFile(name);
   writeReducerFile(name);
@@ -48,7 +45,7 @@ function make(name) {
 
 // 2.1
 function writeComponentFile(name) {
-  const componentFile = path.join(__dirname, `./${name}/Component_${name}.js`);
+  const componentFile = path.join('/Users/tannerbrobers/dev/tannerbroberts.github.io/src/Components', `./${name}/Component_${name}.js`);
   const componentContent =
     `import React from 'react';
 import ${name}Provider from './Provider_${name}';
@@ -75,7 +72,7 @@ export default function ${name}() {
 }
 
 function writeIndexFile(name) {
-  const indexFile = path.join(__dirname, `./${name}/index.js`);
+  const indexFile = path.join('/Users/tannerbrobers/dev/tannerbroberts.github.io/src/Components', `./${name}/index.js`);
   const indexContent =
     `export { default } from './Component_${name}';
 export { default as ${name}Provider, use${name}Context } from './Provider_${name}';
@@ -85,7 +82,7 @@ export { ${name}ReducerActions } from './Reducer_${name}';;
 }
 
 function writeReducerFile(name) {
-  const reducerFile = path.join(__dirname, `./${name}/Reducer_${name}.js`);
+  const reducerFile = path.join('/Users/tannerbrobers/dev/tannerbroberts.github.io/src/Components', `./${name}/Reducer_${name}.js`);
   const reducerContent =
     `
 export const ${name}InitialState = {
@@ -113,7 +110,7 @@ export default function ${name}Reducer(state, action) {
 }
 
 function writeProviderFile(name) {
-  const providerFile = path.join(__dirname, `./${name}/Provider_${name}.js`);
+  const providerFile = path.join('/Users/tannerbrobers/dev/tannerbroberts.github.io/src/Components', `./${name}/Provider_${name}.js`);
   const providerContent =
     `import React, { createContext } from 'react';
 
