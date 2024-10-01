@@ -3,6 +3,7 @@ import { isValidItem, isValidView } from "../../utils";
 
 export const AboutTimeInitialState = {
   bottomDrawerOpen: false,
+  bottomDrawerFocusRef: null,
   sideDrawerOpen: false,
   selectedItem: "[No Selection]",
   selectedView: CALENDAR_VIEWS.UP_NEXT,
@@ -12,11 +13,8 @@ const actionsMap = {
   BATCH: (state, action) => {
     return action.value.reduce(AboutTimeReducer, state);
   },
-  TOGGLE_BOTTOM_DRAWER: (state, action) => {
-    return { ...state, bottomDrawerOpen: !state.bottomDrawerOpen };
-  },
-  TOGGLE_SIDE_DRAWER: (state, action) => {
-    return { ...state, sideDrawerOpen: !state.sideDrawerOpen };
+  REGISTER_BOTTOM_DRAWER_FOCUS_REF: (state, action) => {
+    return { ...state, bottomDrawerFocusRef: action.value };
   },
   SET_SELECTED_ITEM: (state, action) => {
     if (!isValidItem(action.value)) throw new Error("Invalid item");
@@ -25,6 +23,12 @@ const actionsMap = {
   SET_SELECTED_VIEW: (state, action) => {
     if (!isValidView(action.value)) throw new Error("Invalid view");
     return { ...state, selectedView: action.value };
+  },
+  TOGGLE_BOTTOM_DRAWER: (state) => {
+    return { ...state, bottomDrawerOpen: !state.bottomDrawerOpen };
+  },
+  TOGGLE_SIDE_DRAWER: (state) => {
+    return { ...state, sideDrawerOpen: !state.sideDrawerOpen };
   },
 };
 

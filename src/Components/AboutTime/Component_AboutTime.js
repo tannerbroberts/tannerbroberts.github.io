@@ -37,7 +37,7 @@ export default function AboutTime() {
             <Header />
             <ViewHandler />
             <SideDrawer />
-            {state.bottomDrawerOpen && <BottomDrawer />}
+            <BottomDrawer />
             <AddItemFloatingActionButton />
           </div>
         </LocalizationProvider>
