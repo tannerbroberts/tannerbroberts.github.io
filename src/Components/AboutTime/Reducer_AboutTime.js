@@ -1,6 +1,8 @@
 import { CALENDAR_VIEWS } from "../../constants";
 import { isValidItem, isValidView } from "../../utils";
-import { getLocal, setLocal } from "../../utils";
+import { getLocalScope } from "../../utils";
+
+const { getLocal, setLocal } = getLocalScope("AboutTime");
 
 export const AboutTimeInitialState = {
   ...getLocal({ bottomDrawerOpen: false }),
