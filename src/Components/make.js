@@ -54,7 +54,6 @@ function writeIndexFile(name) {
   const indexContent =
     `export { default } from './Component_${name}';
 export { default as ${name}Provider, use${name}Context } from './Provider_${name}';
-export { ${name}ReducerActions } from './Reducer_${name}';;
 `;
   fs.writeFileSync(indexFile, indexContent);
 }
@@ -72,8 +71,6 @@ const actionsMap = {
     return action.value.reduce(${name}Reducer, state);
   }
 };
-
-export const ${name}ReducerActions = Object.keys(actionsMap);
 
 export default function ${name}Reducer(state, action) {
   if (!action.type) throw new Error('Action must have a type');

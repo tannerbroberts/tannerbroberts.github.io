@@ -9,8 +9,6 @@ const actionsMap = {
   }
 };
 
-export const DayReducerActions = Object.keys(actionsMap);
-
 export default function DayReducer(state, action) {
   if (!action.type) throw new Error('Action must have a type');
   if (actionsMap[action.type]) {

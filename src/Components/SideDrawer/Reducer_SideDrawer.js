@@ -9,8 +9,6 @@ const actionsMap = {
   }
 };
 
-export const SideDrawerReducerActions = Object.keys(actionsMap);
-
 export default function SideDrawerReducer(state, action) {
   if (!action.type) throw new Error('Action must have a type');
   if (actionsMap[action.type]) {
