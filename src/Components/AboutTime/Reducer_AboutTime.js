@@ -1,10 +1,11 @@
 import { CALENDAR_VIEWS } from "../../constants";
 import { isValidItem, isValidView } from "../../utils";
+import { getLocal, setLocal } from "../../utils";
 
 export const AboutTimeInitialState = {
-  bottomDrawerOpen: false,
+  ...getLocal({ bottomDrawerOpen: false }),
+  ...getLocal({ sideDrawerOpen: false }),
   bottomDrawerFocusRef: null,
-  sideDrawerOpen: false,
   selectedItem: "[No Selection]",
   selectedView: CALENDAR_VIEWS.UP_NEXT,
 };
@@ -12,6 +13,12 @@ export const AboutTimeInitialState = {
 const actionsMap = {
   BATCH: (state, action) => {
     return action.value.reduce(AboutTimeReducer, state);
+  },
+  TOGGLE_BOTTOM_DRAWER: (state) => {
+    return { ...state, ...setLocal({ bottomDrawerOpen: !state.bottomDrawerOpen }) };
+  },
+  TOGGLE_SIDE_DRAWER: (state) => {
+    return { ...state, ...setLocal({ sideDrawerOpen: !state.sideDrawerOpen }) };
   },
   REGISTER_BOTTOM_DRAWER_FOCUS_REF: (state, action) => {
     return { ...state, bottomDrawerFocusRef: action.value };
@@ -24,15 +31,7 @@ const actionsMap = {
     if (!isValidView(action.value)) throw new Error("Invalid view");
     return { ...state, selectedView: action.value };
   },
-  TOGGLE_BOTTOM_DRAWER: (state) => {
-    return { ...state, bottomDrawerOpen: !state.bottomDrawerOpen };
-  },
-  TOGGLE_SIDE_DRAWER: (state) => {
-    return { ...state, sideDrawerOpen: !state.sideDrawerOpen };
-  },
 };
-
-export const AboutTimeReducerActions = Object.keys(actionsMap);
 
 export default function AboutTimeReducer(state, action) {
   if (!action.type) throw new Error('Action must have a type');
