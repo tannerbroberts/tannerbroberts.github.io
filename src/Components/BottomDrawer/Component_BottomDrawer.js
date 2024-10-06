@@ -15,9 +15,9 @@ const formStyle = css`
 export default function BottomDrawer() {
   const [state, dispatch] = React.useReducer(BottomDrawerReducer, BottomDrawerInitialState);
   const { AboutTimeState } = useAboutTimeContext();
-  const onCancel = useNewItemFormCancel({ dispatch });
+  const onCancel = useNewItemFormOnCancel({ dispatch });
   const onChange = useNewItemFormOnChange({ dispatch });
-  const onSubmit = useNewItemFormSubmit({ state, dispatch });
+  const onSubmit = useNewItemFormOnSubmit({ state, dispatch });
 
   return (
     <BottomDrawerProvider {...{ state, dispatch }}>
@@ -25,6 +25,7 @@ export default function BottomDrawer() {
         id={'bottom-drawer-popover'}
         disableRestoreFocus
         open={AboutTimeState.bottomDrawerOpen}
+        onClose={onCancel}
         anchorOrigin={{ vertical: 'center', horizontal: 'center' }}
       >
         {AboutTimeState.bottomDrawerOpen &&
@@ -53,7 +54,7 @@ export default function BottomDrawer() {
   );
 }
 
-function useNewItemFormCancel({ dispatch }) {
+function useNewItemFormOnCancel({ dispatch }) {
   const { AboutTimeDispatch } = useAboutTimeContext();
   return () => {
     AboutTimeDispatch({ type: "TOGGLE_BOTTOM_DRAWER" });
@@ -65,7 +66,7 @@ function useNewItemFormOnChange({ dispatch }) {
   return (e) => dispatch({ type: 'SET_NEW_ITEM_LENGTH', value: e.target.value })
 }
 
-function useNewItemFormSubmit({ state, dispatch }) {
+function useNewItemFormOnSubmit({ state, dispatch }) {
   const { AboutTimeDispatch, extras: AboutTimeExtras } = useAboutTimeContext();
   return React.useCallback((e) => {
     const isInvalid = () => {
