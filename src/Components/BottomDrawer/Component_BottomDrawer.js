@@ -15,6 +15,8 @@ const formStyle = css`
 export default function BottomDrawer() {
   const [state, dispatch] = React.useReducer(BottomDrawerReducer, BottomDrawerInitialState);
   const { AboutTimeState } = useAboutTimeContext();
+  const onCancel = useNewItemFormCancel({ dispatch });
+  const onChange = useNewItemFormOnChange({ dispatch });
   const onSubmit = useNewItemFormSubmit({ state, dispatch });
 
   return (
@@ -33,21 +35,34 @@ export default function BottomDrawer() {
                 placeholder='Item Name'
                 type='text'
                 value={state.newItemName}
-                onChange={(e) => dispatch({ type: 'SET_NEW_ITEM_NAME', payload: e.target.value })}
+                onChange={(e) => dispatch({ type: 'SET_NEW_ITEM_NAME', value: e.target.value })}
               />
               <Input
                 label="Item Length (ms)"
                 type="number"
                 value={state.newItemLength}
-                onChange={(e) => dispatch({ type: 'SET_NEW_ITEM_LENGTH', payload: e.target.value })}
+                onChange={onChange}
               />
               <Button type='submit'>Submit</Button>
+              <Button onClick={onCancel}>Cancel</Button>
             </form>
           </>
         }
       </Popover>
     </BottomDrawerProvider>
   );
+}
+
+function useNewItemFormCancel({ dispatch }) {
+  const { AboutTimeDispatch } = useAboutTimeContext();
+  return () => {
+    AboutTimeDispatch({ type: "TOGGLE_BOTTOM_DRAWER" });
+    dispatch({ type: "SET_NEW_ITEM_NAME", value: "" });
+  }
+}
+
+function useNewItemFormOnChange({ dispatch }) {
+  return (e) => dispatch({ type: 'SET_NEW_ITEM_LENGTH', value: e.target.value })
 }
 
 function useNewItemFormSubmit({ state, dispatch }) {
@@ -67,8 +82,8 @@ function useNewItemFormSubmit({ state, dispatch }) {
     const clearForm = () => {
       dispatch({
         type: 'BATCH', value: [
-          { type: 'SET_NEW_ITEM_NAME', payload: '' },
-          { type: 'SET_NEW_ITEM_LENGTH', payload: 3_600_000 }
+          { type: 'SET_NEW_ITEM_NAME', value: '' },
+          { type: 'SET_NEW_ITEM_LENGTH', value: 3_600_000 }
         ]
       })
     }
