@@ -65,11 +65,12 @@ function useCommandExecutionOnEnter({ state, dispatch, commandLineCommands }) {
 }
 
 function useCommandLineCommands() {
+  const { AboutTimeDispatch } = useAboutTimeContext();
   return React.useMemo(() => ({
     "/add": () => {
-      // TODO: Open the add bottom drawer to add an item
+      AboutTimeDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' });
     },
-  }), []);
+  }), [AboutTimeDispatch]);
 }
 
 function useCommanLineOnChangeInputListener({ dispatch, commandLineCommands }) {

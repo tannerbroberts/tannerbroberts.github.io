@@ -9,10 +9,10 @@ const actionsMap = {
     return action.value.reduce(BottomDrawerReducer, state);
   },
   SET_NEW_ITEM_NAME: (state, action) => {
-    return { ...state, newItemName: action.payload };
+    return { ...state, newItemName: action.value };
   },
   SET_NEW_ITEM_LENGTH: (state, action) => {
-    return { ...state, newItemLength: action.payload };
+    return { ...state, newItemLength: action.value };
   }
 };
 
