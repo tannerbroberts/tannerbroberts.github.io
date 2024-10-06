@@ -8,6 +8,7 @@ export const AboutTimeInitialState = {
   ...getLocal({ bottomDrawerOpen: false }),
   ...getLocal({ sideDrawerOpen: false }),
   bottomDrawerFocusRef: null,
+  commandLineOpen: false,
   selectedItem: "[No Selection]",
   selectedView: CALENDAR_VIEWS.UP_NEXT,
 };
@@ -21,6 +22,9 @@ const actionsMap = {
   },
   TOGGLE_SIDE_DRAWER: (state) => {
     return { ...state, ...setLocal({ sideDrawerOpen: !state.sideDrawerOpen }) };
+  },
+  TOGGLE_COMMAND_LINE: (state) => {
+    return { ...state, commandLineOpen: !state.commandLineOpen };
   },
   REGISTER_BOTTOM_DRAWER_FOCUS_REF: (state, action) => {
     return { ...state, bottomDrawerFocusRef: action.value };
