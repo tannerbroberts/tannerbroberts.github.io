@@ -19,5 +19,7 @@
   "workbench.editor.wrapTabs": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "javascript.updateImportsOnFileMove.enabled": "always",
-  "typescript.updateImportsOnFileMove.enabled": "always"
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "explorer.openEditors.sortOrder": "editorOrder",
+  "gitlens.advanced.abbreviateShaOnCopy": false
 }

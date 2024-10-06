@@ -119,6 +119,5 @@ if (fs.existsSync(path.join('/Users/tannerbrobers/dev/tannerbroberts.github.io/s
   console.log('Component already exists');
   process.exit(1);
 }
-const upperCaseName = name.charAt(0).toUpperCase() + name.slice(1);
-
+const upperCaseName = `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
 make(upperCaseName);
