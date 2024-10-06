@@ -70,15 +70,17 @@ function useBackslashCommandLineToggle({ dispatch }) {
 }
 
 function useRunOnEnter({ state, dispatch, commands }) {
-  const { AboutTimeDispatch } = useAboutTimeContext();
+  const { AboutTimeState, AboutTimeDispatch } = useAboutTimeContext();
   React.useEffect(() => {
     const listenForEnter = (event) => {
       if (event.key === "Enter") {
-        if (state.isValidCommand) {
-          commands[state.command]();
-          dispatch({ type: 'SET_COMMAND', value: '' });
+        if (AboutTimeState.commandLineOpen) {
+          if (state.isValidCommand) {
+            commands[state.command]();
+            dispatch({ type: 'SET_COMMAND', value: '' });
+          }
+          AboutTimeDispatch({ type: 'TOGGLE_COMMAND_LINE' });
         }
-        AboutTimeDispatch({ type: 'TOGGLE_COMMAND_LINE' });
       }
     };
     window.addEventListener("keydown", listenForEnter);
