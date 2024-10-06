@@ -5,6 +5,7 @@ import SideDrawerProvider from './Provider_SideDrawer';
 import SideDrawerReducer, { SideDrawerInitialState } from './Reducer_SideDrawer';
 import { Divider, Drawer, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useAboutTimeContext } from '../AboutTime/Provider_AboutTime';
+import ItemLibrary from '../ItemLibrary';
 import SupportAgentSharpIcon from "@mui/icons-material/SupportAgentSharp";
 import ViewDaySharpIcon from "@mui/icons-material/ViewDaySharp";
 import CalendarViewWeekSharpIcon from "@mui/icons-material/CalendarViewWeekSharp";
@@ -13,10 +14,52 @@ import Code from "@mui/icons-material/Code";
 
 export default function SideDrawer() {
   const [state, dispatch] = React.useReducer(SideDrawerReducer, SideDrawerInitialState);
-  const { AboutTimeState: { sideDrawerOpen, selectedView }, AboutTimeDispatch } = useAboutTimeContext();
+  const { AboutTimeState: { sideDrawerOpen, selectedView } } = useAboutTimeContext();
+
+  const onUpNextClick = useOnUpNextClick();
+  const onDayViewClick = useOnDayViewClick();
+  const onWeekViewClick = useOnWeekViewClick();
+  const onMonthViewClick = useOnMonthViewClick();
+  const onChangelogClick = useOnChangelogClick();
+
+  const toggleSideDrawer = useToggleSideDrawer();
+
+  const VIEWS = React.useMemo(() => {
+    return [
+      { Icon: SupportAgentSharpIcon, selected: selectedView === CALENDAR_VIEWS.UP_NEXT, onClick: onUpNextClick, text: t(CALENDAR_VIEWS.UP_NEXT) },
+      { Icon: ViewDaySharpIcon, selected: selectedView === CALENDAR_VIEWS.DAY, onClick: onDayViewClick, text: t(CALENDAR_VIEWS.DAY) },
+      { Icon: CalendarViewWeekSharpIcon, selected: selectedView === CALENDAR_VIEWS.WEEK, onClick: onWeekViewClick, text: t(CALENDAR_VIEWS.WEEK) },
+      { Icon: CalendarMonthSharpIcon, selected: selectedView === CALENDAR_VIEWS.MONTH, onClick: onMonthViewClick, text: t(CALENDAR_VIEWS.MONTH) },
+      { Icon: Code, selected: selectedView === CALENDAR_VIEWS.CHANGELOG, onClick: onChangelogClick, text: t(CALENDAR_VIEWS.CHANGELOG) },
+    ]
+  }, [onChangelogClick, onDayViewClick, onMonthViewClick, onUpNextClick, onWeekViewClick, selectedView]);
 
 
-  const openUpNextView = React.useCallback(() => {
+  return (
+    <SideDrawerProvider {...{ state, dispatch }}>
+      <Drawer open={sideDrawerOpen} onClose={toggleSideDrawer}>
+        <List>
+          {VIEWS.map(({ Icon, selected, onClick, text }) => {
+            return (
+              <ListItemButton key={text} selected={selected} onClick={onClick}>
+                <ListItemIcon>
+                  <Icon />
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            )
+          })}
+          <Divider />
+          <ItemLibrary />
+        </List>
+      </Drawer>
+    </SideDrawerProvider>
+  );
+}
+
+function useOnUpNextClick() {
+  const { AboutTimeDispatch } = useAboutTimeContext();
+  return React.useCallback(() => {
     AboutTimeDispatch({
       type: "BATCH", value: [
         { type: "SET_SELECTED_VIEW", value: CALENDAR_VIEWS.UP_NEXT },
@@ -24,8 +67,11 @@ export default function SideDrawer() {
       ]
     })
   }, [AboutTimeDispatch]);
+}
 
-  const openDayView = React.useCallback(() => {
+function useOnDayViewClick() {
+  const { AboutTimeDispatch } = useAboutTimeContext();
+  return React.useCallback(() => {
     AboutTimeDispatch({
       type: "BATCH", value: [
         { type: "SET_SELECTED_VIEW", value: CALENDAR_VIEWS.DAY },
@@ -33,8 +79,11 @@ export default function SideDrawer() {
       ]
     })
   }, [AboutTimeDispatch]);
+}
 
-  const openWeekView = React.useCallback(() => {
+function useOnWeekViewClick() {
+  const { AboutTimeDispatch } = useAboutTimeContext();
+  return React.useCallback(() => {
     AboutTimeDispatch({
       type: "BATCH", value: [
         { type: "SET_SELECTED_VIEW", value: CALENDAR_VIEWS.WEEK },
@@ -42,8 +91,11 @@ export default function SideDrawer() {
       ]
     })
   }, [AboutTimeDispatch]);
+}
 
-  const openMonthView = React.useCallback(() => {
+function useOnMonthViewClick() {
+  const { AboutTimeDispatch } = useAboutTimeContext();
+  return React.useCallback(() => {
     AboutTimeDispatch({
       type: "BATCH", value: [
         { type: "SET_SELECTED_VIEW", value: CALENDAR_VIEWS.MONTH },
@@ -51,8 +103,11 @@ export default function SideDrawer() {
       ]
     })
   }, [AboutTimeDispatch]);
+}
 
-  const openChangeLog = React.useCallback(() => {
+function useOnChangelogClick() {
+  const { AboutTimeDispatch } = useAboutTimeContext();
+  return React.useCallback(() => {
     AboutTimeDispatch({
       type: "BATCH", value: [
         { type: "SET_SELECTED_VIEW", value: CALENDAR_VIEWS.CHANGELOG },
@@ -60,69 +115,9 @@ export default function SideDrawer() {
       ]
     })
   }, [AboutTimeDispatch]);
+}
 
-  const toggleSideDrawer = React.useCallback(() => {
-    AboutTimeDispatch({ type: "TOGGLE_SIDE_DRAWER" });
-  }, [AboutTimeDispatch]);
-
-
-  return (
-    <SideDrawerProvider {...{ state, dispatch }}>
-      <Drawer open={sideDrawerOpen} onClose={toggleSideDrawer}>
-        <List>
-          <ListItemButton
-            selected={selectedView === CALENDAR_VIEWS.UP_NEXT}
-            onClick={openUpNextView}
-          >
-            <ListItemIcon>
-              <SupportAgentSharpIcon />
-            </ListItemIcon>
-            <ListItemText primary={t(CALENDAR_VIEWS.UP_NEXT)} />
-          </ListItemButton>
-
-          <ListItemButton
-            selected={selectedView === CALENDAR_VIEWS.DAY}
-            onClick={openDayView}
-          >
-            <ListItemIcon>
-              <ViewDaySharpIcon />
-            </ListItemIcon>
-            <ListItemText primary={t(CALENDAR_VIEWS.DAY)} />
-          </ListItemButton>
-
-          <ListItemButton
-            selected={selectedView === CALENDAR_VIEWS.WEEK}
-            onClick={openWeekView}
-          >
-            <ListItemIcon>
-              <CalendarViewWeekSharpIcon />
-            </ListItemIcon>
-            <ListItemText primary={t(CALENDAR_VIEWS.WEEK)} />
-          </ListItemButton>
-
-          <ListItemButton
-            selected={selectedView === CALENDAR_VIEWS.MONTH}
-            onClick={openMonthView}
-          >
-            <ListItemIcon>
-              <CalendarMonthSharpIcon />
-            </ListItemIcon>
-            <ListItemText primary={t(CALENDAR_VIEWS.MONTH)} />
-          </ListItemButton>
-
-          <ListItemButton
-            selected={selectedView === CALENDAR_VIEWS.CHANGELOG}
-            onClick={openChangeLog}
-          >
-            <ListItemIcon>
-              <Code />
-            </ListItemIcon>
-            <ListItemText primary={t(CALENDAR_VIEWS.CHANGELOG)} />
-          </ListItemButton>
-
-          <Divider />
-        </List>
-      </Drawer>
-    </SideDrawerProvider>
-  );
+function useToggleSideDrawer() {
+  const { AboutTimeDispatch } = useAboutTimeContext();
+  return React.useCallback(() => AboutTimeDispatch({ type: "TOGGLE_SIDE_DRAWER" }), [AboutTimeDispatch]);
 }

@@ -20,8 +20,6 @@ export default function CommandLine() {
   useCommandExecutionOnEnter({ state, dispatch, commandLineCommands });
   const onChange = useCommanLineOnChangeInputListener({ dispatch, commandLineCommands });
 
-  console.log('CommandLine', state);
-
   return (
     <CommandLineProvider {...{ state, dispatch }}>
       <Popover
