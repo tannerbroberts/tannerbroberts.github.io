@@ -18,7 +18,6 @@ export default function BottomDrawer() {
   const onCancel = useNewItemFormOnCancel({ dispatch });
   const onChange = useNewItemFormOnChange({ dispatch });
   const onSubmit = useNewItemFormOnSubmit({ state, dispatch });
-  useB_BottomDrawerToggle();
 
   return (
     <BottomDrawerProvider {...{ state, dispatch }}>
@@ -51,20 +50,6 @@ export default function BottomDrawer() {
       </Popover>
     </BottomDrawerProvider>
   );
-}
-
-function useB_BottomDrawerToggle() {
-  const { AboutTimeDispatch } = useAboutTimeContext();
-  const toggleBottomDrawerOnBKey = React.useCallback((event) => {
-    if (event.key === 'b') {
-      event.preventDefault();
-      AboutTimeDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' });
-    }
-  }, [AboutTimeDispatch]);
-  React.useEffect(() => {
-    window.addEventListener('keydown', toggleBottomDrawerOnBKey);
-    return () => window.removeEventListener('keydown', toggleBottomDrawerOnBKey);
-  })
 }
 
 function useNewItemFormOnCancel({ dispatch }) {
