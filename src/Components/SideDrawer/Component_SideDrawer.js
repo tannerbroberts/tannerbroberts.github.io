@@ -23,7 +23,6 @@ export default function SideDrawer() {
   const onChangelogClick = useOnChangelogClick();
 
   const toggleSideDrawer = useToggleSideDrawer();
-  useRegisterPress_S_ToToggleSideDrawer();
 
   const VIEWS = React.useMemo(() => {
     return [
@@ -116,21 +115,6 @@ function useOnChangelogClick() {
       ]
     })
   }, [AboutTimeDispatch]);
-}
-
-
-function useRegisterPress_S_ToToggleSideDrawer() {
-  const { AboutTimeDispatch } = useAboutTimeContext();
-  React.useEffect(() => {
-    const listenForS = (event) => {
-      if (event.key === "s") {
-        AboutTimeDispatch({ type: 'TOGGLE_SIDE_DRAWER' });
-      }
-    }
-    window.addEventListener("keydown", listenForS);
-    return () => window.removeEventListener("keydown", listenForS);
-  }, [AboutTimeDispatch]);
-
 }
 
 function useToggleSideDrawer() {
