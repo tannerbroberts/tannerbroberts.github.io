@@ -3,7 +3,6 @@ import AddItemFloatingActionButtonProvider from './Provider_AddItemFloatingActio
 import AddItemFloatingActionButtonReducer, { AddItemFloatingActionButtonInitialState } from './Reducer_AddItemFloatingActionButton';
 import { useAboutTimeContext } from '../AboutTime/Provider_AboutTime';
 import { Fab } from '@mui/material';
-import { Add } from '@mui/icons-material';
 import { css } from '@emotion/css';
 
 const fabStyle = css`
@@ -14,14 +13,14 @@ const fabStyle = css`
 
 export default function AddItemFloatingActionButton() {
   const [state, dispatch] = React.useReducer(AddItemFloatingActionButtonReducer, AddItemFloatingActionButtonInitialState);
-  const openBottomDrawer = useOpenBottomDrawer();
+  const openCommandLine = useOpenCommandLine();
 
   return (
     <AddItemFloatingActionButtonProvider {...{ state, dispatch }}>
 
       <div className={fabStyle}>
-        <Fab color="primary" aria-label="add" onClick={openBottomDrawer}>
-          <Add />
+        <Fab color="primary" aria-label="add" onClick={openCommandLine}>
+          /
         </Fab>
       </div>
     </AddItemFloatingActionButtonProvider>
@@ -29,9 +28,14 @@ export default function AddItemFloatingActionButton() {
   );
 }
 
-function useOpenBottomDrawer() {
+function useOpenCommandLine() {
   const { AboutTimeDispatch } = useAboutTimeContext();
-  return React.useCallback(() => {
-    AboutTimeDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' })
-  }, [AboutTimeDispatch]);
+  return () => {
+    AboutTimeDispatch({
+      type: 'BATCH', value: [
+        { type: 'TOGGLE_COMMAND_LINE' },
+        { type: 'SET_COMMAND', value: '/' }
+      ]
+    });
+  }
 }

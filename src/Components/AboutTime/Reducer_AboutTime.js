@@ -11,23 +11,22 @@ export const AboutTimeInitialState = {
   commandLineOpen: false,
   selectedItem: "[No Selection]",
   selectedView: CALENDAR_VIEWS.UP_NEXT,
+  command: "",
+  isValidCommand: false,
 };
 
 const actionsMap = {
   BATCH: (state, action) => {
     return action.value.reduce(AboutTimeReducer, state);
   },
-  TOGGLE_BOTTOM_DRAWER: (state) => {
-    return { ...state, ...setLocal({ bottomDrawerOpen: !state.bottomDrawerOpen }) };
-  },
-  TOGGLE_SIDE_DRAWER: (state) => {
-    return { ...state, ...setLocal({ sideDrawerOpen: !state.sideDrawerOpen }) };
-  },
-  TOGGLE_COMMAND_LINE: (state) => {
-    return { ...state, commandLineOpen: !state.commandLineOpen };
-  },
   REGISTER_BOTTOM_DRAWER_FOCUS_REF: (state, action) => {
     return { ...state, bottomDrawerFocusRef: action.value };
+  },
+  SET_COMMAND: (state, action) => {
+    return { ...state, command: action.value };
+  },
+  SET_IS_VALID_COMMAND: (state, action) => {
+    return { ...state, isValidCommand: action.value };
   },
   SET_SELECTED_ITEM: (state, action) => {
     if (!isValidItem(action.value)) throw new Error("Invalid item");
@@ -37,6 +36,15 @@ const actionsMap = {
     if (!isValidView(action.value)) throw new Error("Invalid view");
     return { ...state, selectedView: action.value };
   },
+  TOGGLE_BOTTOM_DRAWER: (state) => {
+    return { ...state, ...setLocal({ bottomDrawerOpen: !state.bottomDrawerOpen }) };
+  },
+  TOGGLE_COMMAND_LINE: (state) => {
+    return { ...state, commandLineOpen: !state.commandLineOpen };
+  },
+  TOGGLE_SIDE_DRAWER: (state) => {
+    return { ...state, ...setLocal({ sideDrawerOpen: !state.sideDrawerOpen }) };
+  }
 };
 
 export default function AboutTimeReducer(state, action) {

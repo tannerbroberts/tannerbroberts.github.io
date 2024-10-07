@@ -16,9 +16,9 @@ export default function CommandLine() {
   const [state, dispatch] = React.useReducer(CommandLineReducer, CommandLineInitialState);
   const { AboutTimeState } = useAboutTimeContext();
   const commandLineCommands = useCommandLineCommands();
-  useForwardSlashCommandLineToggle({ dispatch });
-  useCommandExecutionOnEnter({ state, dispatch, commandLineCommands });
-  const onChange = useCommanLineOnChangeInputListener({ dispatch, commandLineCommands });
+  useForwardSlashCommandLineToggle();
+  useCommandExecutionOnEnter({ AboutTimeState, commandLineCommands });
+  const onChange = useCommanLineOnChangeInputListener({ commandLineCommands });
 
   return (
     <CommandLineProvider {...{ state, dispatch }}>
@@ -31,8 +31,8 @@ export default function CommandLine() {
           <Input
             autoFocus
             placeholder='command'
-            className={CommandLineCss(state.isValidCommand)}
-            value={state.command}
+            className={CommandLineCss(AboutTimeState.isValidCommand)}
+            value={AboutTimeState.command}
             onChange={onChange}
           />}
       </Popover>
@@ -40,20 +40,20 @@ export default function CommandLine() {
   );
 }
 
-function useCommandExecutionOnEnter({ state, dispatch, commandLineCommands }) {
+function useCommandExecutionOnEnter({ commandLineCommands }) {
   const { AboutTimeState, AboutTimeDispatch } = useAboutTimeContext();
 
   const listenForEnter = React.useCallback((event) => {
     if (event.key === "Enter") {
       if (AboutTimeState.commandLineOpen) {
-        if (state.isValidCommand) {
-          commandLineCommands[state.command]();
-          dispatch({ type: 'SET_COMMAND', value: '' });
+        if (AboutTimeState.isValidCommand) {
+          commandLineCommands[AboutTimeState.command]();
+          AboutTimeDispatch({ type: 'SET_COMMAND', value: '' });
         }
         AboutTimeDispatch({ type: 'TOGGLE_COMMAND_LINE' });
       }
     }
-  }, [AboutTimeDispatch, AboutTimeState.commandLineOpen, commandLineCommands, dispatch, state.command, state.isValidCommand]);
+  }, [AboutTimeDispatch, AboutTimeState.commandLineOpen, commandLineCommands, AboutTimeState.command, AboutTimeState.isValidCommand]);
 
   React.useEffect(() => {
     window.addEventListener("keydown", listenForEnter);
@@ -71,10 +71,11 @@ function useCommandLineCommands() {
   }), [AboutTimeDispatch]);
 }
 
-function useCommanLineOnChangeInputListener({ dispatch, commandLineCommands }) {
+function useCommanLineOnChangeInputListener({ commandLineCommands }) {
+  const { AboutTimeDispatch } = useAboutTimeContext();
   return (e) => {
     const isValidCommand = Boolean(commandLineCommands[e.target.value]);
-    dispatch({
+    AboutTimeDispatch({
       type: 'BATCH', value: [
         { type: 'SET_COMMAND', value: e.target.value },
         { type: 'SET_IS_VALID_COMMAND', value: isValidCommand },
@@ -83,17 +84,21 @@ function useCommanLineOnChangeInputListener({ dispatch, commandLineCommands }) {
   }
 }
 
-function useForwardSlashCommandLineToggle({ dispatch }) {
+function useForwardSlashCommandLineToggle() {
   const { AboutTimeDispatch } = useAboutTimeContext();
   React.useEffect(() => {
     const listenForForwardSlash = (event) => {
       if (event.key === "/") {
-        AboutTimeDispatch({ type: 'TOGGLE_COMMAND_LINE' });
-        dispatch({ type: 'SET_COMMAND', value: '' });
+        event.preventDefault();
+        AboutTimeDispatch({
+          type: 'BATCH', value: [
+            { type: 'TOGGLE_COMMAND_LINE' },
+            { type: 'SET_COMMAND', value: '/' }
+          ]
+        });
       }
     }
     window.addEventListener("keydown", listenForForwardSlash);
     return () => window.removeEventListener("keydown", listenForForwardSlash);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [AboutTimeDispatch]);
 }

@@ -1,18 +1,11 @@
 
 export const CommandLineInitialState = {
-  isValidCommand: false,
-  command: '',
+
 };
 
 const actionsMap = {
   BATCH: (state, action) => {
     return action.value.reduce(CommandLineReducer, state);
-  },
-  SET_COMMAND: (state, action) => {
-    return { ...state, command: action.value };
-  },
-  SET_IS_VALID_COMMAND: (state, action) => {
-    return { ...state, isValidCommand: action.value };
   },
 };
 
