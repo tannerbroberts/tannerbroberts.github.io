@@ -61,6 +61,9 @@ function useCommandLineCommands() {
     "/add": () => {
       AboutTimeDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' });
     },
+    "/s": () => {
+      AboutTimeDispatch({ type: 'TOGGLE_SIDE_DRAWER' });
+    }
   }), [AboutTimeDispatch]);
 }
 
