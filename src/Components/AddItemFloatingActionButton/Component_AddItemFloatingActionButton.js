@@ -14,12 +14,7 @@ const fabStyle = css`
 
 export default function AddItemFloatingActionButton() {
   const [state, dispatch] = React.useReducer(AddItemFloatingActionButtonReducer, AddItemFloatingActionButtonInitialState);
-
-  const { AboutTimeDispatch } = useAboutTimeContext();
-
-  const openBottomDrawer = React.useCallback(() => {
-    AboutTimeDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' })
-  }, [AboutTimeDispatch]);
+  const openBottomDrawer = useOpenBottomDrawer();
 
   return (
     <AddItemFloatingActionButtonProvider {...{ state, dispatch }}>
@@ -32,4 +27,11 @@ export default function AddItemFloatingActionButton() {
     </AddItemFloatingActionButtonProvider>
 
   );
+}
+
+function useOpenBottomDrawer() {
+  const { AboutTimeDispatch } = useAboutTimeContext();
+  return React.useCallback(() => {
+    AboutTimeDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' })
+  }, [AboutTimeDispatch]);
 }
