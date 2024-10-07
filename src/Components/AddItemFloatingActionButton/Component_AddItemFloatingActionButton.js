@@ -34,7 +34,6 @@ function useOpenCommandLine() {
     AboutTimeDispatch({
       type: 'BATCH', value: [
         { type: 'TOGGLE_COMMAND_LINE' },
-        { type: 'SET_COMMAND', value: '/' }
       ]
     });
   }

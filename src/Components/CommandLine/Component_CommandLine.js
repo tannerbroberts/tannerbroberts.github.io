@@ -48,7 +48,6 @@ function useCommandExecutionOnEnter({ commandLineCommands }) {
       if (AboutTimeState.commandLineOpen) {
         if (AboutTimeState.isValidCommand) {
           commandLineCommands[AboutTimeState.command]();
-          AboutTimeDispatch({ type: 'SET_COMMAND', value: '' });
         }
         AboutTimeDispatch({ type: 'TOGGLE_COMMAND_LINE' });
       }
@@ -90,12 +89,7 @@ function useForwardSlashCommandLineToggle() {
     const listenForForwardSlash = (event) => {
       if (event.key === "/") {
         event.preventDefault();
-        AboutTimeDispatch({
-          type: 'BATCH', value: [
-            { type: 'TOGGLE_COMMAND_LINE' },
-            { type: 'SET_COMMAND', value: '/' }
-          ]
-        });
+        AboutTimeDispatch({ type: 'TOGGLE_COMMAND_LINE' });
       }
     }
     window.addEventListener("keydown", listenForForwardSlash);

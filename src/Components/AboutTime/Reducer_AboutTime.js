@@ -23,6 +23,7 @@ const actionsMap = {
     return { ...state, bottomDrawerFocusRef: action.value };
   },
   SET_COMMAND: (state, action) => {
+    if (action.value === '') return { ...state, command: '', isValidCommand: false, commandLineOpen: false };
     return { ...state, command: action.value };
   },
   SET_IS_VALID_COMMAND: (state, action) => {
@@ -42,9 +43,9 @@ const actionsMap = {
   TOGGLE_COMMAND_LINE: (state) => {
     const { commandLineOpen } = state;
     if (commandLineOpen) {
-      return { ...state, commandLineOpen: false, command: "", isValidCommand: false };
+      return { ...state, commandLineOpen: false, command: "/", isValidCommand: false };
     }
-    return { ...state, commandLineOpen: true };
+    return { ...state, commandLineOpen: true, command: "/", isValidCommand: false };
   },
   TOGGLE_SIDE_DRAWER: (state) => {
     return { ...state, ...setLocal({ sideDrawerOpen: !state.sideDrawerOpen }) };
