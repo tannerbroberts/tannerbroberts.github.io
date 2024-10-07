@@ -40,7 +40,11 @@ const actionsMap = {
     return { ...state, ...setLocal({ bottomDrawerOpen: !state.bottomDrawerOpen }) };
   },
   TOGGLE_COMMAND_LINE: (state) => {
-    return { ...state, commandLineOpen: !state.commandLineOpen };
+    const { commandLineOpen } = state;
+    if (commandLineOpen) {
+      return { ...state, commandLineOpen: false, command: "", isValidCommand: false };
+    }
+    return { ...state, commandLineOpen: true };
   },
   TOGGLE_SIDE_DRAWER: (state) => {
     return { ...state, ...setLocal({ sideDrawerOpen: !state.sideDrawerOpen }) };
