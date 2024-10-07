@@ -42,22 +42,16 @@ export default function CommandLine() {
 
 function useCommandExecutionOnEnter({ commandLineCommands }) {
   const { AboutTimeState, AboutTimeDispatch } = useAboutTimeContext();
-
   const listenForEnter = React.useCallback((event) => {
-    if (event.key === "Enter") {
-      if (AboutTimeState.commandLineOpen) {
-        if (AboutTimeState.isValidCommand) {
-          commandLineCommands[AboutTimeState.command]();
-        }
-        AboutTimeDispatch({ type: 'TOGGLE_COMMAND_LINE' });
-      }
+    const validEnterEvent = event.key === "Enter" && AboutTimeState.commandLineOpen
+    if (validEnterEvent) {
+      if (AboutTimeState.isValidCommand) commandLineCommands[AboutTimeState.command]();
+      AboutTimeDispatch({ type: 'TOGGLE_COMMAND_LINE' });
     }
   }, [AboutTimeDispatch, AboutTimeState.commandLineOpen, commandLineCommands, AboutTimeState.command, AboutTimeState.isValidCommand]);
-
   React.useEffect(() => {
     window.addEventListener("keydown", listenForEnter);
     return () => window.removeEventListener("keydown", listenForEnter);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listenForEnter]);
 }
 

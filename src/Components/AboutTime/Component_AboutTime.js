@@ -10,7 +10,7 @@ import { css } from '@emotion/css';
 import Header from '../Header';
 import ViewHandler from '../ViewHandler';
 import SideDrawer from '../SideDrawer';
-import AddItemFloatingActionButton from '../AddItemFloatingActionButton';
+import CommandLineFloatingActionButton from '../CommandLineFloatingActionButton';
 import BottomDrawer from '../BottomDrawer';
 import CommandLine from '../CommandLine/Component_CommandLine';
 
@@ -40,7 +40,7 @@ export default function AboutTime() {
             <SideDrawer />
             <BottomDrawer />
             <CommandLine />
-            <AddItemFloatingActionButton />
+            <CommandLineFloatingActionButton />
           </div>
         </LocalizationProvider>
       </ErrorBoundary>  </AboutTimeProvider>
