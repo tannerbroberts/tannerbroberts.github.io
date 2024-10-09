@@ -2,8 +2,7 @@ module.exports = {
   testEnvironment: 'jsdom',
   preset: 'ts-jest',
   transform: {
-    '^.+\\.(js|jsx)$': 'babel-jest',
-    '^.+\\.(ts|tsx)$': 'ts-jest',
+    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest'
   },
   setupFilesAfterEnv: ['./src/__mocks__/browserMocks.js'],
   transformIgnorePatterns: [

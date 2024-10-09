@@ -4,7 +4,10 @@
   "homepage": "https://tannerbroberts.github.io",
   "private": true,
   "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/plugin-transform-object-rest-spread": "^7.25.7",
+    "@babel/plugin-transform-runtime": "^7.25.7",
     "@emotion/css": "^11.11.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
@@ -44,7 +47,7 @@
     "prepatch": "npm run build ; git add --all ; git commit -m 'normal version bump' ; git push ; npm version patch",
     "patch": "gh-pages -d build",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "npx jest",
     "eject": "react-scripts eject",
     "lint": "eslint src/**/*.js"
   },
