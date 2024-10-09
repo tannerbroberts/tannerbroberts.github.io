@@ -103,9 +103,13 @@ export function useSchedule() {
 
   const addRecurrence = React.useCallback((recurrence) => {
     setRecurrences((prevRecurrences) => {
-      const { startPositionMillis, endPositionMillis, interval, itemName, repeatCount } = recurrence;
+      const { startPositionMillis, endPositionMillis, interval, itemName, count } = recurrence;
+      if (!startPositionMillis) throw new Error("Attempted to add a recurrence without a startPositionMillis.");
+      if (!interval) throw new Error("Attempted to add a recurrence without an interval.");
+      if (!count && !endPositionMillis) throw new Error("Attempted to add a recurrence without a count or endPositionMillis.");
+      if (!itemName) throw new Error("Attempted to add a recurrence without an itemName.");
       const newRecurrenceId = Math.floor(Math.random() * 1_000_000_000_000_000);
-      const newRecurrences = { ...prevRecurrences, [itemName]: { startPositionMillis, endPositionMillis, interval, repeatCount, id: newRecurrenceId } };
+      const newRecurrences = { ...prevRecurrences, [itemName]: { startPositionMillis, endPositionMillis, interval, count, id: newRecurrenceId } };
       return newRecurrences;
     });
   }, [setRecurrences]);

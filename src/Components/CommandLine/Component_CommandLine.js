@@ -56,15 +56,18 @@ function useCommandExecutionOnEnter({ commandLineCommands }) {
 }
 
 function useCommandLineCommands() {
-  const { AboutTimeDispatch } = useAboutTimeContext();
+  const { AboutTimeDispatch, extras: { schedule } } = useAboutTimeContext();
   return React.useMemo(() => ({
-    "/add": () => {
+    "/new": () => {
       AboutTimeDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' });
     },
-    "/s": () => {
+    "/side": () => {
       AboutTimeDispatch({ type: 'TOGGLE_SIDE_DRAWER' });
+    },
+    "/add": () => {
+      schedule.addItem({ itemName: "test", positionMillis: 0 });
     }
-  }), [AboutTimeDispatch]);
+  }), [AboutTimeDispatch, schedule]);
 }
 
 function useCommanLineOnChangeInputListener({ commandLineCommands }) {
