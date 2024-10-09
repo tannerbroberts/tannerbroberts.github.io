@@ -70,7 +70,12 @@ export function useLibrary() {
     });
   }, [setItems]);
 
-  return { setItem, deleteItem, items };
+  const getItems = React.useCallback((filters) => {
+    const { byName, byLength, byTag } = filters;
+    return Object.entries(items).filter(byName).filter(byLength).filter(byTag);
+  }, [items]);
+
+  return { setItem, deleteItem, getItems };
 }
 
 export function useSchedule() {
@@ -91,17 +96,16 @@ export function useSchedule() {
 
   const dropItem = React.useCallback(({ itemName, positionMillis }) => {
     setSchedule((prevSchedule) => {
-      const newSchedule = prevSchedule.filter((item) => item.positionMillis !== positionMillis || item.name !== itemName);
+      const newSchedule = prevSchedule.filter((item) => item.positionMillis !== positionMillis || item.itemName !== itemName);
       return newSchedule;
     });
   }, [setSchedule]);
 
-  const addRecurrence = React.useCallback(({ recurrence }) => {
+  const addRecurrence = React.useCallback((recurrence) => {
     setRecurrences((prevRecurrences) => {
+      const { startPositionMillis, endPositionMillis, interval, itemName, repeatCount } = recurrence;
       const newRecurrenceId = Math.floor(Math.random() * 1_000_000_000_000_000);
-      // Get the itemName from the object, and spread the rest of the object into the recurrences object
-      const { itemName, ...recurrenceSettings } = recurrence;
-      const newRecurrences = { ...prevRecurrences, [recurrence.itemName]: { ...recurrenceSettings, id: newRecurrenceId } };
+      const newRecurrences = { ...prevRecurrences, [itemName]: { startPositionMillis, endPositionMillis, interval, repeatCount, id: newRecurrenceId } };
       return newRecurrences;
     });
   }, [setRecurrences]);
@@ -130,16 +134,19 @@ export function useSchedule() {
       const recurringItems = [];
       const items = [];
       Object.values(recurrences).forEach((recurrence) => {
-        if (recurrence.start >= start && recurrence.start <= end) {
+        if (recurrence.startPositionMillis >= start && recurrence.startPositionMillis <= end) {
           recurringItems.push(recurrence);
         }
       });
       recurringItems.forEach((recurrence) => {
-        let nextOccurrence = recurrence.start;
-        while (nextOccurrence <= end) {
+        let nextOccurrence = recurrence.startPositionMillis;
+        let repeatCount = recurrence.repeatCount !== undefined ? recurrence.repeatCount : Infinity;
+        const endPositionMillis = recurrence.endPositionMillis !== undefined ? recurrence.endPositionMillis : end;
+        while (nextOccurrence <= end && repeatCount > 0 && endPositionMillis >= nextOccurrence) {
           const { itemName, id } = recurrence;
           items.push({ itemName, id, positionMillis: nextOccurrence });
           nextOccurrence += recurrence.interval;
+          repeatCount--;
         }
       });
       return items;
