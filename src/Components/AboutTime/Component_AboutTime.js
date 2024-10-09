@@ -6,6 +6,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { css } from '@emotion/css';
 import { useLocalStorage } from "@uidotdev/usehooks";
+import { v4 as uuid } from 'uuid';
 
 import Header from '../Header';
 import ViewHandler from '../ViewHandler';
@@ -49,38 +50,37 @@ export default function AboutTime() {
 }
 
 export function useLibrary() {
-  const [items, setItems] = useLocalStorage("items", {});
+  const [items, setItems] = useLocalStorage("items", []);
 
   const setItem = React.useCallback((item) => {
-    if (!item.name) throw new Error("Attempted to set item in items without a name.");
-    if (!item.length) throw new Error("Attempted to set item in items without a length.");
+    if (!item.name) throw new Error("Attempted to set item in items without a name property.");
+    if (!item.lengthMillis) throw new Error("Attempted to set item in items without a lengthMillis property.");
 
-    setItems((prevLibrary) => ({
-      ...prevLibrary,
-      [item.name]: item,
-    }));
+    setItems((prevLibrary) => {
+      if (prevLibrary?.length) return [...prevLibrary, item];
+      return [item];
+    });
   }, [setItems]);
 
   const deleteItem = React.useCallback((name) => {
     setItems((prevLibrary) => {
-      const newLibrary = { ...prevLibrary };
-      if (!newLibrary[name]) throw new Error(`Attempted to delete item ${name}, but the item does not exist in the items.`);
-      delete newLibrary[name];
-      return newLibrary;
+      if (!prevLibrary.find((item) => item.name === name)) throw new Error("Attempted to delete an item that doesn't exist.");
+      return prevLibrary.filter((item) => item.name !== name);
     });
   }, [setItems]);
 
   const getItems = React.useCallback((filters) => {
-    const { byName, byLength, byTag } = filters;
-    return Object.entries(items).filter(byName).filter(byLength).filter(byTag);
+    const { byName = () => true, byLength = () => true, byTag = () => true } = filters || {};
+    return [...items.filter(byName).filter(byLength).filter(byTag)];
   }, [items]);
 
   return { setItem, deleteItem, getItems };
 }
 
-export function useSchedule() {
-  const [schedule, setSchedule] = useLocalStorage("schedule", []);
-  const [recurrences, setRecurrences] = useLocalStorage("recurrences", {});
+export function useSchedule(nameContext = undefined) {
+  const scheduleKey = nameContext ? `itemSchedule:${nameContext}` : "rootSchedule";
+  const [schedule, setSchedule] = useLocalStorage(scheduleKey, []);
+  const [recurrences, setRecurrences] = useLocalStorage("recurrences", []);
 
   const addItem = React.useCallback(({ itemName, positionMillis }) => {
     setSchedule((prevSchedule) => {
@@ -101,25 +101,31 @@ export function useSchedule() {
     });
   }, [setSchedule]);
 
-  const addRecurrence = React.useCallback((recurrence) => {
+  const addRecurrence = React.useCallback(({ startPositionMillis, endPositionMillis, interval, itemName, count }) => {
+    let newRecurrenceId = uuid();
     setRecurrences((prevRecurrences) => {
-      const { startPositionMillis, endPositionMillis, interval, itemName, count } = recurrence;
-      if (!startPositionMillis) throw new Error("Attempted to add a recurrence without a startPositionMillis.");
+
+      if (startPositionMillis === undefined) throw new Error("Attempted to add a recurrence without a startPositionMillis.");
       if (!interval) throw new Error("Attempted to add a recurrence without an interval.");
       if (!count && !endPositionMillis) throw new Error("Attempted to add a recurrence without a count or endPositionMillis.");
       if (!itemName) throw new Error("Attempted to add a recurrence without an itemName.");
-      const newRecurrenceId = Math.floor(Math.random() * 1_000_000_000_000_000);
-      const newRecurrences = { ...prevRecurrences, [itemName]: { startPositionMillis, endPositionMillis, interval, count, id: newRecurrenceId } };
-      return newRecurrences;
+      const newRecurrence = { id: newRecurrenceId, startPositionMillis, endPositionMillis, interval, count, itemName };
+      return [...prevRecurrences, newRecurrence];
     });
+
+    return newRecurrenceId;
   }, [setRecurrences]);
 
-  const dropRecurrence = React.useCallback(({ recurrenceId }) => {
+  const getRecurrences = React.useCallback(() => {
+    return [...recurrences];
+  }, [recurrences]);
+
+  const dropRecurrenceById = React.useCallback((recurrenceId) => {
     setRecurrences((prevRecurrences) => {
-      delete prevRecurrences[recurrenceId];
-      return prevRecurrences;
+      if (!Boolean(recurrences.find(recurrence => recurrence.id === recurrenceId))) throw new Error("Attempted to drop a recurrence that doesn't exist.");
+      return prevRecurrences.filter(recurrence => recurrence.id !== recurrenceId);
     });
-  }, [setRecurrences]);
+  }, [recurrences, setRecurrences]);
 
   const getItemsInWindow = React.useCallback(({ start, end }) => {
     // build up a list of scheduled items as well as a virtual list of recurring items
@@ -135,24 +141,22 @@ export function useSchedule() {
     }
 
     const getRecurringItems = () => {
-      const recurringItems = [];
       const items = [];
-      Object.values(recurrences).forEach((recurrence) => {
-        if (recurrence.startPositionMillis >= start && recurrence.startPositionMillis <= end) {
-          recurringItems.push(recurrence);
-        }
-      });
-      recurringItems.forEach((recurrence) => {
-        let nextOccurrence = recurrence.startPositionMillis;
-        let repeatCount = recurrence.repeatCount !== undefined ? recurrence.repeatCount : Infinity;
-        const endPositionMillis = recurrence.endPositionMillis !== undefined ? recurrence.endPositionMillis : end;
-        while (nextOccurrence <= end && repeatCount > 0 && endPositionMillis >= nextOccurrence) {
-          const { itemName, id } = recurrence;
-          items.push({ itemName, id, positionMillis: nextOccurrence });
-          nextOccurrence += recurrence.interval;
-          repeatCount--;
-        }
-      });
+      recurrences
+        .filter((recurrence) => {
+          return recurrence.startPositionMillis >= start && recurrence.startPositionMillis <= end;
+        })
+        .forEach((recurrence) => {
+          let nextOccurrence = recurrence.startPositionMillis;
+          let count = recurrence.count !== undefined ? recurrence.count : Infinity;
+          const endPositionMillis = recurrence.endPositionMillis !== undefined ? recurrence.endPositionMillis : end;
+          while (nextOccurrence <= end && count !== 0 && endPositionMillis >= nextOccurrence) {
+            const { itemName, id } = recurrence;
+            items.push({ itemName, id, positionMillis: nextOccurrence });
+            nextOccurrence += recurrence.interval;
+            count--;
+          }
+        });
       return items;
     }
 
@@ -160,5 +164,5 @@ export function useSchedule() {
     return allItems.sort((a, b) => a.positionMillis - b.positionMillis);
   }, [schedule, recurrences]);
 
-  return { addItem, dropItem, addRecurrence, dropRecurrence, getItemsInWindow }
+  return { addItem, dropItem, addRecurrence, getRecurrences, dropRecurrenceById, getItemsInWindow }
 }
