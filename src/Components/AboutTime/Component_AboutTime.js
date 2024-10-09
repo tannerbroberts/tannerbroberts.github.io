@@ -4,8 +4,8 @@ import AboutTimeReducer, { AboutTimeInitialState } from './Reducer_AboutTime';
 import { ErrorBoundary } from 'react-error-boundary';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import useLibrary from '../../useLibrary';
 import { css } from '@emotion/css';
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 import Header from '../Header';
 import ViewHandler from '../ViewHandler';
@@ -28,7 +28,8 @@ const fullScreenCss = css`
 export default function AboutTime() {
   const [state, dispatch] = React.useReducer(AboutTimeReducer, AboutTimeInitialState);
   const library = useLibrary();
-  const extras = useMemo(() => ({ library }), [library]);
+  const schedule = useSchedule();
+  const extras = useMemo(() => ({ library, schedule }), [library, schedule]);
 
   return (
     <AboutTimeProvider {...{ state, dispatch, extras }}>
@@ -45,4 +46,108 @@ export default function AboutTime() {
         </LocalizationProvider>
       </ErrorBoundary>  </AboutTimeProvider>
   );
+}
+
+export function useLibrary() {
+  const [items, setItems] = useLocalStorage("items", {});
+
+  const setItem = React.useCallback((item) => {
+    if (!item.name) throw new Error("Attempted to set item in items without a name.");
+    if (!item.length) throw new Error("Attempted to set item in items without a length.");
+
+    setItems((prevLibrary) => ({
+      ...prevLibrary,
+      [item.name]: item,
+    }));
+  }, [setItems]);
+
+  const deleteItem = React.useCallback((name) => {
+    setItems((prevLibrary) => {
+      const newLibrary = { ...prevLibrary };
+      if (!newLibrary[name]) throw new Error(`Attempted to delete item ${name}, but the item does not exist in the items.`);
+      delete newLibrary[name];
+      return newLibrary;
+    });
+  }, [setItems]);
+
+  return { setItem, deleteItem, items };
+}
+
+export function useSchedule() {
+  const [schedule, setSchedule] = useLocalStorage("schedule", []);
+  const [recurrences, setRecurrences] = useLocalStorage("recurrences", {});
+
+  const addItem = React.useCallback(({ itemName, positionMillis }) => {
+    setSchedule((prevSchedule) => {
+      const newSchedule = prevSchedule?.length ? [...prevSchedule] : [];
+      let insertionIndex = 0;
+      while (newSchedule[insertionIndex] && newSchedule[insertionIndex].positionMillis < positionMillis) {
+        insertionIndex++;
+      }
+      newSchedule.splice(insertionIndex, 0, { itemName, positionMillis });
+      return newSchedule;
+    });
+  }, [setSchedule]);
+
+  const dropItem = React.useCallback(({ itemName, positionMillis }) => {
+    setSchedule((prevSchedule) => {
+      const newSchedule = prevSchedule.filter((item) => item.positionMillis !== positionMillis || item.name !== itemName);
+      return newSchedule;
+    });
+  }, [setSchedule]);
+
+  const addRecurrence = React.useCallback(({ recurrence }) => {
+    setRecurrences((prevRecurrences) => {
+      const newRecurrenceId = Math.floor(Math.random() * 1_000_000_000_000_000);
+      // Get the itemName from the object, and spread the rest of the object into the recurrences object
+      const { itemName, ...recurrenceSettings } = recurrence;
+      const newRecurrences = { ...prevRecurrences, [recurrence.itemName]: { ...recurrenceSettings, id: newRecurrenceId } };
+      return newRecurrences;
+    });
+  }, [setRecurrences]);
+
+  const dropRecurrence = React.useCallback(({ recurrenceId }) => {
+    setRecurrences((prevRecurrences) => {
+      delete prevRecurrences[recurrenceId];
+      return prevRecurrences;
+    });
+  }, [setRecurrences]);
+
+  const getItemsInWindow = React.useCallback(({ start, end }) => {
+    // build up a list of scheduled items as well as a virtual list of recurring items
+
+    const getScheduledItems = () => {
+      const items = [];
+      schedule.forEach((item) => {
+        if (item.positionMillis >= start && item.positionMillis <= end) {
+          items.push(item);
+        }
+      });
+      return items;
+    }
+
+    const getRecurringItems = () => {
+      const recurringItems = [];
+      const items = [];
+      Object.values(recurrences).forEach((recurrence) => {
+        if (recurrence.start >= start && recurrence.start <= end) {
+          recurringItems.push(recurrence);
+        }
+      });
+      recurringItems.forEach((recurrence) => {
+        let nextOccurrence = recurrence.start;
+        while (nextOccurrence <= end) {
+          const { itemName, id } = recurrence;
+          items.push({ itemName, id, positionMillis: nextOccurrence });
+          nextOccurrence += recurrence.interval;
+        }
+      });
+      return items;
+    }
+
+    const allItems = [...getScheduledItems(), ...getRecurringItems()];
+    return allItems.sort((a, b) => a.positionMillis - b.positionMillis);
+  }, [schedule, recurrences]);
+
+  return { addItem, dropItem, addRecurrence, dropRecurrence, getItemsInWindow }
 }

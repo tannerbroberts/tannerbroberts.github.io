@@ -1,26 +1,20 @@
-class Storage {
-  constructor() {
-    this.length = 0;
-  }
-  getItem(key) {
-    return this[key] || null;
-  }
-  setItem(key, value) {
-    if (!this[key]) {
-      this.length++;
-    }
-    this[key] = value.toString();
-  }
-  removeItem(key) {
-    if (this[key]) {
-      this.length--;
-    }
-    delete this[key];
-  }
-  clear() {
-    Object.keys(this).forEach((key) => delete this[key]);
-    this.length = 0;
-  }
-}
+// src/__mocks__/browserMocks.js
+export const localStorageMock = (function() {
+  let store = {};
+  return {
+    getItem(key) {
+      return store[key] || null;
+    },
+    setItem(key, value) {
+      store[key] = value.toString();
+    },
+    clear() {
+      store = {};
+    },
+    removeItem(key) {
+      delete store[key];
+    },
+  };
+})();
 
-export const localStorageMock = Object.create(new Storage());
+Object.defineProperty(global, 'localStorage', { value: localStorageMock });
