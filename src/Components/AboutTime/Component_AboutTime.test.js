@@ -121,7 +121,7 @@ describe("useLibrary", () => {
     expect(result.current.getItems({})).toHaveLength(0);
   });
 
-  it('has a function, getItems, that can filter by name', async () => {
+  it('has a function, getItems, that can filter by name and lengthRange', async () => {
     const { result } = renderHook(() => useLibrary());
 
     // Set a number of test items
@@ -130,8 +130,12 @@ describe("useLibrary", () => {
     await act(async () => result.current.createItem({ name: "test3", lengthMillis: 1000 }));
 
     // Filter by name
-    const filteredItems = result.current.getItems({ names: ["test"] });
-    expect(filteredItems).toHaveLength(1);
+    const itemsFilteredByName = result.current.getItems({ names: ["test"] });
+    expect(itemsFilteredByName).toHaveLength(1);
+
+    // Filter by lengthRange (inclusive on both ends)
+    const itemsFilteredByLengthRange = result.current.getItems({ lengthRange: { min: 1000, max: 1000 } });
+    expect(itemsFilteredByLengthRange).toHaveLength(3);
 
     // Drop the items
     await act(async () => result.current.deleteItem("test"));
