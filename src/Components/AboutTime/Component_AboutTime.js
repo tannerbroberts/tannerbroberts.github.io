@@ -149,7 +149,7 @@ export function useSchedule(nameContext = undefined) {
 
     const getRecurringItems = () => {
       const items = [];
-      recurrences
+      if (Array.isArray(recurrences)) recurrences
         .filter((recurrence) => {
           return recurrence.startPositionMillis >= start && recurrence.startPositionMillis <= end;
         })

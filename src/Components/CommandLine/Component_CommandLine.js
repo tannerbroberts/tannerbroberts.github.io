@@ -73,7 +73,6 @@ function useCommandLineCommands() {
       AboutTimeDispatch({ type: 'TOGGLE_SIDE_DRAWER' });
     },
     "/schedule": ([itemName]) => {
-      console.log('scheduling item:', itemName);
       const items = library.getItems({ names: [itemName] });
       if (!items) throw new Error(`Illegal return from getItems.`);
       if (!Array.isArray(items)) throw new Error(`getItems must return an array.`);
