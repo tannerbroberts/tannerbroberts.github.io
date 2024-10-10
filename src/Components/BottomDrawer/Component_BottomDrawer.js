@@ -68,14 +68,14 @@ function useNewItemFormOnSubmit({ state, dispatch }) {
   const { AboutTimeDispatch, extras: AboutTimeExtras } = useAboutTimeContext();
   return React.useCallback((e) => {
     const isInvalid = () => {
-      const itemExistsAlready = AboutTimeExtras.library.items[state.newItemName];
+      const itemExistsAlready = AboutTimeExtras.library.getItems({ names: [state.newItemName] })[state.newItemName];
       const itemIsEmpty = state.newItemName === '';
       return itemExistsAlready || itemIsEmpty;
     }
     const addItem = () => {
       AboutTimeExtras.library.createItem({
         name: state.newItemName,
-        length: state.newItemLength
+        lengthMillis: state.newItemLength
       });
     }
     const clearForm = () => {

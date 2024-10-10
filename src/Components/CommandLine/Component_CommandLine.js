@@ -43,9 +43,17 @@ export default function CommandLine() {
 function useCommandExecutionOnEnter({ commandLineCommands }) {
   const { AboutTimeState, AboutTimeDispatch } = useAboutTimeContext();
   const listenForEnter = React.useCallback((event) => {
-    const validEnterEvent = event.key === "Enter" && AboutTimeState.commandLineOpen
+    const validEnterEvent = event.key === "Enter" && AboutTimeState.commandLineOpen && AboutTimeState.isValidCommand;
     if (validEnterEvent) {
-      if (AboutTimeState.isValidCommand) commandLineCommands[AboutTimeState.command]();
+      const argsList = AboutTimeState.command.split(" ");
+      if (!Array.isArray(argsList) || argsList.length === 0) throw new Error("Command must have at least one argument.");
+      // Execute the command
+      const command = argsList[0];
+      const theRest = argsList.slice(1);
+      if (!commandLineCommands[command]) throw new Error(`Command: ${command} not found, but input was left valid.`);
+      theRest.length === 0
+        ? commandLineCommands[command]()
+        : commandLineCommands[command](theRest);
       AboutTimeDispatch({ type: 'TOGGLE_COMMAND_LINE' });
     }
   }, [AboutTimeDispatch, AboutTimeState.commandLineOpen, commandLineCommands, AboutTimeState.command, AboutTimeState.isValidCommand]);
@@ -56,7 +64,7 @@ function useCommandExecutionOnEnter({ commandLineCommands }) {
 }
 
 function useCommandLineCommands() {
-  const { AboutTimeDispatch, extras: { schedule } } = useAboutTimeContext();
+  const { AboutTimeDispatch, extras: { schedule, library } } = useAboutTimeContext();
   return React.useMemo(() => ({
     "/new": () => {
       AboutTimeDispatch({ type: 'TOGGLE_BOTTOM_DRAWER' });
@@ -64,16 +72,25 @@ function useCommandLineCommands() {
     "/side": () => {
       AboutTimeDispatch({ type: 'TOGGLE_SIDE_DRAWER' });
     },
-    "/add": () => {
-      schedule.addItem({ itemName: "test", positionMillis: 0 });
+    "/schedule": ([itemName]) => {
+      console.log('scheduling item:', itemName);
+      const items = library.getItems({ names: [itemName] });
+      if (!items) throw new Error(`Illegal return from getItems.`);
+      if (!Array.isArray(items)) throw new Error(`getItems must return an array.`);
+      if (items.length === 0) throw new Error(`Item: ${itemName} not found, but command was left valid.`);
+      if (items.length > 1) throw new Error(`getItems must return an array with only one item when scheduling by name.`);
+      if (items.length === 1) {
+        schedule.addItem({ itemName, positionMillis: Date.now() });
+      }
     }
-  }), [AboutTimeDispatch, schedule]);
+  }), [AboutTimeDispatch, library, schedule]);
 }
 
 function useCommanLineOnChangeInputListener({ commandLineCommands }) {
   const { AboutTimeDispatch } = useAboutTimeContext();
   return (e) => {
-    const isValidCommand = Boolean(commandLineCommands[e.target.value]);
+    const firstArg = e.target?.value?.split(" ")[0] || "";
+    const isValidCommand = Boolean(commandLineCommands[firstArg]);
     AboutTimeDispatch({
       type: 'BATCH', value: [
         { type: 'SET_COMMAND', value: e.target.value },

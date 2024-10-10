@@ -57,10 +57,10 @@ export function useLibrary() {
     if (!item.lengthMillis) throw new Error("Attempted to set item in items without a lengthMillis property.");
 
     setItems((prevLibrary) => {
-      if (prevLibrary?.length) return [...prevLibrary, item];
+      if (Array.isArray(items)) return [...prevLibrary, item];
       return [item];
     });
-  }, [setItems]);
+  }, [items, setItems]);
 
   const deleteItem = React.useCallback((name) => {
     setItems((prevLibrary) => {
@@ -74,7 +74,7 @@ export function useLibrary() {
     if (lengthRange && (lengthRange.min === undefined || lengthRange.max === undefined)) {
       throw new Error("Attempted to get items with a lengthRange parameter that doesn't have min and max properties.");
     }
-      const byName = names ? ({ name }) => names.includes(name) : () => true;
+    const byName = names ? ({ name }) => names.includes(name) : () => true;
     const byLengthRange = lengthRange ? ({ lengthMillis }) => lengthRange.min <= lengthMillis && lengthMillis <= lengthRange.max : () => true;
     return [
       ...items.filter(byName).filter(byLengthRange)
