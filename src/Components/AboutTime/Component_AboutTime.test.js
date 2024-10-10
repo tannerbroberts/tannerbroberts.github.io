@@ -102,7 +102,7 @@ describe("useSchedule", () => {
 describe("useLibrary", () => {
   it('should return an object with all expected properties', async () => {
     const { result } = await renderHook(() => useLibrary());
-    expect(result.current).toHaveProperty("setItem");
+    expect(result.current).toHaveProperty("createItem");
     expect(result.current).toHaveProperty("deleteItem");
     expect(result.current).toHaveProperty("getItems");
     expect(result.current).toBeInstanceOf(Object);
@@ -112,26 +112,25 @@ describe("useLibrary", () => {
     const { result } = renderHook(() => useLibrary());
 
     // Set a test item
-    await act(async () => result.current.setItem({ name: "test", lengthMillis: 1000 }));
-    expect(result.current.getItems()).toHaveLength(1);
-    expect(result.current.getItems()[0].name).toBe("test");
+    await act(async () => result.current.createItem({ name: "test", lengthMillis: 1000 }));
+    expect(result.current.getItems({})).toHaveLength(1);
+    expect(result.current.getItems({})[0].name).toBe("test");
 
     // Drop by name works
     await act(async () => result.current.deleteItem("test"));
-    expect(result.current.getItems()).toHaveLength(0);
+    expect(result.current.getItems({})).toHaveLength(0);
   });
 
   it('has a function, getItems, that can filter by name', async () => {
     const { result } = renderHook(() => useLibrary());
 
     // Set a number of test items
-    await act(async () => result.current.setItem({ name: "test", lengthMillis: 1000 }));
-    await act(async () => result.current.setItem({ name: "test2", lengthMillis: 1000 }));
-    await act(async () => result.current.setItem({ name: "test3", lengthMillis: 1000 }));
+    await act(async () => result.current.createItem({ name: "test", lengthMillis: 1000 }));
+    await act(async () => result.current.createItem({ name: "test2", lengthMillis: 1000 }));
+    await act(async () => result.current.createItem({ name: "test3", lengthMillis: 1000 }));
 
     // Filter by name
-    const byName = (item) => item.name === "test";
-    const filteredItems = result.current.getItems({ byName });
+    const filteredItems = result.current.getItems({ names: ["test"] });
     expect(filteredItems).toHaveLength(1);
 
     // Drop the items
@@ -140,6 +139,6 @@ describe("useLibrary", () => {
     await act(async () => result.current.deleteItem("test3"));
 
     // They're gone
-    expect(result.current.getItems()).toHaveLength(0);
+    expect(result.current.getItems({})).toHaveLength(0);
   })
 })

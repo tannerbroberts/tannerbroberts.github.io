@@ -52,7 +52,7 @@ export default function AboutTime() {
 export function useLibrary() {
   const [items, setItems] = useLocalStorage("items", []);
 
-  const setItem = React.useCallback((item) => {
+  const createItem = React.useCallback((item) => {
     if (!item.name) throw new Error("Attempted to set item in items without a name property.");
     if (!item.lengthMillis) throw new Error("Attempted to set item in items without a lengthMillis property.");
 
@@ -69,12 +69,19 @@ export function useLibrary() {
     });
   }, [setItems]);
 
-  const getItems = React.useCallback((filters) => {
-    const { byName = () => true, byLength = () => true, byTag = () => true } = filters || {};
-    return [...items.filter(byName).filter(byLength).filter(byTag)];
+  const getItems = React.useCallback(({ names, lengthRange }) => {
+    if (!Array.isArray(names) && names !== undefined) throw new Error("Attempted to get items with a non-array names parameter.");
+    if (lengthRange && (lengthRange.min === undefined || lengthRange.max === undefined)) {
+      throw new Error("Attempted to get items with a lengthRange parameter that doesn't have min and max properties.");
+    }
+      const byName = names ? ({ name }) => names.includes(name) : () => true;
+    const byLengthRange = lengthRange ? ({ lengthMillis }) => lengthRange.min <= lengthMillis && lengthMillis <= lengthRange.max : () => true;
+    return [
+      ...items.filter(byName).filter(byLengthRange)
+    ]
   }, [items]);
 
-  return { setItem, deleteItem, getItems };
+  return { createItem, deleteItem, getItems };
 }
 
 export function useSchedule(nameContext = undefined) {

@@ -73,7 +73,7 @@ function useNewItemFormOnSubmit({ state, dispatch }) {
       return itemExistsAlready || itemIsEmpty;
     }
     const addItem = () => {
-      AboutTimeExtras.library.setItem({
+      AboutTimeExtras.library.createItem({
         name: state.newItemName,
         length: state.newItemLength
       });
