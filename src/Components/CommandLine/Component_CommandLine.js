@@ -51,9 +51,9 @@ function useCommandExecutionOnEnter({ commandLineCommands }) {
       const command = argsList[0];
       const theRest = argsList.slice(1);
       if (!commandLineCommands[command]) throw new Error(`Command: ${command} not found, but input was left valid.`);
-      theRest.length === 0
-        ? commandLineCommands[command]()
-        : commandLineCommands[command](theRest);
+      Array.isArray(theRest) && theRest.length > 0
+        ? commandLineCommands[command](theRest)
+        : commandLineCommands[command]()
       AboutTimeDispatch({ type: 'TOGGLE_COMMAND_LINE' });
     }
   }, [AboutTimeDispatch, AboutTimeState.commandLineOpen, commandLineCommands, AboutTimeState.command, AboutTimeState.isValidCommand]);
@@ -73,6 +73,9 @@ function useCommandLineCommands() {
       AboutTimeDispatch({ type: 'TOGGLE_SIDE_DRAWER' });
     },
     "/schedule": ([itemName]) => {
+      const noItemProvided = !itemName;
+      const itemDoesntExist = !library.getItems({ names: [itemName] }).length;
+      if (noItemProvided || itemDoesntExist) return;
       const items = library.getItems({ names: [itemName] });
       if (!items) throw new Error(`Illegal return from getItems.`);
       if (!Array.isArray(items)) throw new Error(`getItems must return an array.`);
