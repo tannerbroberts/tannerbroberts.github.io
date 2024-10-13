@@ -7,23 +7,21 @@ const { getLocal, setLocal } = getLocalScope("AboutTime");
 export const AboutTimeInitialState = {
   ...getLocal({ bottomDrawerOpen: false }),
   ...getLocal({ sideDrawerOpen: false }),
-  bottomDrawerFocusRef: null,
-  commandLineOpen: false,
+  CommandLine: {
+    isOpen: false,
+    command: "",
+    isValidCommand: false,
+  },
   selectedItem: "[No Selection]",
   selectedView: CALENDAR_VIEWS.UP_NEXT,
-  command: "",
-  isValidCommand: false,
 };
 
 const actionsMap = {
   BATCH: (state, action) => {
     return action.value.reduce(AboutTimeReducer, state);
   },
-  REGISTER_BOTTOM_DRAWER_FOCUS_REF: (state, action) => {
-    return { ...state, bottomDrawerFocusRef: action.value };
-  },
   SET_COMMAND: (state, action) => {
-    if (action.value === '') return { ...state, command: '', isValidCommand: false, commandLineOpen: false };
+    if (action.value === '') return { ...state, CommandLine: { ...state.CommandLine, command: '', isValidCommand: false, isOpen: false } };
     return { ...state, command: action.value };
   },
   SET_IS_VALID_COMMAND: (state, action) => {
@@ -41,11 +39,11 @@ const actionsMap = {
     return { ...state, ...setLocal({ bottomDrawerOpen: !state.bottomDrawerOpen }) };
   },
   TOGGLE_COMMAND_LINE: (state) => {
-    const { commandLineOpen } = state;
-    if (commandLineOpen) {
-      return { ...state, commandLineOpen: false, command: "/", isValidCommand: false };
+    const { CommandLine: { isOpen } } = state;
+    if (isOpen) {
+      return { ...state, CommandLine: { ...state.CommandLine, isOpen: false, command: "/", isValidCommand: false } };
     }
-    return { ...state, commandLineOpen: true, command: "/", isValidCommand: false };
+    return { ...state, CommandLine: { isOpen: true, command: "/", isValidCommand: false } };
   },
   TOGGLE_SIDE_DRAWER: (state) => {
     return { ...state, ...setLocal({ sideDrawerOpen: !state.sideDrawerOpen }) };

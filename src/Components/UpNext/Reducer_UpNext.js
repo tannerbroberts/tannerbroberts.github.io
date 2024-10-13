@@ -1,12 +1,21 @@
 
 export const UpNextInitialState = {
-
+  ownHeight: 0,
 };
 
 const actionsMap = {
   BATCH: (state, action) => {
     return action.value.reduce(UpNextReducer, state);
-  }
+  },
+  SET_OWN_HEIGHT: (state, action) => {
+    return { ...state, ownHeight: action.value };
+  },
+  SET_LEDGER_INTERVAL: (state, action) => {
+    return { ...state, ledgerInterval: action.value };
+  },
+  SET_LEDGER_INTERVAL_PIXEL_HEIGHT: (state, action) => {
+    return { ...state, ledgerIntervalPixelHeight: action.value };
+  },
 };
 
 export default function UpNextReducer(state, action) {

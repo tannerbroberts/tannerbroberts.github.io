@@ -24,10 +24,10 @@ export default function CommandLine() {
     <CommandLineProvider {...{ state, dispatch }}>
       <Popover
         disableRestoreFocus
-        open={AboutTimeState.commandLineOpen}
+        open={AboutTimeState.CommandLine.isOpen}
         anchorOrigin={{ vertical: 'center', horizontal: 'center' }}
       >
-        {AboutTimeState.commandLineOpen &&
+        {AboutTimeState.CommandLine.isOpen &&
           <Input
             autoFocus
             placeholder='command'
@@ -43,7 +43,7 @@ export default function CommandLine() {
 function useCommandExecutionOnEnter({ commandLineCommands }) {
   const { AboutTimeState, AboutTimeDispatch } = useAboutTimeContext();
   const listenForEnter = React.useCallback((event) => {
-    const validEnterEvent = event.key === "Enter" && AboutTimeState.commandLineOpen && AboutTimeState.isValidCommand;
+    const validEnterEvent = event.key === "Enter" && AboutTimeState.CommandLine.isOpen && AboutTimeState.isValidCommand;
     if (validEnterEvent) {
       const argsList = AboutTimeState.command.split(" ");
       if (!Array.isArray(argsList) || argsList.length === 0) throw new Error("Command must have at least one argument.");
@@ -56,7 +56,7 @@ function useCommandExecutionOnEnter({ commandLineCommands }) {
         : commandLineCommands[command]()
       AboutTimeDispatch({ type: 'TOGGLE_COMMAND_LINE' });
     }
-  }, [AboutTimeDispatch, AboutTimeState.commandLineOpen, commandLineCommands, AboutTimeState.command, AboutTimeState.isValidCommand]);
+  }, [AboutTimeDispatch, AboutTimeState.CommandLine.isOpen, commandLineCommands, AboutTimeState.command, AboutTimeState.isValidCommand]);
   React.useEffect(() => {
     window.addEventListener("keydown", listenForEnter);
     return () => window.removeEventListener("keydown", listenForEnter);
