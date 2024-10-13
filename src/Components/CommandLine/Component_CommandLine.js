@@ -25,7 +25,7 @@ export default function CommandLine() {
       <Popover
         disableRestoreFocus
         open={AboutTimeState.CommandLine.isOpen}
-        anchorOrigin={{ vertical: 'center', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         {AboutTimeState.CommandLine.isOpen &&
           <Input

@@ -53,8 +53,6 @@ const actionsMap = {
 export default function AboutTimeReducer(state, action) {
   if (!action.type) throw new Error('Action must have a type');
   if (actionsMap[action.type]) {
-    console.log(JSON.stringify({ state, action }, null, 2));
-
     return actionsMap[action.type](state, action);
   } else {
     throw new Error(`Action type ${action.type} not found in AboutTimeReducer`);

@@ -1,6 +1,8 @@
 
 export const UpNextInitialState = {
   ownHeight: 0,
+  windowSize: 3_600_000,
+  intervalSize: 120_000,
 };
 
 const actionsMap = {
@@ -8,14 +10,13 @@ const actionsMap = {
     return action.value.reduce(UpNextReducer, state);
   },
   SET_OWN_HEIGHT: (state, action) => {
-    console.log('called set own height', action.value);
     return { ...state, ownHeight: action.value };
   },
-  SET_LEDGER_INTERVAL: (state, action) => {
-    return { ...state, ledgerInterval: action.value };
+  SET_INTERVAL_SIZE: (state, action) => {
+    return { ...state, intervalSize: action.value };
   },
-  SET_LEDGER_INTERVAL_PIXEL_HEIGHT: (state, action) => {
-    return { ...state, ledgerIntervalPixelHeight: action.value };
+  SET_WINDOW_SIZE: (state, action) => {
+    return { ...state, windowSize: action.value };
   },
 };
 

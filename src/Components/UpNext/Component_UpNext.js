@@ -1,7 +1,6 @@
 import React from 'react';
 import UpNextProvider, { useUpNextContext } from './Provider_UpNext';
 import UpNextReducer, { UpNextInitialState } from './Reducer_UpNext';
-import { useAboutTimeContext } from '../AboutTime';
 import { css } from '@emotion/css';
 
 const scrollableParentCss = css`
@@ -54,7 +53,6 @@ export function useWatchHeightOfComponentRef({ ref, updateHeight }) {
   React.useEffect(() => {
     const handleResize = () => {
       if (ref.current) {
-        console.log('setting height:', ref.current.clientHeight);
         updateHeight(ref.current.clientHeight);
       }
     };
@@ -72,45 +70,30 @@ export function useWatchHeightOfComponentRef({ ref, updateHeight }) {
 }
 
 function LedgerLines() {
-  const { UpNextState: { ownHeight } } = useUpNextContext();
-  console.log('context:', useUpNextContext());
-  const ledgerSectionHeight = 30;
-  const ledgerSectionMillis = 120_000; // 2 minutes for now
+  const { UpNextState: { windowSize, intervalSize } } = useUpNextContext();
+  const millisecondsPerPixel = 1000;
+
+  const totalBlocks = windowSize / intervalSize;
 
 
-  console.log(`${ownHeight} / ${ledgerSectionHeight} = ${ownHeight / ledgerSectionHeight}`);
+
+
+  // know how much time is being displayed
+  // know how large the time chunks should be
+  // calculate how many time chunks should be displayed based on those two things (height doesn't matter, the parent is a fixed height, and the child is variable height depending on the time chunk size)
+  // later, virtualizing the ledger lines will be important, but for now, just render them all though they are not visible
+
   return <>
-    {Array.from({ length: Math.floor(ownHeight / ledgerSectionHeight) }).map((_, index) => {
-      const offset = index * ledgerSectionHeight;
-      return <div className={ledgerLineCss(offset, ledgerSectionHeight)} key={index}></div>
+    {Array.from({ length: Math.floor(totalBlocks) }).map((_, index) => {
+      const offset = index * intervalSize / millisecondsPerPixel
+      const height = intervalSize / millisecondsPerPixel
+      return <div className={ledgerLineCss(offset, height)} key={index}>
+        {index}
+      </div>
     })}
   </>
 }
 
 function NowLine() {
-  
+
 }
-
-// function ChildItems() {
-//   const { extras: { schedule, library } } = useAboutTimeContext();
-//   const { ownHeight: parentHeight } = useUpNextContext();
-//   const timeWindowSize = 3_600_000;
-//   const timeWindow = { start: Date.now() - timeWindowSize / 2, end: Date.now() + timeWindowSize / 2 };
-//   const millisPerPixel = Math.floor(timeWindowSize / parentHeight);
-
-//   return <>
-
-//     {schedule.getItemsInWindow({ ...timeWindow }).map(scheduledItem => {
-//       const item = library.getItems({ names: [scheduledItem.itemName] })[0];
-//       const offset = (scheduledItem.positionMillis - timeWindow.start) / millisPerPixel;
-//       const height = item.lengthMillis / millisPerPixel;
-
-
-//       return (
-//         <div className={childComponentCss({ offset, height })} key={`${item.name}${scheduledItem.positionMillis}`}>
-//         </div>
-//       )
-//     }
-//     )}
-//   </>
-// }
