@@ -31,7 +31,7 @@ const ledgerLineCss = (offset, height) => css`
 
 export default function UpNext() {
   const [state, dispatch] = React.useReducer(UpNextReducer, UpNextInitialState);
-  const updateHeight = React.useCallback(height => dispatch({ type: 'SET_OWN_HEIGHT', payload: height }), [dispatch]);
+  const updateHeight = React.useCallback(height => dispatch({ type: 'SET_OWN_HEIGHT', value: height }), [dispatch]);
   const scrollableParentRef = React.useRef(null);
   useWatchHeightOfComponentRef({ ref: scrollableParentRef, updateHeight });
 
@@ -39,6 +39,7 @@ export default function UpNext() {
     <UpNextProvider {...{ state, dispatch }}>
       <div ref={scrollableParentRef} className={scrollableParentCss}>
         <LedgerLines />
+        <NowLine />
         {/* <ChildItems /> */}
       </div>
     </UpNextProvider>
@@ -71,9 +72,23 @@ export function useWatchHeightOfComponentRef({ ref, updateHeight }) {
 }
 
 function LedgerLines() {
-  const { UpNextState: { ownHeight, ledgerInterval, ledgerIntervalPixelHeight } } = useUpNextContext();
+  const { UpNextState: { ownHeight } } = useUpNextContext();
+  console.log('context:', useUpNextContext());
+  const ledgerSectionHeight = 30;
+  const ledgerSectionMillis = 120_000; // 2 minutes for now
 
-  return <></>
+
+  console.log(`${ownHeight} / ${ledgerSectionHeight} = ${ownHeight / ledgerSectionHeight}`);
+  return <>
+    {Array.from({ length: Math.floor(ownHeight / ledgerSectionHeight) }).map((_, index) => {
+      const offset = index * ledgerSectionHeight;
+      return <div className={ledgerLineCss(offset, ledgerSectionHeight)} key={index}></div>
+    })}
+  </>
+}
+
+function NowLine() {
+  
 }
 
 // function ChildItems() {

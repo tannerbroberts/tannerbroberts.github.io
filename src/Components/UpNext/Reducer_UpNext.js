@@ -8,6 +8,7 @@ const actionsMap = {
     return action.value.reduce(UpNextReducer, state);
   },
   SET_OWN_HEIGHT: (state, action) => {
+    console.log('called set own height', action.value);
     return { ...state, ownHeight: action.value };
   },
   SET_LEDGER_INTERVAL: (state, action) => {

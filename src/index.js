@@ -25,7 +25,22 @@ html.style.height = "100%";
 body.style.height = "100%";
 rootCss.style.height = "100%";
 
+html.style.touchAction = "manipulation";
+body.style.touchAction = "manipulation";
+
 body.style.position = "relative";
+
+document.addEventListener('gesturestart', function (e) {
+  e.preventDefault();
+});
+
+document.addEventListener('gesturechange', function (e) {
+  e.preventDefault();
+});
+
+document.addEventListener('gestureend', function (e) {
+  e.preventDefault();
+});
 
 // Add css to make sure the default font is monospace
 html.style.fontFamily = "monospace";
@@ -33,6 +48,9 @@ html.style.fontFamily = "monospace";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <AboutTime />
-  </React.StrictMode>
+    <>
+      <button onClick={localStorage.clear()}>Delete LocalStorage</button>
+      <AboutTime />
+    </>
+  </React.StrictMode >
 );
