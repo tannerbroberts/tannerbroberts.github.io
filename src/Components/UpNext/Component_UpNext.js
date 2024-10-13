@@ -21,6 +21,8 @@ const childComponentCss = ({ offset, height }) => css`
 
 const ledgerLineCss = (offset, height) => css`
   position: absolute;
+  // smoothly scroll the ledger lines by translating the top value
+  transition: top 1s;
   top: ${offset}px;
   left: 10vw;
   width: 100%;
@@ -74,6 +76,7 @@ function LedgerLines() {
   const millisecondsPerPixel = 1000;
 
   const totalBlocks = windowSize / intervalSize;
+  const remainderOffset = useRealtimeOffset({ millisecondsPerPixel, intervalSize });
 
 
 
@@ -85,10 +88,16 @@ function LedgerLines() {
 
   return <>
     {Array.from({ length: Math.floor(totalBlocks) }).map((_, index) => {
-      const offset = index * intervalSize / millisecondsPerPixel
-      const height = intervalSize / millisecondsPerPixel
+      const offset = index * intervalSize / millisecondsPerPixel - remainderOffset;
+      const height = intervalSize / millisecondsPerPixel;
+
+      // Get the offset in hours and minutes for each time chunk
+      const date = new Date(Date.now() + offset * millisecondsPerPixel);
+      const hour = date.getHours() % 12;
+      const minute = date.getMinutes().toString().padStart(2, '0');
+
       return <div className={ledgerLineCss(offset, height)} key={index}>
-        {index}
+        {hour}:{minute}
       </div>
     })}
   </>
@@ -96,4 +105,21 @@ function LedgerLines() {
 
 function NowLine() {
 
+}
+
+function useRealtimeOffset({ millisecondsPerPixel, intervalSize, updateFrequency = 1000 }) {
+  const [now, setNow] = React.useState(Date.now());
+  const [remainder, setRemainder] = React.useState(now % intervalSize);
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(Date.now());
+      setRemainder(now % intervalSize);
+    }, updateFrequency);
+    return () => {
+      clearInterval(interval);
+    }
+  }, [now, intervalSize, updateFrequency]);
+
+  return remainder / millisecondsPerPixel;
 }
