@@ -31,11 +31,13 @@ const ledgerLineCss = (offset, height) => css`
 
 export default function UpNext() {
   const [state, dispatch] = React.useReducer(UpNextReducer, UpNextInitialState);
-  const heightWatchingRef = useHeightWatchingRef({ dispatch });
+  const updateHeight = React.useCallback(height => dispatch({ type: 'SET_OWN_HEIGHT', payload: height }), [dispatch]);
+  const scrollableParentRef = React.useRef(null);
+  useWatchHeightOfComponentRef({ ref: scrollableParentRef, updateHeight });
 
   return (
     <UpNextProvider {...{ state, dispatch }}>
-      <div ref={heightWatchingRef} className={scrollableParentCss}>
+      <div ref={scrollableParentRef} className={scrollableParentCss}>
         <LedgerLines />
         {/* <ChildItems /> */}
       </div>
@@ -43,13 +45,16 @@ export default function UpNext() {
   );
 }
 
-export function useHeightWatchingRef({ dispatch }) {
-  const ref = React.useRef(null);
+/**
+  * @param {function} updateHeight - A function that will be called with the height of the watched component
+  * @returns {React.RefObject} - A ref to the DOM component that will have its height watched
+ */
+export function useWatchHeightOfComponentRef({ ref, updateHeight }) {
   React.useEffect(() => {
     const handleResize = () => {
       if (ref.current) {
         console.log('setting height:', ref.current.clientHeight);
-        dispatch({ type: 'SET_OWN_HEIGHT', value: ref.current.clientHeight });
+        updateHeight(ref.current.clientHeight);
       }
     };
     if (!ref.current.clientHeight) return;
@@ -58,16 +63,17 @@ export function useHeightWatchingRef({ dispatch }) {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [dispatch, ref]);
+  }, [ref, updateHeight]);
+
+  if (!ref) throw new Error('useWatchHeightOfComponentRef must be called with a ref');
+  if (!updateHeight) throw new Error('useWatchHeightOfComponentRef must be called with an updateHeight function');
   return ref;
 }
 
 function LedgerLines() {
   const { UpNextState: { ownHeight, ledgerInterval, ledgerIntervalPixelHeight } } = useUpNextContext();
 
-  return <>
-    
-  </>
+  return <></>
 }
 
 // function ChildItems() {

@@ -22,10 +22,10 @@ const actionsMap = {
   },
   SET_COMMAND: (state, action) => {
     if (action.value === '') return { ...state, CommandLine: { ...state.CommandLine, command: '', isValidCommand: false, isOpen: false } };
-    return { ...state, command: action.value };
+    return { ...state, CommandLine: { ...state.CommandLine, command: action.value } };
   },
   SET_IS_VALID_COMMAND: (state, action) => {
-    return { ...state, isValidCommand: action.value };
+    return { ...state, CommandLine: { ...state.CommandLine, isValidCommand: action.value } };
   },
   SET_SELECTED_ITEM: (state, action) => {
     if (!isValidItem(action.value)) throw new Error("Invalid item");
@@ -53,6 +53,8 @@ const actionsMap = {
 export default function AboutTimeReducer(state, action) {
   if (!action.type) throw new Error('Action must have a type');
   if (actionsMap[action.type]) {
+    console.log(JSON.stringify({ state, action }, null, 2));
+
     return actionsMap[action.type](state, action);
   } else {
     throw new Error(`Action type ${action.type} not found in AboutTimeReducer`);
