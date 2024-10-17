@@ -2,7 +2,8 @@
 export const UpNextInitialState = {
   ownHeight: 0,
   windowSize: 3_600_000,
-  intervalSize: 120_000,
+  intervalSize: 60_000,
+  millisecondsPerPixel: 1000,
 };
 
 const actionsMap = {

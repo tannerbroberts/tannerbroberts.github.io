@@ -72,7 +72,7 @@ function useCommandLineCommands() {
     "/side": () => {
       AboutTimeDispatch({ type: 'TOGGLE_SIDE_DRAWER' });
     },
-    "/schedule": ([itemName]) => {
+    "/schedule": ([itemName, offset]) => {
       const noItemProvided = !itemName;
       const itemDoesntExist = !library.getItems({ names: [itemName] }).length;
       if (noItemProvided || itemDoesntExist) return;
@@ -82,7 +82,8 @@ function useCommandLineCommands() {
       if (items.length === 0) throw new Error(`Item: ${itemName} not found, but command was left valid.`);
       if (items.length > 1) throw new Error(`getItems must return an array with only one item when scheduling by name.`);
       if (items.length === 1) {
-        schedule.addItem({ itemName, positionMillis: Date.now() });
+        const snapToMinuteOffset = Date.now() % 60_000;
+        schedule.addItem({ itemName, positionMillis: Date.now() + offset * 60_000 - snapToMinuteOffset }); // offset is a number in minutes
       }
     }
   }), [AboutTimeDispatch, library, schedule]);

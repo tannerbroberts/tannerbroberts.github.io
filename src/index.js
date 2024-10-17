@@ -48,9 +48,6 @@ html.style.fontFamily = "monospace";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <>
-      <button onClick={localStorage.clear()}>Delete LocalStorage</button>
-      <AboutTime />
-    </>
+    <AboutTime />
   </React.StrictMode >
 );

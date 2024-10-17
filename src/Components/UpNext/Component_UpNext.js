@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAboutTimeContext } from '../AboutTime/Provider_AboutTime';
 import UpNextProvider, { useUpNextContext } from './Provider_UpNext';
 import UpNextReducer, { UpNextInitialState } from './Reducer_UpNext';
 import { css } from '@emotion/css';
@@ -10,25 +11,33 @@ const scrollableParentCss = css`
   position: relative;
 `
 
-const childComponentCss = ({ offset, height }) => css`
-  position: absolute;
-  top: ${offset}px;
-  left: 0;
-  width: 100%;
-  height: ${height}px;
-  background-color: rgba(0, 0, 0, 0.5);
-`
-
 const ledgerLineCss = (offset, height) => css`
   position: absolute;
   // smoothly scroll the ledger lines by translating the top value
   transition: top 1s;
   top: ${offset}px;
   left: 10vw;
-  width: 100%;
+  width: 89vw;
   height: ${height}px;
   border-top: 1px solid black;
 `
+
+const childComponentCss = ({ offset, height }) => css`
+  position: absolute;
+  top: ${offset}px;
+  transition: top 1s;
+  left: 0;
+  width: 100%;
+  height: ${height}px;
+  background-color: rgba(0, 0, 0, 0.5);
+`
+
+// Load enough components to fill three windows, that way scrolling will be smooth
+// Toggleable "follow now" feature that automatically scrolls when the window is too far from center
+// Add a "now" line that is always visible
+
+// When scrolling too far to one side, load more elements?
+// When you want to see a different time, 
 
 export default function UpNext() {
   const [state, dispatch] = React.useReducer(UpNextReducer, UpNextInitialState);
@@ -40,8 +49,7 @@ export default function UpNext() {
     <UpNextProvider {...{ state, dispatch }}>
       <div ref={scrollableParentRef} className={scrollableParentCss}>
         <LedgerLines />
-        <NowLine />
-        {/* <ChildItems /> */}
+        <ChildItems />
       </div>
     </UpNextProvider>
   );
@@ -71,42 +79,6 @@ export function useWatchHeightOfComponentRef({ ref, updateHeight }) {
   return ref;
 }
 
-function LedgerLines() {
-  const { UpNextState: { windowSize, intervalSize } } = useUpNextContext();
-  const millisecondsPerPixel = 1000;
-
-  const totalBlocks = windowSize / intervalSize;
-  const remainderOffset = useRealtimeOffset({ millisecondsPerPixel, intervalSize });
-
-
-
-
-  // know how much time is being displayed
-  // know how large the time chunks should be
-  // calculate how many time chunks should be displayed based on those two things (height doesn't matter, the parent is a fixed height, and the child is variable height depending on the time chunk size)
-  // later, virtualizing the ledger lines will be important, but for now, just render them all though they are not visible
-
-  return <>
-    {Array.from({ length: Math.floor(totalBlocks) }).map((_, index) => {
-      const offset = index * intervalSize / millisecondsPerPixel - remainderOffset;
-      const height = intervalSize / millisecondsPerPixel;
-
-      // Get the offset in hours and minutes for each time chunk
-      const date = new Date(Date.now() + offset * millisecondsPerPixel);
-      const hour = date.getHours() % 12;
-      const minute = date.getMinutes().toString().padStart(2, '0');
-
-      return <div className={ledgerLineCss(offset, height)} key={index}>
-        {hour}:{minute}
-      </div>
-    })}
-  </>
-}
-
-function NowLine() {
-
-}
-
 function useRealtimeOffset({ millisecondsPerPixel, intervalSize, updateFrequency = 1000 }) {
   const [now, setNow] = React.useState(Date.now());
   const [remainder, setRemainder] = React.useState(now % intervalSize);
@@ -122,4 +94,61 @@ function useRealtimeOffset({ millisecondsPerPixel, intervalSize, updateFrequency
   }, [now, intervalSize, updateFrequency]);
 
   return remainder / millisecondsPerPixel;
+}
+
+function LedgerLines() {
+  const { UpNextState: { windowSize, intervalSize, millisecondsPerPixel } } = useUpNextContext();
+
+  const totalLineBlocks = Math.floor(windowSize / intervalSize);
+  const remainderOffset = useRealtimeOffset({ millisecondsPerPixel, intervalSize });
+
+  return <>
+    {Array.from({ length: totalLineBlocks }).map((_, index) => {
+      const offset = index * intervalSize / millisecondsPerPixel - remainderOffset;
+      const height = intervalSize / millisecondsPerPixel;
+
+      // Get the offset in hours and minutes for each time chunk
+      const date = new Date(Date.now() + offset * millisecondsPerPixel);
+      const hour = date.getHours() % 12;
+      const minute = date.getMinutes().toString().padStart(2, '0');
+
+      return <div className={ledgerLineCss(offset, height)} key={`${index}${hour}${minute}`}>
+        {hour}:{minute}
+      </div>
+    })}
+  </>
+}
+
+function ChildItems() {
+  const { extras: { library } } = useAboutTimeContext();
+  const { UpNextState: { windowSize, millisecondsPerPixel } } = useUpNextContext();
+  const windowFrame = { start: Date.now(), end: Date.now() + windowSize };
+  const children = useRecurringChildRequest({ windowFrame });
+
+  return children.map((child) => {
+    // Get the time from now until the child starts and divide by the milliseconds per pixel
+    const offset = (child.positionMillis - Date.now()) / millisecondsPerPixel;
+    const item = library.getItems({ name: child.name })[0];
+    const height = item.lengthMillis / millisecondsPerPixel;
+
+    return <div className={childComponentCss({ offset, height })} key={child.id}>
+      {child.name}
+    </div>
+  });
+}
+
+function useRecurringChildRequest({ windowFrame, updateFrequency = 1000 }) {
+  const [children, setChildren] = React.useState([]);
+  const { extras: { schedule } } = useAboutTimeContext();
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setChildren(schedule.getItemsInWindow({ ...windowFrame }));
+    }, updateFrequency);
+    return () => {
+      clearInterval(interval);
+    }
+  }, [schedule, updateFrequency, windowFrame]);
+
+  return children;
 }
