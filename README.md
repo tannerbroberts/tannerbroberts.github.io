@@ -1,1 +1,1 @@
-# React + TypeScript + Vite + Getting things done with a custom calendar
+# React + TypeScript + Vite + Tanner = Calendar
