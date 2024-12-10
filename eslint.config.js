@@ -47,7 +47,6 @@ export default [
           ignoreRegExpLiterals: true,
         },
       ],
-      'function-paren-newline': ['error', 'multiline'],
       'prettier/prettier': 'error',
     },
   },

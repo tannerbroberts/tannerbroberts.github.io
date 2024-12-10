@@ -35,8 +35,8 @@ export class Event {
   constructor(
     name: string,
     length: number,
-    schedule: Schedule,
-    parentEvents: Event[],
+    schedule: Schedule = new Schedule(),
+    parentEvents: Event[] = [],
   ) {
     this.name = name;
     this.length = length;
@@ -84,7 +84,10 @@ export class Collision {
 export class Schedule {
   events: ScheduledPrioritizedEvent[];
   collisions: Collision[];
-  constructor(events: ScheduledPrioritizedEvent[], collisions: Collision[]) {
+  constructor(
+    events: ScheduledPrioritizedEvent[] = [],
+    collisions: Collision[] = [],
+  ) {
     this.events = events;
     this.collisions = collisions;
   }
