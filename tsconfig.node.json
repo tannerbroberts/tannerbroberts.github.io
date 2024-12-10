@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
+    "jsx": "react",
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "ES2020",
     "lib": [
-      "ES2023"
+      "ES2023",
+      "DOM"
     ],
     "module": "CommonJS",
     "skipLibCheck": true,
