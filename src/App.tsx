@@ -1,4 +1,4 @@
-import React, { MutableRefObject } from "react";
+import React from "react";
 import { Event } from "./utils";
 import LengthInput from "./components/LengthInput";
 
@@ -8,7 +8,7 @@ function App() {
   const [event, setEvent] = React.useState<Event | null>(null);
 
   const onSave = React.useCallback(() => {
-    setEvent(new Event(name, length));
+    setEvent(new Event({ name, length }));
   }, [name, length]);
   return (
     <>

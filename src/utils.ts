@@ -1,16 +1,96 @@
-type CondensedEvent = {
+export type CondensedEvent = {
   name: string;
   length: number;
   locations: CondensedLocation[];
   schedule: CondensedSchedule;
 };
+
+export type CondensedLocation = {
+  parentName: string;
+  position: number;
+};
+
+export type CondensedSchedule = {
+  children: CondensedChild[];
+  collisions: CondensedCollision[];
+};
+
+export type CondensedChild = {
+  eventName: string;
+  location: CondensedLocation;
+  priority: number;
+  busy: boolean;
+};
+
+export type ConstructorParams_Schedule = {
+  children: Child[];
+  collisions: Collision[];
+  parent: Event;
+};
+
+export type ConstructorParams_Event = {
+  name: string;
+  length: number;
+  locations?: Location[];
+};
+
+export type ConstructorParams_Collision = {
+  first: Child;
+  second: Child;
+};
+
+export type ConstructorParams_Location = {
+  parent: Event;
+  position: number;
+};
+
+export type ConstructorParams_Child = {
+  event: Event;
+  priority: number;
+  location: Location;
+  busy?: boolean;
+};
+
+export type ConstructorParams_Parent = {
+  event: Event;
+  startTime: number;
+};
+
+export type CondensedCollision = CondensedChild[];
+
+export type NewEventInfo = {
+  name: string;
+  length: number;
+};
+
+export class Location {
+  parent: Event;
+  position: number;
+
+  public constructor({ parent, position }: ConstructorParams_Location) {
+    this.parent = parent;
+    this.position = position;
+  }
+
+  public condense(): CondensedLocation {
+    return {
+      parentName: this.parent.name,
+      position: this.position,
+    };
+  }
+}
+
 export class Event {
   name: string;
   length: number;
   locations: Location[];
   schedule: Schedule | null;
 
-  constructor(name: string, length: number, locations: Location[]) {
+  public constructor({
+    name,
+    length,
+    locations = [],
+  }: ConstructorParams_Event) {
     this.name = name;
     this.length = length;
     this.schedule = null;
@@ -28,8 +108,8 @@ export class Event {
     this.getSchedule().insert(event, startTime, priorityLevel);
   }
 
-  public remove(event: Event) {
-    this.getSchedule().remove(event);
+  public removeChild(event: Event) {
+    this.getSchedule().removeChild(event);
   }
 
   public moveEvent(
@@ -40,97 +120,107 @@ export class Event {
     this.getSchedule().move(eventName, eventStartTime, newStartTime);
   }
 
-  condense(): CondensedEvent {
+  public condense(): CondensedEvent {
     return {
       name: this.name,
       length: this.length,
-      locations: this.locations.condense(),
-      schedule: this.schedule.condense(),
+      locations: this.locations.map((location) => location.condense()),
+      schedule: this.schedule?.condense() || Schedule.emptyCondensed(),
     };
+  }
+
+  static fromCondensedForm(condensed: CondensedEvent): Event {
+    const store = EventStore.getList();
+    const event = store.getEvent(condensed.name);
+    event.locations = condensed.locations.map((cl) => {
+      const parent = store.getEvent(cl.parentName);
+      return new Location({ parent, position: cl.position });
+    });
+    event.schedule = Schedule.fromCondensedForm(condensed.schedule, event);
+    return event;
   }
 }
 
-type CondensedSchedule = {
-  events: CondensedChild[];
-  collisions: Collision[];
-};
-type CondensedChild = {
-  name: string;
-  startTime: number;
-  priority: number;
-  busy: boolean;
-};
-class Schedule {
+export class Schedule {
   children: Child[];
   collisions: Collision[];
   parent: Event;
-  constructor(
-    children: Child[] = [],
-    collisions: Collision[] = [],
-    parent: Event,
-  ) {
+  public constructor({
+    children,
+    collisions,
+    parent,
+  }: ConstructorParams_Schedule) {
     this.children = children;
     this.collisions = collisions;
     this.parent = parent;
   }
 
-  insert(event: Event, startTime: number, priorityLevel: number = 0) {
-    const newOne = new Child(event, startTime, priorityLevel);
-    this.collisions = [...this.collisions, ...this.getCollisions(newOne)];
-    this.children.push(newOne);
-  }
-
-  remove(event: Event) {
-    this.children = this.children.filter((ce) => ce.event !== event);
-    // remove all collisions that involve the event
-    this.collisions = this.collisions.filter(
-      (collision) =>
-        collision.event1.event !== event && collision.event2.event !== event,
-    );
-  }
-
-  move(eventName: string, eventStartTime: number, newStartTime: number) {
-    const event = this.children.find(
-      (ce) => ce.event.name === eventName && ce.startTime === eventStartTime,
-    );
-    if (event) {
-      event.startTime = newStartTime;
-      // remove all collisions and re-add them if they still exist
-      this.collisions = [
-        ...this.collisions.filter(
-          (collision) =>
-            collision.event1 !== event && collision.event2 !== event,
-        ),
-        ...this.getCollisions(event),
-      ];
-    }
-  }
-
-  getCollisions(newOne: Child): Collision[] {
+  private getCollisions(newOne: Child): Collision[] {
     const collisions: Collision[] = [];
     this.children.forEach((oldOne) => {
       const timeOverlap =
         !oldOne.busy &&
-        newOne.startTime < oldOne.startTime + oldOne.event.length &&
-        newOne.startTime + newOne.event.length > oldOne.startTime;
+        newOne.location.position <
+          oldOne.location.position + oldOne.event.length &&
+        newOne.location.position + newOne.event.length >
+          oldOne.location.position;
       const priorityOverlap = newOne.priority === oldOne.priority;
       const bothBusy = newOne.busy && oldOne.busy;
       if (timeOverlap && priorityOverlap && bothBusy) {
-        collisions.push(new Collision(oldOne, newOne));
+        collisions.push(new Collision({ first: newOne, second: oldOne }));
       }
     });
     return collisions;
   }
 
-  toCondensedForm(): CondensedSchedule {
+  public insert(
+    event: Event,
+    position: number,
+    priority: number = 0,
+    busy: boolean = false,
+  ) {
+    const location = new Location({
+      parent: this.parent,
+      position,
+    });
+    const newOne = new Child({ event, priority, location, busy });
+    this.collisions = [...this.collisions, ...this.getCollisions(newOne)];
+    this.children.push(newOne);
+  }
+
+  public removeChild(event: Event) {
+    this.children = this.children.filter((child) => child.event !== event);
+    this.collisions = this.collisions.filter(
+      (collision) =>
+        collision.first.event !== event && collision.second.event !== event,
+    );
+  }
+
+  public move(eventName: string, eventStartTime: number, newStartTime: number) {
+    const childToMove = this.children.find(
+      (child) =>
+        child.event.name === eventName &&
+        child.location.position === eventStartTime,
+    );
+    if (childToMove) {
+      childToMove.location.position = newStartTime;
+      // remove all collisions and re-add them if they still exist
+      this.collisions = [
+        ...this.collisions.filter(
+          (collision) =>
+            collision.first !== childToMove && collision.second !== childToMove,
+        ),
+        ...this.getCollisions(childToMove),
+      ];
+    }
+  }
+
+  public condense(): CondensedSchedule {
     return {
-      children: this.children.map((ce) => ({
-        name: ce.event.name,
-        startTime: ce.startTime,
-        priority: ce.priority,
-        busy: ce.busy,
-      })),
-      collisions: this.collisions,
+      children: this.children.map((child) => child.condense()),
+      collisions: this.collisions.map((collision) =>
+        collision.toCondensedForm(),
+      ),
     };
   }
 
@@ -140,62 +230,96 @@ class Schedule {
   ): Schedule {
     const store = EventStore.getList();
     const children = condensed.children.map((ce) => {
-      const event = store.getEvent(ce.name);
-      return new Child(event, ce.startTime, ce.priority, ce.busy);
+      const event = store.getEvent(ce.eventName);
+      const location = new Location({ parent, position: ce.location.position });
+      return new Child({
+        event,
+        priority: ce.priority,
+        location,
+        busy: ce.busy,
+      });
     });
-    const collisions = condensed.collisions.map((collision) => {
-      const event1 = children.find((e) => e.event.name === collision.event1);
-      const event2 = children.find((e) => e.event.name === collision.event2);
-      if (event1 && event2) {
-        return new Collision(event1, event2);
-      }
-      throw new Error("Collision children not found");
+    const collisions = condensed.collisions.map((cc) => {
+      return Collision.fromCondensedForm(cc, parent);
     });
-    return new Schedule(children, collisions, parent);
+    return new Schedule({ children, collisions, parent });
+  }
+
+  static emptyCondensed(): CondensedSchedule {
+    return {
+      children: [],
+      collisions: [],
+    };
   }
 }
 
 export class Child {
   event: Event;
-  startTime: number;
   priority: number;
   busy: boolean;
+  location: Location;
 
-  constructor(
-    event: Event,
-    startTime: number,
-    priority: number,
-    busy: boolean = false,
-  ) {
+  public constructor({
+    event,
+    priority,
+    location,
+    busy = false,
+  }: ConstructorParams_Child) {
     this.event = event;
     this.priority = priority;
-    this.startTime = startTime;
-    this.busy = busy; // busy means the event cannot be overlapped without forcing sacrificial prioritization
-    // The concept of busy is really just a loose definition of an unspecified requirement.
-    // For example, a meeting blocks me from doing MOST anything else, so it is busy to MOST anything else,
-    // unless that something else happens to be playing a game on my phone, which the meeting does not block.
-    // I'm using 'busy' as an idea because I don't want to get into the weeds of defining all the possible ways that one event could block another.
-    // Things like: location, resources, mental state, etc. are all things that could be used to determine if an event is busy, and they're all hard to define.
+    this.location = location;
+    this.busy = busy;
+  }
+
+  public condense(): CondensedChild {
+    return {
+      eventName: this.event.name,
+      priority: this.priority,
+      busy: this.busy,
+      location: this.location.condense(),
+    };
   }
 }
 
-type CondensedCollision = {
-  event1: string;
-  event2: string;
-};
 export class Collision {
-  event1: Child;
-  event2: Child;
-  constructor(event1: Child, event2: Child) {
-    this.event1 = event1;
-    this.event2 = event2;
+  first: Child;
+  second: Child;
+  public constructor({ first, second }: ConstructorParams_Collision) {
+    this.first = first;
+    this.second = second;
   }
 
-  toCondensedForm(): CondensedCollision {
-    return {
-      event1: this.event1.event.name,
-      event2: this.event2.event.name,
-    };
+  public toCondensedForm(): CondensedCollision {
+    return [this.first.condense(), this.second.condense()];
+  }
+
+  static fromCondensedForm(
+    condensed: CondensedCollision,
+    parent: Event,
+  ): Collision {
+    const store = EventStore.getList();
+    const firstEvent = store.getEvent(condensed[0].eventName);
+    const second = store.getEvent(condensed[1].eventName);
+    return new Collision({
+      first: new Child({
+        event: firstEvent,
+        priority: condensed[0].priority,
+        location: new Location({
+          parent,
+          position: condensed[0].location.position,
+        }),
+        busy: condensed[0].busy,
+      }),
+      second: new Child({
+        event: second,
+        priority: condensed[1].priority,
+        location: new Location({
+          parent,
+          position: condensed[1].location.position,
+        }),
+        busy: condensed[1].busy,
+      }),
+    });
   }
 }
 
@@ -203,16 +327,12 @@ export class Parent {
   event: Event;
   startTime: number;
 
-  constructor(event: Event, startTime: number) {
+  public constructor({ event, startTime }: ConstructorParams_Parent) {
     this.event = event;
     this.startTime = startTime;
   }
 }
 
-export type EventInitInfo = {
-  name: string;
-  length: number;
-};
 export class EventStore {
   private static instance: EventStore;
   events: Event[];
@@ -224,7 +344,11 @@ export class EventStore {
       this.events = names.map((name) => {
         const eventJSON = localStorage.getItem(`event-${name}`);
         if (eventJSON) {
-          return Event.fromJSON(eventJSON);
+          const condensedEvent = JSON.parse(eventJSON) as CondensedEvent;
+          if (condensedEvent) return Event.fromCondensedForm(condensedEvent);
+          throw new Error(
+            `Event ${name} could not be parsed from localStorage`,
+          );
         }
         throw new Error(`Event ${name} not found in localStorage`);
       });
@@ -233,27 +357,30 @@ export class EventStore {
     }
   }
 
-  static getList(): EventStore {
+  public static getList(): EventStore {
     if (!EventStore.instance) {
       EventStore.instance = new EventStore();
     }
     return EventStore.instance;
   }
 
-  create(eventInitInfo: EventInitInfo) {
+  public create(eventInitInfo: NewEventInfo) {
     const { name, length } = eventInitInfo;
     if (this.events.find((e) => e.name === name))
       throw new Error("Event already exists in EventStore");
-    const event = new Event(name, length, [], []);
+    const event = new Event({ name, length, locations: [] });
     this.events.push(event);
     localStorage.setItem(
       "EventList",
       JSON.stringify(this.events.map((e) => e.name)),
     );
-    localStorage.setItem(`event-${event.name}`, event.toJSON());
+    localStorage.setItem(
+      `event-${event.name}`,
+      JSON.stringify(event.condense()),
+    );
   }
 
-  remove(eventName: string) {
+  public remove(eventName: string) {
     // Remove the event from the list of event names
     this.events = this.events.filter((event) => event.name !== eventName);
     localStorage.setItem("EventList", JSON.stringify(this.events));
@@ -262,7 +389,7 @@ export class EventStore {
     localStorage.removeItem(`event-${eventName}`);
   }
 
-  getEvent(eventName: string): Event {
+  public getEvent(eventName: string): Event {
     const event = this.events.find((event) => event.name === eventName);
     if (event) {
       return event;
