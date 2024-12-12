@@ -1,52 +1,29 @@
 import React from "react";
-import { Event } from "./utils";
-import LengthInput from "./components/LengthInput";
+import { EventStore, Event } from "./eventStore";
+import NewItemInput from "./components/NewItemInput";
+import { Button } from "@mui/material";
 
 function App() {
-  const [name, setName] = React.useState<string>("");
-  const [length, setLength] = React.useState<number>(0);
-  const [event, setEvent] = React.useState<Event | null>(null);
+  const [event, setEvent] = React.useState<Event>();
 
-  const onSave = React.useCallback(() => {
-    setEvent(new Event({ name, length }));
-  }, [name, length]);
+  const onSubmit = React.useCallback((name: string, length: number) => {
+    setEvent(EventStore.getList().create({ name, length }));
+  }, []);
   return (
     <>
-      <div style={{ display: "flex" }}>
-        <NameInput name={name} setName={setName} />
-        <LengthInput length={length} setLength={setLength} />
-        <SaveButton onClick={onSave} />
-      </div>
+      <NewItemInput onSubmit={onSubmit} />
       {event && (
         <div>
+          <Button
+            variant="contained"
+            onClick={() => console.log("button clicked")}
+          ></Button>
           <h2>{event.name}</h2>
           <p>{event.length}</p>
         </div>
       )}
     </>
   );
-}
-
-function NameInput({
-  name,
-  setName,
-}: {
-  name: string;
-  setName: (name: string) => void;
-}) {
-  return (
-    <input
-      style={{ fontSize: "1em" }}
-      type="text"
-      placeholder="Event Name"
-      value={name}
-      onChange={(e) => setName(e.target.value)}
-    />
-  );
-}
-
-function SaveButton({ onClick }: { onClick: () => void }) {
-  return <button onClick={onClick}>Save</button>;
 }
 
 export default App;

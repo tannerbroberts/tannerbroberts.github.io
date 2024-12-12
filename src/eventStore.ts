@@ -51,19 +51,14 @@ export type ConstructorParams_Child = {
   busy?: boolean;
 };
 
-export type ConstructorParams_Parent = {
-  event: Event;
-  startTime: number;
-};
+type CondensedCollision = CondensedChild[];
 
-export type CondensedCollision = CondensedChild[];
-
-export type NewEventInfo = {
+type NewEventInfo = {
   name: string;
   length: number;
 };
 
-export class Location {
+class Location {
   parent: Event;
   position: number;
 
@@ -141,7 +136,7 @@ export class Event {
   }
 }
 
-export class Schedule {
+class Schedule {
   children: Child[];
   collisions: Collision[];
   parent: Event;
@@ -253,7 +248,7 @@ export class Schedule {
   }
 }
 
-export class Child {
+class Child {
   event: Event;
   priority: number;
   busy: boolean;
@@ -281,7 +276,7 @@ export class Child {
   }
 }
 
-export class Collision {
+class Collision {
   first: Child;
   second: Child;
   public constructor({ first, second }: ConstructorParams_Collision) {
@@ -323,25 +318,19 @@ export class Collision {
   }
 }
 
-export class Parent {
-  event: Event;
-  startTime: number;
-
-  public constructor({ event, startTime }: ConstructorParams_Parent) {
-    this.event = event;
-    this.startTime = startTime;
-  }
-}
-
 export class EventStore {
   private static instance: EventStore;
-  events: Event[];
+  eventList: Event[];
 
   private constructor() {
-    const eventList = localStorage.getItem("EventList");
-    if (eventList) {
-      const names = JSON.parse(eventList) as string[];
-      this.events = names.map((name) => {
+    const eventListNamesJSON = localStorage.getItem("EventList");
+    if (eventListNamesJSON) {
+      const eventListNames = JSON.parse(eventListNamesJSON) as string[];
+      if (!eventListNames)
+        throw new Error(
+          "EventList exists but could not be parsed from localStorage",
+        );
+      this.eventList = eventListNames.map((name) => {
         const eventJSON = localStorage.getItem(`event-${name}`);
         if (eventJSON) {
           const condensedEvent = JSON.parse(eventJSON) as CondensedEvent;
@@ -350,10 +339,12 @@ export class EventStore {
             `Event ${name} could not be parsed from localStorage`,
           );
         }
-        throw new Error(`Event ${name} not found in localStorage`);
+        throw new Error(
+          `Event '${name}' in eventList not found in localStorage`,
+        );
       });
     } else {
-      this.events = [];
+      this.eventList = new Array<Event>();
     }
   }
 
@@ -364,33 +355,34 @@ export class EventStore {
     return EventStore.instance;
   }
 
-  public create(eventInitInfo: NewEventInfo) {
+  public create(eventInitInfo: NewEventInfo): Event {
     const { name, length } = eventInitInfo;
-    if (this.events.find((e) => e.name === name))
+    if (this.eventList.find((e) => e.name === name))
       throw new Error("Event already exists in EventStore");
     const event = new Event({ name, length, locations: [] });
-    this.events.push(event);
+    this.eventList.push(event);
     localStorage.setItem(
       "EventList",
-      JSON.stringify(this.events.map((e) => e.name)),
+      JSON.stringify(this.eventList.map((e) => e.name)),
     );
     localStorage.setItem(
       `event-${event.name}`,
       JSON.stringify(event.condense()),
     );
+    return event;
   }
 
   public remove(eventName: string) {
     // Remove the event from the list of event names
-    this.events = this.events.filter((event) => event.name !== eventName);
-    localStorage.setItem("EventList", JSON.stringify(this.events));
+    this.eventList = this.eventList.filter((event) => event.name !== eventName);
+    localStorage.setItem("EventList", JSON.stringify(this.eventList));
 
     // Remove the 'event-<name>' key from localStorage
     localStorage.removeItem(`event-${eventName}`);
   }
 
   public getEvent(eventName: string): Event {
-    const event = this.events.find((event) => event.name === eventName);
+    const event = this.eventList.find((event) => event.name === eventName);
     if (event) {
       return event;
     }

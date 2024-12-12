@@ -8,40 +8,49 @@ type TimeInputPart =
   | "minutes"
   | "seconds"
   | "milliseconds";
+const TimePartsInMilliseconds = {
+  years: 31536000000,
+  months: 2628000000,
+  days: 86400000,
+  hours: 3600000,
+  minutes: 60000,
+  seconds: 1000,
+  milliseconds: 1,
+} as { [key in TimeInputPart]: number };
+
+type props_LengthInput = {
+  length: number;
+  setLength: (length: number) => void;
+};
+
+type params_setLengthFromParts = {
+  partType: TimeInputPart;
+  e: React.ChangeEvent<HTMLInputElement>;
+};
 
 export default function LengthInput({
   length,
   setLength,
-}: {
-  length: number;
-  setLength: (length: number) => void;
-}) {
+}: props_LengthInput): React.ReactElement {
   const parts = useTimeIntervalPartRefs(length);
 
   // Runs for each part of the time interval when the value changes
   const setLengthFromParts = React.useCallback(
-    ({
-      partType,
-      e,
-    }: {
-      partType: TimeInputPart;
-      e: React.ChangeEvent<HTMLInputElement>;
-    }) => {
+    ({ partType, e }: params_setLengthFromParts) => {
       const value = parseInt(e.target.value);
-      if (isNaN(value)) return; // Ensure value is a number
-      parts.current[partType] = value;
-      console.log("parts.current", parts.current, partType, value);
-      setLength(
-        parts.current.years * 31536000000 +
-          parts.current.months * 2628000000 +
-          parts.current.days * 86400000 +
-          parts.current.hours * 3600000 +
-          parts.current.minutes * 60000 +
-          parts.current.seconds * 1000 +
-          parts.current.milliseconds,
+      if (e.target.value === "") parts.current[partType] = 0;
+      else if (isNaN(value))
+        return; // Order matters here, as isNaN("") returns false
+      else parts.current[partType] = value;
+      const newLength = Object.entries(parts.current).reduce(
+        (acc: number, [ptype, pval]) => {
+          return acc + pval * TimePartsInMilliseconds[ptype as TimeInputPart];
+        },
+        0,
       );
+      setLength(newLength);
     },
-    [setLength, parts],
+    [parts, setLength],
   );
 
   const TimeSegmentInputs = React.useMemo(() => {
@@ -56,7 +65,7 @@ export default function LengthInput({
         ["milliseconds", "Ms"],
       ] as const
     ).map(([partType, label]) => ({
-      value: parts.current[partType],
+      value: parts.current[partType].toString(),
       partType,
       label,
     }));
@@ -75,22 +84,22 @@ export default function LengthInput({
   return (
     <div
       style={{
-        display: "flex",
-        border: "2px solid black",
+        border: "px solid black",
         borderRadius: "5px",
       }}
     >
       {TimeSegmentInputs.map(({ value, partType, label }) => (
-        <LabeledTimeSegment key={partType}>
-          <p style={{ fontFamily: "monospace" }}>{label}</p>
+        <>
           <TimeSegmentInput
             value={value}
+            placeholder={label}
             onChange={setLengthFromParts}
             partType={partType}
           />
-        </LabeledTimeSegment>
+          :
+        </>
       ))}
-      <p>{length}</p>
+      <p style={{ paddingLeft: "20px", paddingRight: "20px" }}>{length} ms</p>
     </div>
   );
 }
@@ -122,48 +131,43 @@ function useTimeIntervalPartRefs(length: number): MutableRefObject<{
   return parts;
 }
 
-const labeledTimeSegmentCSS = {
-  width: "min-content",
-  height: "min-content",
-  fontWeight: "bold",
-  backgroundColor: "lightgray",
-  fontFamily: "monospace",
-};
-function LabeledTimeSegment({ children }: { children: React.ReactNode }) {
-  return <div style={labeledTimeSegmentCSS}>{children}</div>;
-}
-
-const timeSegmentInputCSS = ({ digitCount }: { digitCount: number }): Object => ({
+const timeSegmentInputCSS = ({
+  digitCount,
+}: {
+  digitCount: number;
+}): Object => ({
   width: `${digitCount * 10 + 20}px`,
   fontWeight: "bold",
+  placeHolderColor: "black",
   border: "none",
-  backgroundColor: "lightgray",
 });
 function TimeSegmentInput({
   value,
   onChange,
   partType,
+  placeholder,
 }: {
-  value: number;
-  onChange: ({
-    e,
-    partType,
-  }: {
-    e: React.ChangeEvent<HTMLInputElement>;
-    partType: TimeInputPart;
-  }) => void;
+  value: string;
+  onChange: Function;
   partType: TimeInputPart;
+  placeholder: string;
 }): React.JSX.Element {
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (typeof parseInt(e.target.value) !== "number") return;
+    let parsedInput: string | number = parseInt(e.target.value);
+    if (typeof parsedInput !== "number") return;
+    if (parsedInput <= 0) parsedInput = "";
     onChange({ e, partType });
   };
 
+  const shownValue = value === "0" ? "" : value;
+
   return (
     <input
+      className={"lengthSegmentInput"}
+      placeholder={placeholder}
       style={timeSegmentInputCSS({ digitCount: value.toString().length })}
-      type="number"
-      value={value}
+      type="string"
+      value={shownValue}
       onChange={onChangeHandler}
     />
   );
