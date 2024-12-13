@@ -1,3 +1,19 @@
 input.lengthSegmentInput::placeholder {
-  color: darkslategrey;
+  color: yellow;
+}
+
+input.lengthSegmentInput::-webkit-input-placeholder {
+  color: yellow;
+}
+
+input.lengthSegmentInput:-ms-input-placeholder {
+  color: yellow;
+}
+
+input.lengthSegmentInput::-moz-placeholder {
+  color: yellow;
+}
+
+input.lengthSegmentInput:-moz-placeholder {
+  color: yellow;
 }

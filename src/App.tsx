@@ -5,9 +5,10 @@ import { Button } from "@mui/material";
 
 function App() {
   const [event, setEvent] = React.useState<Event>();
+  const store = React.useRef(EventStore.getList());
 
   const onSubmit = React.useCallback((name: string, length: number) => {
-    setEvent(EventStore.getList().create({ name, length }));
+    setEvent(store.current.create({ name, length }));
   }, []);
   return (
     <>
