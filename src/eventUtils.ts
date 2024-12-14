@@ -466,6 +466,10 @@ export class EventStore {
     return EventStore.instance;
   }
 
+  public allEventNames(): string[] {
+    return [...this.eventList.keys()];
+  }
+
   public create(eventInitInfo: { name: string; length: number }): Event {
     const newEvent = new Event(eventInitInfo);
     this.eventList.set(newEvent.name, newEvent);

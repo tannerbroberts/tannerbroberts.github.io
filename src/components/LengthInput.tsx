@@ -39,7 +39,6 @@ export default function LengthInput({
   // Passed for each TimeSegmentInput
   const setLengthFromParts = React.useCallback(
     ({ partType, value }: params_setLengthFromParts) => {
-      console.log("value at setLengthFromParts", value);
       parts.current[partType] = value;
       const newLength = Object.entries(parts.current).reduce(
         (acc: number, [pType, pValue]) => {

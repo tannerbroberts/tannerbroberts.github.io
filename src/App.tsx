@@ -14,16 +14,31 @@ function App() {
   return (
     <>
       <NewItemInput onSubmit={onSubmit} />
+      <div
+        id="eventNames"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {store.current.allEventNames().map((name) => (
+          <p
+            key={name}
+            style={{ backgroundColor: "lightblue" }}
+            onClick={(e) =>
+              setEvent(store.current.getEvent(e.target.innerHTML))
+            }
+          >
+            {name}
+          </p>
+        ))}
+      </div>
       {event && (
         <div key={"tempDisplay"}>
-          <Button
-            variant="contained"
-            onClick={() => console.log("button clicked, but not implemented")}
-          >
-            Event?
-          </Button>
-          <h2>{event.name}</h2>
-          <p>{event.length}</p>
+          <div>
+            <h2>{event.name}</h2>
+            <p>{event.length}</p>
+          </div>
         </div>
       )}
     </>
