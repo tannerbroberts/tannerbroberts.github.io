@@ -1,19 +1,58 @@
 import React from "react";
-import NewItemInput from "./components/NewItemInput";
-import { Button } from "@mui/material";
+import { Button, Fab } from "@mui/material";
 import { EventStore, Event } from "./eventUtils";
+import Sidebar from "./components/Sidebar";
+import AddIcon from "@mui/icons-material/Add";
+import NewEventPopup from "./components/NewEventPopup";
+import EventDisplay from "./components/EventDisplay";
 
 function App() {
-  const [event, setEvent] = React.useState<Event>();
+  const [focusEvent, setFocusEvent] = React.useState<Event | undefined>();
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const [isPopupOpen, setIsPopupOpen] = React.useState(false);
   const store = React.useRef(EventStore.getList());
 
-  const onSubmit = React.useCallback((name: string, length: number) => {
-    const newEvent = store.current.create({ name, length });
-    setEvent(newEvent);
+  const toggleSidebar = React.useCallback(() => {
+    if (store.current.allEventNames().length > 0) {
+      setIsSidebarOpen((prev) => !prev);
+    } else {
+      alert("No events in the library.");
+    }
   }, []);
+
+  const handleSetEvent = React.useCallback(
+    (event: Event) => {
+      setFocusEvent(event);
+      setIsSidebarOpen(false);
+    },
+    [setFocusEvent],
+  );
+
+  const handleOpenPopup = React.useCallback(() => {
+    setIsPopupOpen(true);
+  }, []);
+
+  const handleClosePopup = React.useCallback(() => {
+    setIsPopupOpen(false);
+  }, []);
+
+  const handleSaveEvent = React.useCallback(
+    (newEvent: Event) => {
+      setFocusEvent(newEvent);
+    },
+    [setFocusEvent],
+  );
+
   return (
     <>
-      <NewItemInput onSubmit={onSubmit} />
+      <Button onClick={toggleSidebar}>
+        {`Library (${store.current.allEventNames().length} Events)`}
+      </Button>
+      <Sidebar
+        event={focusEvent}
+        setEvent={handleSetEvent}
+        isOpen={isSidebarOpen}
+      />
       <div
         id="eventNames"
         style={{
@@ -22,25 +61,25 @@ function App() {
         }}
       >
         {store.current.allEventNames().map((name) => (
-          <p
-            key={name}
-            style={{ backgroundColor: "lightblue" }}
-            onClick={(e) =>
-              setEvent(store.current.getEvent(e.target.innerHTML))
-            }
-          >
+          <p key={name} style={{ backgroundColor: "lightblue" }}>
             {name}
           </p>
         ))}
       </div>
-      {event && (
-        <div key={"tempDisplay"}>
-          <div>
-            <h2>{event.name}</h2>
-            <p>{event.length}</p>
-          </div>
-        </div>
-      )}
+      {focusEvent && <EventDisplay event={focusEvent} />}
+      <Fab
+        color="primary"
+        aria-label="add"
+        onClick={handleOpenPopup}
+        style={{ position: "fixed", bottom: 16, right: 16 }}
+      >
+        <AddIcon />
+      </Fab>
+      <NewEventPopup
+        isOpen={isPopupOpen}
+        onClose={handleClosePopup}
+        onSave={handleSaveEvent}
+      />
     </>
   );
 }

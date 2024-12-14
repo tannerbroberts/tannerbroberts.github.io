@@ -42,5 +42,5 @@ function NameInput({
 }
 
 function SaveButton({ onClick }: { onClick: () => void }) {
-  return <button onClick={() => onClick()}>Save</button>;
+  return <button onClick={onClick}>Save</button>;
 }
