@@ -31,6 +31,7 @@ function NameInput({
 }) {
   return (
     <input
+      key="nameInput"
       style={{ fontSize: "1em" }}
       type="text"
       placeholder="Event Name"

@@ -39,6 +39,7 @@ export default function LengthInput({
   // Passed for each TimeSegmentInput
   const setLengthFromParts = React.useCallback(
     ({ partType, value }: params_setLengthFromParts) => {
+      console.log("value at setLengthFromParts", value);
       parts.current[partType] = value;
       const newLength = Object.entries(parts.current).reduce(
         (acc: number, [pType, pValue]) => {
@@ -81,21 +82,22 @@ export default function LengthInput({
 
   return (
     <div
+      key="lengthInput"
       style={{
         border: "px solid black",
         borderRadius: "5px",
       }}
     >
       {TimeSegmentInputs.map(({ value, partType, label }) => (
-        <>
+        <React.Fragment key={partType}>
           <TimeSegmentInput
             value={value}
             placeholder={label}
-            onChange={setLengthFromParts}
+            setLengthFromParts={setLengthFromParts}
             partType={partType}
           />
           :
-        </>
+        </React.Fragment>
       ))}
       <p style={{ paddingLeft: "20px", paddingRight: "20px" }}>{length} ms</p>
     </div>

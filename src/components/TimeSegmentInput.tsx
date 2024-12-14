@@ -9,35 +9,48 @@ const timeSegmentInputCSS = ({
 });
 export default function TimeSegmentInput({
   value,
-  onChange,
+  setLengthFromParts,
   partType,
   placeholder,
 }: {
   value: string;
-  onChange: (params: params_setLengthFromParts) => void;
+  setLengthFromParts: (params: params_setLengthFromParts) => void;
   partType: TimeInputPart;
   placeholder: string;
 }): React.JSX.Element {
-  const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value: string | number = parseInt(e.target.value);
-    if (typeof value !== "number") return;
-    onChange({ value, partType });
+  // For normal character input chnages
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const numberValue: number = parseInt(e.target.value) || 0;
+    setLengthFromParts({ value: numberValue, partType });
   };
-  const onKeyDownHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const target = e.target as HTMLInputElement;
-    let value: number = parseInt(target.value);
-    if (typeof value !== "number") return;
-    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-      e.preventDefault();
-      if (e.key === "ArrowDown") {
-        if (typeof value !== "number") return;
-        value++;
-        onChange({ value, partType });
-      } else if (e.key === "ArrowUp") {
-        value--;
-        // TODO get number value from input
-        onChange({ value, partType });
+
+  // For special cases "Backspace", "ArrowUp", "ArrowDown"
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const input = e.target as HTMLInputElement;
+    // Handle backspace
+    if (e.key === "Backspace") {
+      if (input.value.length === 1) {
+        setLengthFromParts({ value: 0, partType });
+      } else if (input.value.length > 1) {
+        setLengthFromParts({
+          value: parseInt(input.value),
+          partType,
+        });
+      } else if (input.value.length === 0) {
+        // Do nothing
       }
+    } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      e.preventDefault();
+      let numberValue = parseInt(input.value) || 0;
+      if (e.key === "ArrowUp") {
+        numberValue++;
+        setLengthFromParts({ value: numberValue, partType });
+      } else if (e.key === "ArrowDown") {
+        numberValue <= 0 ? 0 : numberValue--;
+        setLengthFromParts({ value: numberValue, partType });
+      }
+    } else {
+      // Other cases are handled by onChange
     }
   };
 
@@ -45,13 +58,14 @@ export default function TimeSegmentInput({
 
   return (
     <input
+      key={partType}
       className={"lengthSegmentInput"}
       placeholder={placeholder}
       style={timeSegmentInputCSS({ digitCount: value.toString().length })}
       type="string"
       value={shownValue}
-      onChange={onChangeHandler}
-      onKeyDown={onKeyDownHandler}
+      onChange={onChange}
+      onKeyDown={onKeyDown}
     />
   );
 }
