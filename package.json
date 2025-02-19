@@ -6,7 +6,7 @@
   "scripts": {
     "predeploy": "vite build",
     "deploy": "gh-pages -d dist",
-    "start": "vite",
+    "start": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -17,7 +17,8 @@
     "@mui/icons-material": "^6.4.4",
     "@mui/material": "^6.4.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-router": "^7.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
