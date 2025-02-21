@@ -1,7 +1,9 @@
 import { Box, Button } from "@mui/material";
 import { Link } from "react-router";
+import useTracking from "./hooks.ts/useTracking";
 
 export default function LandingPage() {
+  useTracking("LandingPage");
   return (
     <Box
       sx={{
@@ -16,7 +18,7 @@ export default function LandingPage() {
         overflow: "clip",
       }}>
       <h1>Welcome!</h1>
-      <Button component={Link} to="/search" variant="contained">
+      <Button component={Link} to="/projects" variant="contained">
         View Projects
       </Button>
     </Box>

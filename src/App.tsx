@@ -2,22 +2,25 @@ import { useReducer } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router'
 import { AppStateContext, AppDispatchContext } from './AppContext'
 import appReducer, { initialState } from './AppReducer'
-import LandingPage from './LandingPage'
-import Search from './Search'
+import data from './data'
 
 export default function App() {
-  const [state, dispatch] = useReducer(appReducer, initialState)
+    const [state, dispatch] = useReducer(appReducer, initialState)
 
   return (
-    <AppStateContext.Provider value={state}>
-      <AppDispatchContext.Provider value={dispatch}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/search" element={<Search />} />
-          </Routes>
-        </BrowserRouter>
-      </AppDispatchContext.Provider>
-    </AppStateContext.Provider>
-  )
+  <AppStateContext.Provider value={state}>
+    <AppDispatchContext.Provider value={dispatch}>
+      <BrowserRouter>
+        <Routes>
+          <Route {...data.landingPath} />
+          <Route {...data.main}>
+            {data.main.childrenRoutes.map((child) => (
+              <Route key={child.routeProps.path} {...child.routeProps} />
+            ))}
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AppDispatchContext.Provider>
+  </AppStateContext.Provider>
+)
 }

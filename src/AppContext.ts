@@ -1,8 +1,8 @@
 import { createContext, useContext } from 'react';
-import type { StateType, ActionType } from './AppReducer';
+import type { AppState, AppAction } from './AppReducer';
 
-export const AppStateContext = createContext<StateType | null>(null);
-export const AppDispatchContext = createContext<React.Dispatch<ActionType> | null>(null);
+export const AppStateContext = createContext<AppState | null>(null);
+export const AppDispatchContext = createContext<React.Dispatch<AppAction> | null>(null);
 
 export function useAppStateContext() {
   const context = useContext(AppStateContext)
