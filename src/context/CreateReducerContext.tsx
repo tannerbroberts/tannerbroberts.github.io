@@ -33,10 +33,3 @@ export default function CreateReducerContext<Action, State>(reducer: React.Reduc
 
   return { Provider, useStateContext, useDispatchContext }
 }
-
-// Usage:
-// import CreateReducerContext from './CreateReducerContext'
-// const { Provider, useStateContext, useDispatchContext } = CreateReducerContext(reducer, initialState)
-// export { Provider, useStateContext, useDispatchContext }
-
-// The above code is a generic context provider that takes a reducer and initial state and returns a Provider component and two hooks for consuming the state and dispatch function.
