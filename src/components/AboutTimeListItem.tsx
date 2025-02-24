@@ -1,5 +1,5 @@
-import { ListItem, ListItemButton, ListItemText } from "@mui/material";
-import Item, { getItemById } from "../store/utils/item";
+import { Accordion, AccordionDetails, AccordionSummary, ListItemButton, ListItemText } from "@mui/material";
+import { getItemById, Item } from "../store/utils/item";
 import { useCallback } from "react";
 import { Delete } from "@mui/icons-material";
 import { useAppDispatch, useAppState } from "../context/App";
@@ -19,11 +19,16 @@ export default function AboutTimeListItem({ item }: { item: Item }) {
   }).join(', ')
 
   return (
-    <ListItem key={item.id}>
-      <ListItemText primary={item.name} secondary={childrenString} />
-      <ListItemButton onClick={deleteItem}>
-        <Delete />
-      </ListItemButton>
-    </ListItem>
+    <Accordion style={{ border: "1px solid black" }} key={item.id}>
+      <AccordionSummary>
+        <ListItemButton>
+          <ListItemText primary={item.name} secondary={`${item.duration}ms`} />
+        </ListItemButton>
+      </AccordionSummary>
+      <AccordionDetails>
+        <ListItemText primary={childrenString} />
+        <Delete onClick={deleteItem} />
+      </AccordionDetails>
+    </Accordion>
   )
 }
