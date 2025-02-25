@@ -9,19 +9,19 @@ export default function Header() {
 
   return (
     <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Toolbar>
-          <IconButton
-            onClick={() => appDispatch({ type: 'TOGGLE_SIDE_DRAWER' })}
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-          >
-            {sideDrawerOpen ? <MenuOpen /> : <Menu />}
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            About Time
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <Toolbar>
+        <IconButton
+          onClick={() => appDispatch({ type: 'TOGGLE_SIDE_DRAWER' })}
+          color="inherit"
+          aria-label="open drawer"
+          edge="start"
+        >
+          {sideDrawerOpen ? <MenuOpen /> : <Menu />}
+        </IconButton>
+        <Typography variant="h6" noWrap component="div">
+          About Time
+        </Typography>
+      </Toolbar>
+    </AppBar>
   )
 }

@@ -3,12 +3,14 @@ export class Item {
   name: string
   duration: number
   children: Child[]
+  showChildren: boolean
 
-  constructor(id: string, name: string, duration: number, children: Child[]) {
+  constructor(id: string, name: string, duration: number, children: Child[], showChildren: boolean) {
     this.id = id
     this.name = name
     this.duration = duration
     this.children = children
+    this.showChildren = showChildren
   }
 }
 
@@ -22,6 +24,9 @@ export class Child {
   }
 }
 
-export function getItemById(items: Item[], id: string): Item | undefined {
-  return items.find(item => item.id === id)
+export function getItemById(items: Item[], id: string | null): Item | null {
+  if (!id) return null
+  const item = items.find(item => item.id === id)
+  if (!item) return null
+  return item
 }
