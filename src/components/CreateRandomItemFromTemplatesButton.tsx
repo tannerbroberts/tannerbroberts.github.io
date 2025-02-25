@@ -42,6 +42,7 @@ export default function CreateRandomItemFromTemplatesButton({ mountedRef }: { mo
 
   useEffect(() => {
     // call createRandomItemFromTemplates 30 times when the component mounts
+    if (mountedRef.current) return
     for (let i = 0; i < 30; i++) {
       createRandomItemFromTemplates()
     }
