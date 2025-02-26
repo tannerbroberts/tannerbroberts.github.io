@@ -1,51 +1,62 @@
-# React + TypeScript + Vite
+# Features Roadmap
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- parent references from children items 
+```javascript
+{ id: string, start: number }
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+- item structure validation context
+  - Run through each link to children from each item, ensuring the children exist
+  # BLOCKED
+  - Run through each link to parents from each item, ensuring that all parents exist
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+- better test item scafolding
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
-# about-time
+- Get testing environment setup
+
+- Time input overlay
+
+- ledger lines
+
+- Item scheduling input
+
+- variables in items
+
+- variables in variables
+  - variable summary
+  - custom variable summary view
+
+- parent id's
+
+- binary search item lookup
+
+- saving items
+
+- parent-child link node
+  - Alleviates the duplicate items in the same parent, which is which, question
+
+- recursive updating of items and variables
+- Item change
+  - Recreating the Item object in the reducer ought to be sufficient to render any updates to the UI
+- Child start change
+  - The child, and the parent reference of the child item, needs updating
+
+- work out item schedule state
+  - Memoizing is obviously good, but how to make sure updates in the reducer pair with needed updates in the UI?
+  - Remember, changing object reference equality is the update command
+  - perfect optimization is a 1:1 change to UI-consuming-change update ratio
+
+- Accounting for the largest recent past item option, top-down
+
+# Product Launch Vision
+I share mealplans with other individuals in such a compelling way that they begin using my app for food
+  - Easy building of the "lasagna dinner" meal
+  - Scheduling/saving a schedule (in localStorage is fine)
+  - Easy Summaries like calories, macros, vitamins/minerals, dollars, required equipment, etc.
+  - Easy sharing of the item (hard coded on a github pages site is fine)
+  - Easy scheduling
+  - Easy follow-along
+  - Easy accounting with celabrations for completion
+  - Simple priorities based conflict resolution (show this or that on the main schedule)
+  - Container items don't conflict
+  - Easy understanding of scheduling contract (clean kitchen before and after, calories, etc.)

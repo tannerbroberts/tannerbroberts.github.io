@@ -44,7 +44,7 @@ export default function reducer(
       const children = action.payload.children;
       const newItem = new Item(id, name, duration, children, false);
       const items = [...previous.items, newItem];
-      items.sort((a, b) => a.duration > b.duration ? 1 : -1);
+      items.sort((a, b) => a.id > b.id ? 1 : -1);
       return { ...previous, items };
     }
     case "DELETE_ITEM_BY_ID": {
