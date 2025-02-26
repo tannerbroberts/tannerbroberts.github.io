@@ -1,5 +1,5 @@
 import { v4 as uuid } from "uuid";
-import { Child, Item } from "../utils/item";
+import { Child, getIndexById, getItemById, Item, Parent } from "../utils/item";
 import { cloneDeep } from "lodash";
 
 export type AppState = typeof initialState;
@@ -42,10 +42,37 @@ export default function reducer(
       const name = action.payload.name;
       const duration = action.payload.duration;
       const children = action.payload.children;
+      const items = previous.items;
       const newItem = new Item(id, name, duration, children, false);
-      const items = [...previous.items, newItem];
-      items.sort((a, b) => a.id > b.id ? 1 : -1);
-      return { ...previous, items };
+
+      // Add parent references to all child items
+      children.forEach((child) => {
+        const childIndex = getIndexById(items, child.id);
+        if (childIndex !== -1) {
+          const relationshipId = uuid();
+          const parent = new Parent(id, relationshipId)
+
+          //* ****************************************************
+          //* parents array for each child in the new item
+          //* ****************************************************
+          items[childIndex].parents = [...items[childIndex].parents, parent];
+        }
+      })
+
+      // Add the new item to the list
+      //* ****************************************************
+      //* items
+      //* ****************************************************
+      const newItems = [...items, newItem];
+
+      // Sort by id
+      newItems.sort((a, b) => a.id > b.id ? 1 : -1);
+
+      previous.items = newItems;
+
+      // Avoids re-rendering of components that consume the state object because the reference to the object is the same
+      // Triggers re-rendering of components that consume the items array because the reference to the array is different
+      return previous;
     }
     case "DELETE_ITEM_BY_ID": {
       const id = action.payload.id;

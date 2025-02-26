@@ -10,9 +10,11 @@
   # BLOCKED
   - Run through each link to parents from each item, ensuring that all parents exist
 
+- Get testing environment setup
+
 - better test item scafolding
 
-- Get testing environment setup
+- saving items
 
 - Time input overlay
 
@@ -27,10 +29,6 @@
   - custom variable summary view
 
 - parent id's
-
-- binary search item lookup
-
-- saving items
 
 - parent-child link node
   - Alleviates the duplicate items in the same parent, which is which, question
