@@ -29,7 +29,7 @@ export default function ItemSchedule({ item, start = null }: { item: Item, start
         marginLeft: start !== null ? `140px` : '0px',
       }}>
       <Typography>
-        {item.name}
+        {`${item.name} (${item.showChildren ? '-' : '+'})`}
       </Typography>
       {item.showChildren &&
         item.children.map((child) => {
