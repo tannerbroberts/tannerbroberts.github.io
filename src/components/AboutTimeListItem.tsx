@@ -16,14 +16,14 @@ export default function AboutTimeListItem({ item }: { item: Item }) {
   const childrenString = item.children.map(child => {
     const childItem = getItemById(items, child.id)
     if (!childItem) throw new Error(`Child with id ${child.id} not found`)
-    return `${childItem.name} (${child.start})`
+    return `${child.id}`
   }).join(', ')
 
   return (
     <Accordion defaultExpanded style={{ border: "1px solid black" }} key={item.id}>
       <AccordionSummary>
         <ListItemButton>
-          <ListItemText primary={item.name} secondary={`${item.duration}ms`} />
+          <ListItemText primary={item.id} secondary={`${item.duration}ms`} />
         </ListItemButton>
       </AccordionSummary>
       <AccordionDetails>

@@ -9,25 +9,25 @@ export default function SideBar() {
   const appDispatch = useAppDispatch()
 
   const closeDrawer = useCallback(() => {
-    appDispatch({ type: 'CLOSE_SIDE_DRAWER' })
+    appDispatch({ type: 'SET_SIDE_DRAWER_OPEN', payload: { sideDrawerOpen: false } })
   }, [appDispatch])
 
   const mountedRef = useRef(false)
 
   return (
     <Drawer
-        variant='temporary'
-        open={sideDrawerOpen}
-        onClose={closeDrawer}
-        sx={{ width: '33vw'}}
-      >
-        <Toolbar />
-        <Box sx={{ overflow: 'auto' }}>
-          <List>
-            <CreateRandomItemFromTemplatesButton mountedRef={mountedRef} />
-            <AboutTimeList />
-          </List>
-        </Box>
-      </Drawer>
+      variant='temporary'
+      open={sideDrawerOpen}
+      onClose={closeDrawer}
+      sx={{ width: '33vw' }}
+    >
+      <Toolbar />
+      <Box sx={{ overflow: 'auto' }}>
+        <List>
+          <CreateRandomItemFromTemplatesButton mountedRef={mountedRef} />
+          <AboutTimeList />
+        </List>
+      </Box>
+    </Drawer>
   )
 }

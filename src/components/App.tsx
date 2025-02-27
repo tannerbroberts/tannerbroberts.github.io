@@ -5,7 +5,6 @@ import SideBar from './SideBar';
 import useItemListValidation from '../store/utils/useItemListValidation';
 
 export default function App() {
-
   useItemListValidation()
 
   return (

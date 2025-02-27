@@ -1,15 +1,5 @@
 # Features Roadmap
 
-- parent references from children items 
-```javascript
-{ id: string, start: number }
-```
-
-- item structure validation context
-  - Run through each link to children from each item, ensuring the children exist
-  # BLOCKED
-  - Run through each link to parents from each item, ensuring that all parents exist
-
 - Get testing environment setup
 
 - better test item scafolding
@@ -27,11 +17,6 @@
 - variables in variables
   - variable summary
   - custom variable summary view
-
-- parent id's
-
-- parent-child link node
-  - Alleviates the duplicate items in the same parent, which is which, question
 
 - recursive updating of items and variables
 - Item change

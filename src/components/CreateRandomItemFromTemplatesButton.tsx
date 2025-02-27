@@ -4,6 +4,7 @@ import { Child, Item } from "../store/utils/item";
 import { useAppDispatch, useAppState } from "../context/App";
 import { getItemById } from "../store/utils/item";
 import getRandomName from "../store/utils/getRandomName";
+import { v4 as uuid } from "uuid";
 
 export default function CreateRandomItemFromTemplatesButton({ mountedRef }: { mountedRef: React.MutableRefObject<boolean> }) {
   const { items } = useAppState()
@@ -28,7 +29,9 @@ export default function CreateRandomItemFromTemplatesButton({ mountedRef }: { mo
           nextAvailableMoment = start + lastChildItem.duration
         }
         if (nextAvailableMoment + item.duration > duration) continue
-        children.push(new Child(item.id, nextAvailableMoment))
+        const { id } = item
+        const relationshipId = uuid()
+        children.push(new Child(id, relationshipId, nextAvailableMoment))
       }
       return children
     }
@@ -36,7 +39,8 @@ export default function CreateRandomItemFromTemplatesButton({ mountedRef }: { mo
     const name = getRandomName()
     const duration = Math.floor(Math.random() * 10_000)
     const children = generateRandomNonOverlappingChildrenFromItems(duration)
-    const payload = { name, duration, children }
+    const id = uuid()
+    const payload = { id, name, duration, children }
     appDispatch({ type: 'CREATE_ITEM', payload })
   }, [appDispatch, items])
 
@@ -47,13 +51,14 @@ export default function CreateRandomItemFromTemplatesButton({ mountedRef }: { mo
       createRandomItemFromTemplates()
     }
     mountedRef.current = true
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
     <ListItem>
-    <Button variant='contained' onClick={createRandomItemFromTemplates}>
-      Create Item
-    </Button>
-  </ListItem>
+      <Button variant='contained' onClick={createRandomItemFromTemplates}>
+        Create Item
+      </Button>
+    </ListItem>
   )
 }

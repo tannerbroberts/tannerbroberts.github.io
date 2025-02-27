@@ -11,7 +11,7 @@ export default function Header() {
     <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
       <Toolbar>
         <IconButton
-          onClick={() => appDispatch({ type: 'TOGGLE_SIDE_DRAWER' })}
+          onClick={() => appDispatch({ type: 'SET_SIDE_DRAWER_OPEN', payload: { sideDrawerOpen: !sideDrawerOpen } })}
           color="inherit"
           aria-label="open drawer"
           edge="start"
