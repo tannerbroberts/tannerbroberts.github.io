@@ -15,15 +15,21 @@ export type AppAction =
     payload: { focusedItemId: string | null };
   }
   | {
+    type: "SET_ITEM_SEARCH_WINDOW_RANGE";
+    payload: { min: number; max: number };
+  }
+  | { type: "SET_SIDE_DRAWER_OPEN"; payload: { sideDrawerOpen: boolean } }
+  | {
     type: "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID";
     payload: { id: string; showChildren: boolean };
-  }
-  | { type: "SET_SIDE_DRAWER_OPEN"; payload: { sideDrawerOpen: boolean } };
+  };
 
 export const initialState = {
   sideDrawerOpen: false,
+  expandSearchItems: false,
   items: new Array<Item>(),
   focusedItemId: null as string | null,
+  itemSearchWindowRange: { min: 0, max: 4 },
 };
 
 export default function reducer(
@@ -139,6 +145,10 @@ export default function reducer(
       const { sideDrawerOpen } = action.payload;
       return { ...previous, sideDrawerOpen };
     }
+    case "SET_ITEM_SEARCH_WINDOW_RANGE": {
+      const { min, max } = action.payload;
+      return { ...previous, itemSearchWindowRange: { min, max } };
+    }
     case "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID": {
       const { id, showChildren } = action.payload;
 
@@ -156,6 +166,7 @@ export default function reducer(
       })];
       return { ...previous, items };
     }
+
     default:
       return previous;
   }

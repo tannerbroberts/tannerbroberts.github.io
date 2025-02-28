@@ -1,12 +1,12 @@
 import { Button, ListItem } from "@mui/material";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { Child, Item } from "../store/utils/item";
 import { useAppDispatch, useAppState } from "../context/App";
 import { getItemById } from "../store/utils/item";
 import getRandomName from "../store/utils/getRandomName";
 import { v4 as uuid } from "uuid";
 
-export default function CreateRandomItemFromTemplatesButton({ mountedRef }: { mountedRef: React.MutableRefObject<boolean> }) {
+export default function CreateRandomItemFromTemplatesButton() {
   const { items } = useAppState()
   const appDispatch = useAppDispatch()
 
@@ -44,20 +44,10 @@ export default function CreateRandomItemFromTemplatesButton({ mountedRef }: { mo
     appDispatch({ type: 'CREATE_ITEM', payload })
   }, [appDispatch, items])
 
-  useEffect(() => {
-    // call createRandomItemFromTemplates 30 times when the component mounts
-    if (mountedRef.current) return
-    for (let i = 0; i < 30; i++) {
-      createRandomItemFromTemplates()
-    }
-    mountedRef.current = true
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   return (
     <ListItem>
       <Button variant='contained' onClick={createRandomItemFromTemplates}>
-        Create Item
+        Create Random Item From Library
       </Button>
     </ListItem>
   )

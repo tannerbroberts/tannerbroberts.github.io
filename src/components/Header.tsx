@@ -4,7 +4,7 @@ import { useAppDispatch, useAppState } from '../context/App';
 
 
 export default function Header() {
-  const { sideDrawerOpen } = useAppState()
+  const { sideDrawerOpen, items } = useAppState()
   const appDispatch = useAppDispatch()
 
   return (
@@ -19,7 +19,7 @@ export default function Header() {
           {sideDrawerOpen ? <MenuOpen /> : <Menu />}
         </IconButton>
         <Typography variant="h6" noWrap component="div">
-          About Time
+          About Time {items.length}
         </Typography>
       </Toolbar>
     </AppBar>

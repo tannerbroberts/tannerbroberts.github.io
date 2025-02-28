@@ -1,35 +1,43 @@
-import { Accordion, AccordionDetails, AccordionSummary, ListItemButton, ListItemText } from "@mui/material";
-import { getItemById, Item } from "../store/utils/item";
-import { useCallback } from "react";
 import { Delete } from "@mui/icons-material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { useAppDispatch, useAppState } from "../context/App";
+import { Accordion, AccordionDetails, AccordionSummary, ButtonGroup, ListItemButton, ListItemText } from "@mui/material";
+import { useCallback } from "react";
+import { useAppDispatch } from "../context/App";
+import { Item } from "../store/utils/item";
 
 export default function AboutTimeListItem({ item }: { item: Item }) {
-  const { items } = useAppState()
   const appDispatch = useAppDispatch()
 
   const deleteItem = useCallback(() => {
     appDispatch({ type: 'DELETE_ITEM_BY_ID', payload: { id: item.id } })
   }, [item.id, appDispatch])
 
-  const childrenString = item.children.map(child => {
-    const childItem = getItemById(items, child.id)
-    if (!childItem) throw new Error(`Child with id ${child.id} not found`)
-    return `${child.id}`
-  }).join(', ')
+  const viewItem = useCallback(() => {
+    appDispatch({ type: 'SET_FOCUSED_ITEM_BY_ID', payload: { focusedItemId: item.id } })
+  }
+    , [item.id, appDispatch])
+
+  const childrenString = item.children.map((child) => {
+    return `{id:${child.id}}`
+  }).join(", ")
+
+  const parentString = item.parents.map((parent) => {
+    return `{id:${parent.id}}`
+  }).join(", ")
 
   return (
-    <Accordion defaultExpanded style={{ border: "1px solid black" }} key={item.id}>
+    <Accordion style={{ border: "1px solid black" }} key={item.id}>
       <AccordionSummary>
         <ListItemButton>
-          <ListItemText primary={item.id} secondary={`${item.duration}ms`} />
+          <ListItemText primary={`children: (${item.children.length})`} secondary={`parents: (${item.parents.length})`} />
         </ListItemButton>
+        <ButtonGroup>
+          <Delete onClick={deleteItem} />
+          <VisibilityIcon onClick={viewItem} />
+        </ButtonGroup>
       </AccordionSummary>
       <AccordionDetails>
-        <ListItemText primary={childrenString} />
-        <Delete onClick={deleteItem} />
-        <VisibilityIcon onClick={() => appDispatch({ type: 'SET_FOCUSED_ITEM_BY_ID', payload: { focusedItemId: item.id } })} />
+        <ListItemText sx={{ wordBreak: "," }} primary={`Children: ${childrenString}`} secondary={`Parents: ${parentString}`} />
       </AccordionDetails>
     </Accordion>
   )

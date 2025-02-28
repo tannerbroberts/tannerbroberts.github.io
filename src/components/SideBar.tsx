@@ -1,6 +1,6 @@
 import { Box, Drawer, List, Toolbar } from "@mui/material";
 import { useAppDispatch, useAppState } from "../context/App";
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 import AboutTimeList from "./AboutTimeList";
 import CreateRandomItemFromTemplatesButton from "./CreateRandomItemFromTemplatesButton.tsx";
 
@@ -12,19 +12,21 @@ export default function SideBar() {
     appDispatch({ type: 'SET_SIDE_DRAWER_OPEN', payload: { sideDrawerOpen: false } })
   }, [appDispatch])
 
-  const mountedRef = useRef(false)
-
   return (
     <Drawer
       variant='temporary'
       open={sideDrawerOpen}
       onClose={closeDrawer}
-      sx={{ width: '33vw' }}
+      sx={{
+        '& .MuiDrawer-paper': {
+          width: '440px',
+        },
+      }}
     >
       <Toolbar />
       <Box sx={{ overflow: 'auto' }}>
+        <CreateRandomItemFromTemplatesButton />
         <List>
-          <CreateRandomItemFromTemplatesButton mountedRef={mountedRef} />
           <AboutTimeList />
         </List>
       </Box>
