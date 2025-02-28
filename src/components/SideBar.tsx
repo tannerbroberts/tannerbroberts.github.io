@@ -1,8 +1,9 @@
-import { Box, Drawer, List, Toolbar } from "@mui/material";
+import { Box, Drawer, List, ListItem, Toolbar } from "@mui/material";
 import { useAppDispatch, useAppState } from "../context/App";
 import { useCallback } from "react";
 import AboutTimeList from "./AboutTimeList";
-import CreateRandomItemFromTemplatesButton from "./CreateRandomItemFromTemplatesButton.tsx";
+import RandomItemButton from "./RandomItemButton.tsx";
+import NewItemButton from "./NewItemButton.tsx";
 
 export default function SideBar() {
   const { sideDrawerOpen } = useAppState()
@@ -25,8 +26,13 @@ export default function SideBar() {
     >
       <Toolbar />
       <Box sx={{ overflow: 'auto' }}>
-        <CreateRandomItemFromTemplatesButton />
         <List>
+          <ListItem>
+            <RandomItemButton />
+          </ListItem>
+          <ListItem>
+            <NewItemButton />
+          </ListItem>
           <AboutTimeList />
         </List>
       </Box>

@@ -2,6 +2,10 @@
 
 - Get testing environment setup
 
+- Scheduling focus
+  - Button to schedule an item starting at "focus"
+  - Scheduling an item moves "focus" cursor to the end moment of the scheduled item
+
 - better test item scafolding
 
 - saving items

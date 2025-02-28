@@ -1,10 +1,9 @@
-import { Button, ListItem } from "@mui/material";
+import { Button } from "@mui/material";
 import { useCallback } from "react";
-import { Child, Item } from "../store/utils/item";
-import { useAppDispatch, useAppState } from "../context/App";
-import { getItemById } from "../store/utils/item";
-import getRandomName from "../store/utils/getRandomName";
 import { v4 as uuid } from "uuid";
+import { useAppDispatch, useAppState } from "../context/App";
+import getRandomName from "../store/utils/getRandomName";
+import { Child, getItemById, Item } from "../store/utils/item";
 
 export default function CreateRandomItemFromTemplatesButton() {
   const { items } = useAppState()
@@ -45,10 +44,8 @@ export default function CreateRandomItemFromTemplatesButton() {
   }, [appDispatch, items])
 
   return (
-    <ListItem>
-      <Button variant='contained' onClick={createRandomItemFromTemplates}>
-        Create Random Item From Library
-      </Button>
-    </ListItem>
+    <Button variant='contained' onClick={createRandomItemFromTemplates}>
+      RANDOM
+    </Button>
   )
 }
