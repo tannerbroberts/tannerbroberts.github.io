@@ -1,11 +1,17 @@
 import { AppBar, Toolbar, IconButton, Typography } from '@mui/material';
 import { Menu, MenuOpen } from '@mui/icons-material';
 import { useAppDispatch, useAppState } from '../context/App';
+import { getItemById } from '../store/utils/item';
+import { useMemo } from 'react';
 
 
 export default function Header() {
-  const { sideDrawerOpen, items } = useAppState()
+  const { sideDrawerOpen, items, focusedItemId } = useAppState()
   const appDispatch = useAppDispatch()
+
+  const focusedItem = useMemo(() => {
+    return getItemById(items, focusedItemId)
+  }, [focusedItemId, items])
 
   return (
     <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
@@ -19,7 +25,7 @@ export default function Header() {
           {sideDrawerOpen ? <MenuOpen /> : <Menu />}
         </IconButton>
         <Typography variant="h6" noWrap component="div">
-          About Time {items.length}
+          {focusedItem ? focusedItem.name : 'About Time'}
         </Typography>
       </Toolbar>
     </AppBar>
