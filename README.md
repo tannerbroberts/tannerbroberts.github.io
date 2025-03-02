@@ -1,20 +1,26 @@
 # Features Roadmap
 
-- Get testing environment setup
+- saving items
+  - Needs to be one item object at a time to avoid the need for saving super complex trees, and loading only what's needed
+  - Save an object to localStorage for now
+  - Save each ID as the key in localStorage, and the item as the value
+  - Getter function emulates fetch by batching multiple item id's into a single "get" call
+
+- ledger lines
+
+- Time interval
+
+- Item scheduling input
 
 - Scheduling focus
   - Button to schedule an item starting at "focus"
   - Scheduling an item moves "focus" cursor to the end moment of the scheduled item
 
+- Get testing environment setup
+
 - better test item scafolding
 
-- saving items
-
 - Time input overlay
-
-- ledger lines
-
-- Item scheduling input
 
 - variables in items
 
@@ -34,6 +40,11 @@
   - perfect optimization is a 1:1 change to UI-consuming-change update ratio
 
 - Accounting for the largest recent past item option, top-down
+
+- Moving real-time scrolling with scheduled items
+
+- Items can have a "scheduled" timestamp which allows derriving the "now" moment
+  - "scheduled" items can't be scheduled in a larger item
 
 # Product Launch Vision
 I share mealplans with other individuals in such a compelling way that they begin using my app for food

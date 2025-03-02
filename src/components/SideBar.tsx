@@ -22,6 +22,10 @@ export default function SideBar() {
         '& .MuiDrawer-paper': {
           width: '440px',
         },
+        // Mobile, fullscreen width
+        '&.MuiDrawer-modal': {
+          width: '100%',
+        },
       }}
     >
       <Toolbar />
