@@ -6,8 +6,6 @@
   - New Item Dialog update
   - Schedule Item Dialog
 
-- Remove an item from another's schedule
-
 ### Saving Items
 
 - Needs to be one item object at a time to avoid the need for saving super
@@ -22,6 +20,12 @@
 - ledger lines
 
 - Time interval
+
+### Item List
+
+- Item representing focusedItemId, if visible, shows with an eyeball
+
+- Remove an item from another's schedule
 
 ### Item Model
 
