@@ -1,35 +1,12 @@
-import { Delete } from "@mui/icons-material";
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Accordion, AccordionActions, AccordionDetails, AccordionSummary, ButtonGroup, IconButton, ListItemButton, ListItemText } from "@mui/material";
-import React, { useCallback, useMemo } from "react";
-import { useAppDispatch } from "../context/App";
+import { IconButton, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import { useCallback, useMemo } from "react";
 import { Item } from "../store/utils/item";
+import { useAppDispatch, useAppState } from "../context/App";
+import { Close } from "@mui/icons-material";
 
-export default function AboutTimeListItem({ item }: { item: Item }) {
-  const appDispatch = useAppDispatch()
-
-  const deleteItem = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    appDispatch({ type: 'DELETE_ITEM_BY_ID', payload: { id: item.id } })
-  }, [item.id, appDispatch])
-
-  const viewItem = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    appDispatch({ type: 'SET_FOCUSED_ITEM_BY_ID', payload: { focusedItemId: item.id } })
-  }
-    , [item.id, appDispatch])
-
-  const childrenString = useMemo(() => {
-    return item.children.map((child) => {
-      return `{id:${child.id}}`
-    }).join(", ")
-  }, [item.children])
-
-  const parentString = useMemo(() => {
-    return item.parents.map((parent) => {
-      return `{id:${parent.id}}`
-    }).join(", ")
-  }, [item.parents])
+export default function PaginatedItemListItem({ item }: { item: Item }) {
+  const { focusedListItemId } = useAppState()
+  const dispatch = useAppDispatch()
 
   const lengthString = useMemo(() => {
     const hours = Math.floor(item.duration / 3600000);
@@ -37,27 +14,30 @@ export default function AboutTimeListItem({ item }: { item: Item }) {
     const seconds = Math.floor((item.duration % 60000) / 1000);
     const milliseconds = item.duration % 1000;
 
-    return `${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`
+    return `${hours ? `${hours}h` : ''} ${minutes ? `${minutes}m` : ''} ${seconds ? `${seconds}` : ''}${milliseconds ? `.${milliseconds}s` : 's'}`
   }, [item.duration])
 
+  const setFocusedListItem = useCallback(() => {
+    dispatch({ type: 'SET_FOCUSED_LIST_ITEM_BY_ID', payload: { focusedListItemId: item.id } })
+  }, [dispatch, item.id])
+
+  const clearFocusedListItemId = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    dispatch({ type: 'SET_FOCUSED_LIST_ITEM_BY_ID', payload: { focusedListItemId: null } })
+  }, [dispatch])
+
+  const isFocused = useMemo(() => focusedListItemId === item.id, [focusedListItemId, item.id])
+
   return (
-    <Accordion style={{ border: "1px solid black" }} key={item.id}>
-      <AccordionSummary>
-        <ListItemButton>
-          <ListItemText primary={item.name} secondary={`length: ${lengthString}`} />
-        </ListItemButton>
-        <AccordionActions>
-          <IconButton onClick={deleteItem}>
-            <Delete />
+    <ListItem>
+      <ListItemButton selected={isFocused} onClick={setFocusedListItem}>
+        <ListItemText primary={item.name} secondary={`length: ${lengthString}`} />
+        {isFocused &&
+          <IconButton onClick={clearFocusedListItemId}>
+            <Close />
           </IconButton>
-          <IconButton onClick={viewItem}>
-            <VisibilityIcon />
-          </IconButton>
-        </AccordionActions>
-      </AccordionSummary>
-      <AccordionDetails>
-        <ListItemText sx={{ wordBreak: "," }} primary={`Children: ${childrenString}`} secondary={`Parents: ${parentString}`} />
-      </AccordionDetails>
-    </Accordion>
+        }
+      </ListItemButton>
+    </ListItem >
   )
 }

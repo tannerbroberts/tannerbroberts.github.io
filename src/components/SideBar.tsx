@@ -1,7 +1,7 @@
 import { Box, Drawer, List, ListItem, Toolbar } from "@mui/material";
 import { useAppDispatch, useAppState } from "../context/App";
 import { useCallback } from "react";
-import AboutTimeList from "./AboutTimeList";
+import PaginatedItemList from "./PaginatedItemList";
 import RandomItemButton from "./RandomItemButton.tsx";
 import NewItemButton from "./NewItemButton.tsx";
 
@@ -37,7 +37,7 @@ export default function SideBar() {
           <ListItem>
             <NewItemButton />
           </ListItem>
-          <AboutTimeList />
+          <PaginatedItemList />
         </List>
       </Box>
     </Drawer>

@@ -15,6 +15,10 @@ export type AppAction =
     payload: { focusedItemId: string | null };
   }
   | {
+    type: "SET_FOCUSED_LIST_ITEM_BY_ID";
+    payload: { focusedListItemId: string | null };
+  }
+  | {
     type: "SET_ITEM_SEARCH_WINDOW_RANGE";
     payload: { min: number; max: number };
   }
@@ -24,13 +28,16 @@ export type AppAction =
     payload: { id: string; showChildren: boolean };
   };
 
+export const DEFAULT_WINDOW_RANGE_SIZE = 6;
 export const initialState = {
   sideDrawerOpen: false,
   expandSearchItems: false,
   items: new Array<Item>(),
   focusedItemId: null as string | null,
-  itemSearchWindowRange: { min: 0, max: 4 },
+  focusedListItemId: null as string | null,
+  itemSearchWindowRange: { min: 0, max: DEFAULT_WINDOW_RANGE_SIZE },
 };
+
 
 export default function reducer(
   previous: AppState,
@@ -136,6 +143,16 @@ export default function reducer(
       //* focusedItemId
       //* ****************************************************
       return { ...previous, focusedItemId };
+    }
+    case "SET_FOCUSED_LIST_ITEM_BY_ID": {
+      const { focusedListItemId } = action.payload;
+      console.log("focusedListItemId", focusedListItemId);
+
+      //* ****************************************************
+      //* appState
+      //* focusedItemId
+      //* ****************************************************
+      return { ...previous, focusedListItemId: focusedListItemId };
     }
     case "SET_SIDE_DRAWER_OPEN": {
       //* ****************************************************
