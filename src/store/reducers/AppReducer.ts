@@ -36,7 +36,7 @@ export type AppAction =
     payload: { id: string; showChildren: boolean };
   };
 
-export const DEFAULT_WINDOW_RANGE_SIZE = 5;
+export const DEFAULT_WINDOW_RANGE_SIZE = 4;
 export const initialState = {
   expandSearchItems: false,
   focusedItemId: null as string | null,
@@ -165,7 +165,7 @@ export default function reducer(
       //* appState
       //* focusedItemId
       //* ****************************************************
-      return { ...previous, focusedItemId };
+      return { ...previous, focusedItemId, focusedListItemId: null };
     }
     case "SET_FOCUSED_LIST_ITEM_BY_ID": {
       const { focusedListItemId } = action.payload;

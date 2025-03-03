@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import TimeInputOverlay from "./TimeInputOverlay";
+import NewItemDialog from "./NewItemDialog";
 import { useCallback, useState } from "react";
 import { useAppDispatch } from "../context/App";
 import { v4 as uuid } from "uuid";
@@ -8,7 +8,7 @@ export default function NewItemButton() {
   const appDispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
 
-  const openTimeInputOverlay = useCallback(() => {
+  const openNewItemDialog = useCallback(() => {
     setOpen(true);
   }, []);
 
@@ -35,11 +35,11 @@ export default function NewItemButton() {
     <>
       <Button
         variant="contained"
-        onClick={openTimeInputOverlay}
+        onClick={openNewItemDialog}
       >
         CREATE NEW ITEM
       </Button>
-      <TimeInputOverlay {...{ open, onClose, prompt, onCustomSubmit }} />
+      <NewItemDialog {...{ open, onClose, prompt, onCustomSubmit }} />
     </>
   )
 }
