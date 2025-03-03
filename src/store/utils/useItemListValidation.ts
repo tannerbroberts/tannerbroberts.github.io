@@ -27,7 +27,7 @@ export default function useItemListValidation() {
       }
     }
     // print green success message
-    console.log(
+    console.info(
       "%cAll children references found in items array",
       "color: green; font-weight: bold",
     );

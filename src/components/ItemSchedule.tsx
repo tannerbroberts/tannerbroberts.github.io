@@ -21,12 +21,12 @@ export default function ItemSchedule({ item, start = null }: { item: Item, start
       onClick={toggleShowChildren}
       style={{
         boxSizing: 'border-box',
-        width: start !== null ? 'calc(100% - 140px)' : '100%',
+        width: start !== null ? 'calc(100% - 40px)' : '100%',
         position: start !== null ? 'absolute' : 'relative',
         top: start !== null ? `${start}px` : '0px',
         height: duration + 'px',
         backgroundColor: 'rgba(0, 0, 150, 0.3)',
-        marginLeft: start !== null ? `140px` : '0px',
+        marginLeft: start !== null ? `40px` : '0px',
       }}>
       <Typography>
         {`${item.name} (${item.showChildren ? '-' : '+'})`}

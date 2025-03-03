@@ -8,8 +8,12 @@ export type AppAction =
     type: "CREATE_ITEM";
     payload: { id: string; name: string; duration: number; children: Child[] };
   }
-  | { type: "DELETE_ITEM_BY_ID"; payload: { id: string } }
-  | { type: "REMOVE_INSTANCES_BY_ID"; payload: { id: string } }
+  | { type: "DELETE_ITEM_BY_ID"; payload: { id: string | null } }
+  | { type: "REMOVE_INSTANCES_BY_ID"; payload: { id: string | null } }
+  | {
+    type: "SCHEDULE_FOCUSED_LIST_ITEM_BY_OFFSET";
+    payload: { offset: number };
+  }
   | {
     type: "SET_FOCUSED_ITEM_BY_ID";
     payload: { focusedItemId: string | null };
@@ -22,22 +26,26 @@ export type AppAction =
     type: "SET_ITEM_SEARCH_WINDOW_RANGE";
     payload: { min: number; max: number };
   }
+  | {
+    type: "SET_SCHEDULING_DIALOG_OPEN";
+    payload: { schedulingDialogOpen: boolean };
+  }
   | { type: "SET_SIDE_DRAWER_OPEN"; payload: { sideDrawerOpen: boolean } }
   | {
     type: "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID";
     payload: { id: string; showChildren: boolean };
   };
 
-export const DEFAULT_WINDOW_RANGE_SIZE = 6;
+export const DEFAULT_WINDOW_RANGE_SIZE = 5;
 export const initialState = {
-  sideDrawerOpen: false,
   expandSearchItems: false,
-  items: new Array<Item>(),
   focusedItemId: null as string | null,
   focusedListItemId: null as string | null,
+  items: new Array<Item>(),
   itemSearchWindowRange: { min: 0, max: DEFAULT_WINDOW_RANGE_SIZE },
+  schedulingDialogOpen: false,
+  sideDrawerOpen: false,
 };
-
 
 export default function reducer(
   previous: AppState,
@@ -63,7 +71,7 @@ export default function reducer(
       children.forEach((child) => {
         const childIndex = getIndexById(items, child.id);
         if (childIndex !== -1) {
-          const parent = new Parent(id, child.relationshipId);
+          const parent = new Parent(newItem.id, child.relationshipId);
 
           //* ****************************************************
           //* parents array for each child in the new item
@@ -88,6 +96,8 @@ export default function reducer(
     }
     case "DELETE_ITEM_BY_ID": {
       const id = action.payload.id;
+      if (!id) return previous;
+
       //* ****************************************************
       //* parents and children with id
       //* ****************************************************
@@ -103,13 +113,25 @@ export default function reducer(
         item.id !== id
       );
 
+      const { focusedListItemId, focusedItemId } = previous;
+      const shouldNullifyFocusedItemId = focusedItemId === id;
+      const shouldNullifyFocusedListItemId = focusedListItemId === id;
+
       //* ****************************************************
       //* appState
       //* ****************************************************
-      return { ...removedInstanceState, items: newItems };
+      return {
+        ...removedInstanceState,
+        items: newItems,
+        focusedItemId: shouldNullifyFocusedItemId ? null : focusedItemId,
+        focusedListItemId: shouldNullifyFocusedListItemId
+          ? null
+          : focusedListItemId,
+      };
     }
     case "REMOVE_INSTANCES_BY_ID": {
       const id = action.payload.id;
+      if (!id) return previous;
 
       //* ****************************************************
       //* parents and children with id
@@ -137,6 +159,7 @@ export default function reducer(
     }
     case "SET_FOCUSED_ITEM_BY_ID": {
       const { focusedItemId } = action.payload;
+      if (!focusedItemId) return previous;
 
       //* ****************************************************
       //* appState
@@ -146,7 +169,7 @@ export default function reducer(
     }
     case "SET_FOCUSED_LIST_ITEM_BY_ID": {
       const { focusedListItemId } = action.payload;
-      console.log("focusedListItemId", focusedListItemId);
+      if (!focusedListItemId) return previous;
 
       //* ****************************************************
       //* appState
