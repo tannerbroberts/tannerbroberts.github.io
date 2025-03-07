@@ -7,6 +7,7 @@ import PaginatedItemList from "./PaginatedItemList";
 import RandomItemButton from "./RandomItemButton.tsx";
 import SchedulingDialog from "./SchedulingDialog.tsx";
 import { getItemById } from "../store/utils/item.ts";
+import { TimeInputProvider } from "../context/TimeInput.ts";
 
 export default function SideBar() {
   const { sideDrawerOpen, focusedItemId, focusedListItemId, items } = useAppState()
@@ -106,10 +107,11 @@ export default function SideBar() {
               </Typography>
             </ListItem>
           </List>
-
         </Box>
       </Drawer>
-      <SchedulingDialog />
+      <TimeInputProvider>
+        <SchedulingDialog />
+      </TimeInputProvider>
     </>
   )
 }
