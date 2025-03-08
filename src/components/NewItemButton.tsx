@@ -24,7 +24,6 @@ export default function NewItemButton() {
         id,
         name,
         duration,
-        children: [],
       }
     })
   }, [appDispatch]);

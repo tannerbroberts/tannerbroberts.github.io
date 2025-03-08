@@ -40,6 +40,13 @@ export class Item {
     const newParents = [...this.parents, parent];
     return new Item({ ...this, parents: newParents });
   }
+
+  toggleShowChildren(showChildren?: boolean): Item {
+    return new Item({
+      ...this,
+      showChildren: showChildren ?? !this.showChildren,
+    });
+  }
 }
 
 export class Child {
@@ -88,12 +95,12 @@ export function scheduleItem({
 }): { newChildItem: Item; newParentItem: Item } {
   const relationshipId = uuid();
   const childReference = new Child({
-    id: uuid(),
+    id: childItem.id,
     relationshipId,
     start,
   });
   const parentReference = new Parent({
-    id: uuid(),
+    id: parentItem.id,
     relationshipId,
   });
 

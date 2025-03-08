@@ -35,7 +35,7 @@ export default function ItemSchedule({ item, start = null }: { item: Item, start
         item.children.map((child) => {
           const { id, start: childStart } = child
           const childItem = getItemById(items, id);
-          if (!childItem) throw new Error(`Item with id ${id} not found whilest rendering children in ItemSchedule of ${item.name}`);
+          if (childItem === null) throw new Error(`Item with id ${id} not found whilest rendering children in ItemSchedule of ${item.name}`);
           return (
             <div key={id}>
               <ItemSchedule item={childItem} start={childStart} />

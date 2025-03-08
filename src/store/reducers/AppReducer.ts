@@ -1,15 +1,26 @@
 import { cloneDeep } from "lodash";
-import { Child, getIndexById, Item, Parent } from "../utils/item";
+import { getIndexById, getItemById, Item, scheduleItem } from "../utils/item";
 
 export type AppState = typeof initialState;
 export type AppAction =
   | { type: "BATCH"; payload: AppAction[] }
   | {
     type: "CREATE_ITEM";
-    payload: { id: string; name: string; duration: number; children: Child[] };
+    payload: { id: string; name: string; duration: number };
   }
   | { type: "DELETE_ITEM_BY_ID"; payload: { id: string | null } }
   | { type: "REMOVE_INSTANCES_BY_ID"; payload: { id: string | null } }
+  | {
+    type: "SCHEDULE_ITEM_BY_ID";
+    payload: { parentId: string; childId: string; start: number };
+  }
+  | {
+    type: "SCHEDULE_ITEMS_BY_ID";
+    payload: {
+      parentId: string;
+      schedules: Array<{ childId: string; start: number }>;
+    };
+  }
   | {
     type: "SET_FOCUSED_ITEM_BY_ID";
     payload: { focusedItemId: string | null };
@@ -59,31 +70,14 @@ export default function reducer(
       const id = action.payload.id;
       const name = action.payload.name;
       const duration = action.payload.duration;
-      const children = action.payload.children;
       const items = previous.items;
       const newItem = new Item({
         id,
         name,
         duration,
-        children,
+        children: [],
         parents: [],
         showChildren: false,
-      });
-
-      // Add parent references to all child items
-      children.forEach((child) => {
-        const childIndex = getIndexById(items, child.id);
-        if (childIndex !== -1) {
-          const parent = new Parent({
-            id: newItem.id,
-            relationshipId: child.relationshipId,
-          });
-
-          //* ****************************************************
-          //* parents array for each child in the new item
-          //* ****************************************************
-          items[childIndex].parents = [...items[childIndex].parents, parent];
-        }
       });
 
       // Add the new item to the list
@@ -163,6 +157,70 @@ export default function reducer(
       //* ****************************************************
       return { ...previous, items: newItems };
     }
+    case "SCHEDULE_ITEM_BY_ID": {
+      const { parentId, childId, start } = action.payload;
+
+      const parentIndex = getIndexById(previous.items, parentId);
+      const parentItem = previous.items[parentIndex];
+      if (!parentItem) throw new Error("Parent item not found when scheduling");
+
+      const childIndex = getIndexById(previous.items, childId);
+      const childItem = getItemById(previous.items, childId);
+      if (!childItem) throw new Error("Child item not found when scheduling");
+
+      const { newChildItem, newParentItem } = scheduleItem({
+        childItem,
+        parentItem,
+        start,
+      });
+
+      //* ****************************************************
+      //* items
+      //* ****************************************************
+      const newItems = [...previous.items];
+
+      //* ****************************************************
+      //* item[childIndex]
+      //* item[parentIndex]
+      //* ****************************************************
+      newItems[parentIndex] = newParentItem;
+      newItems[childIndex] = newChildItem;
+
+      //* ****************************************************
+      //* appState
+      //* ****************************************************
+      return { ...previous, items: newItems };
+    }
+    case "SCHEDULE_ITEMS_BY_ID": {
+      const { parentId, schedules } = action.payload;
+      const parentIndex = getIndexById(previous.items, parentId);
+      const parentItem = previous.items[parentIndex];
+
+      if (!parentItem) {
+        throw new Error("Parent item not found when bulk scheduling");
+      }
+
+      const newItems = [...previous.items];
+      let currentParentItem = parentItem;
+      for (const { childId, start } of schedules) {
+        const childIndex = getIndexById(newItems, childId);
+        const childItem = getItemById(newItems, childId);
+        if (!childItem) throw new Error("Child item not found when scheduling");
+
+        const { newChildItem, newParentItem } = scheduleItem({
+          childItem,
+          parentItem: currentParentItem,
+          start,
+        });
+
+        newItems[childIndex] = newChildItem;
+        currentParentItem = newParentItem;
+      }
+
+      newItems[parentIndex] = currentParentItem;
+
+      return { ...previous, items: newItems };
+    }
     case "SET_FOCUSED_ITEM_BY_ID": {
       const { focusedItemId } = action.payload;
       if (!focusedItemId) return previous;
@@ -205,27 +263,25 @@ export default function reducer(
     }
     case "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID": {
       const { id, showChildren } = action.payload;
+      const index = getIndexById(previous.items, id);
+      if (index === -1) {
+        throw new Error("Item not found when trying to toggle showChildren");
+      }
+
+      //* ****************************************************
+      //* item[index]
+      //* ****************************************************
+      const item = previous.items[index];
+      previous.items[index] = item.toggleShowChildren(showChildren);
 
       //* ****************************************************
       //* items
-      //* item with id
       //* ****************************************************
-      const items = [...previous.items.map((item) => {
-        if (item.id === id) {
-          const { name, duration, children } = item;
-          const newItem = new Item({
-            id,
-            name,
-            duration,
-            children,
-            parents: item.parents,
-            showChildren: !showChildren,
-          });
-          return newItem;
-        }
-        return item;
-      })];
-      return { ...previous, items };
+      //* *****************************************************
+      //* appState
+      //* items
+      //* *****************************************************
+      return { ...previous, items: [...previous.items] };
     }
 
     default:

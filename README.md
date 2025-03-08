@@ -3,14 +3,12 @@
 ### Scheduling
 
 - Scheduling
-  - Any and all changes to items are treated as immutable
-    - update TOGGLE_ITEM_SHOW_CHILDREN_BY_ID
-    - Look through usage of getItemById and getIndexById
   - Time input component
     - New Item Dialog update
     - Schedule Item Dialog
 - // TODO: Instert rules for scheduling here
 - groom backlog for updates
+  - Break SideBar into it's component pieces
 
 ### UnScheduling
 
