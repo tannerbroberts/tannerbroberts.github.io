@@ -8,13 +8,19 @@ export class Item {
   parents: Parent[];
   showChildren: boolean;
 
-  constructor(
-    id: string,
-    name: string,
-    duration: number,
-    children: Child[],
-    showChildren: boolean,
-  ) {
+  constructor({
+    id,
+    name,
+    duration,
+    children,
+    showChildren,
+  }: {
+    id: string;
+    name: string;
+    duration: number;
+    children: Child[];
+    showChildren: boolean;
+  }) {
     this.id = id;
     this.name = name;
     this.duration = duration;
@@ -52,6 +58,9 @@ export class Parent {
   }
 }
 
+/**
+ * Binary search through the sorted items array for an item with the given id
+ */
 export function getItemById(items: Item[], id: string | null): Item | null {
   if (!id) return null;
 
@@ -74,6 +83,9 @@ export function getItemById(items: Item[], id: string | null): Item | null {
   return null;
 }
 
+/**
+ * Binary search through the sorted items array for the index of an item with the given id
+ */
 export function getIndexById(items: Item[], id: string | null): number {
   if (!id) return -1;
 

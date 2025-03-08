@@ -2,9 +2,17 @@
 
 ### Scheduling
 
-- Time input component
-  - New Item Dialog update
-  - Schedule Item Dialog
+- Scheduling
+  - Change Item class constructor to object paramter instead of arguments list
+  - scheduleItem function
+  - Time input component
+    - New Item Dialog update
+    - Schedule Item Dialog
+- Any and all changes to items are treated as immutable
+- groom backlog for updates
+
+### UnScheduling
+  - Unscheduling button on items?
 
 ### Saving Items
 

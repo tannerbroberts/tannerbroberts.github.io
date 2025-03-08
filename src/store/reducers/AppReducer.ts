@@ -61,7 +61,13 @@ export default function reducer(
       const duration = action.payload.duration;
       const children = action.payload.children;
       const items = previous.items;
-      const newItem = new Item(id, name, duration, children, false);
+      const newItem = new Item({
+        id,
+        name,
+        duration,
+        children,
+        showChildren: false,
+      });
 
       // Add parent references to all child items
       children.forEach((child) => {
@@ -206,7 +212,13 @@ export default function reducer(
       const items = [...previous.items.map((item) => {
         if (item.id === id) {
           const { name, duration, children } = item;
-          const newItem = new Item(id, name, duration, children, showChildren);
+          const newItem = new Item({
+            id,
+            name,
+            duration,
+            children,
+            showChildren: !showChildren,
+          });
           return newItem;
         }
         return item;
