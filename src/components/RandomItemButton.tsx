@@ -30,7 +30,11 @@ export default function CreateRandomItemFromTemplatesButton() {
         if (nextAvailableMoment + item.duration > duration) continue
         const { id } = item
         const relationshipId = uuid()
-        children.push(new Child(id, relationshipId, nextAvailableMoment))
+        children.push(new Child({
+          id,
+          relationshipId,
+          start: nextAvailableMoment,
+        }))
       }
       return children
     }

@@ -1,3 +1,5 @@
+import { v4 as uuid } from "uuid";
+
 export class Item {
   id: string;
   name: string;
@@ -27,7 +29,13 @@ export class Child {
   relationshipId: string;
   start: number;
 
-  constructor(id: string, relationshipId: string, start: number) {
+  constructor(
+    { id, relationshipId, start }: {
+      id: string;
+      relationshipId: string;
+      start: number;
+    },
+  ) {
     this.id = id;
     this.relationshipId = relationshipId;
     this.start = start;
@@ -38,7 +46,7 @@ export class Parent {
   id: string;
   relationshipId: string;
 
-  constructor(id: string, relationshipId: string) {
+  constructor({ id, relationshipId }: { id: string; relationshipId: string }) {
     this.id = id;
     this.relationshipId = relationshipId;
   }

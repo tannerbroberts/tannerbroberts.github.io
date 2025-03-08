@@ -11,10 +11,6 @@ export type AppAction =
   | { type: "DELETE_ITEM_BY_ID"; payload: { id: string | null } }
   | { type: "REMOVE_INSTANCES_BY_ID"; payload: { id: string | null } }
   | {
-    type: "SCHEDULE_FOCUSED_LIST_ITEM_BY_OFFSET";
-    payload: { offset: number };
-  }
-  | {
     type: "SET_FOCUSED_ITEM_BY_ID";
     payload: { focusedItemId: string | null };
   }
@@ -43,7 +39,7 @@ export const initialState = {
   focusedListItemId: null as string | null,
   items: new Array<Item>(),
   itemSearchWindowRange: { min: 0, max: DEFAULT_WINDOW_RANGE_SIZE },
-  schedulingDialogOpen: false,
+  schedulingDialogOpen: true,
   sideDrawerOpen: false,
 };
 
@@ -71,7 +67,10 @@ export default function reducer(
       children.forEach((child) => {
         const childIndex = getIndexById(items, child.id);
         if (childIndex !== -1) {
-          const parent = new Parent(newItem.id, child.relationshipId);
+          const parent = new Parent({
+            id: newItem.id,
+            relationshipId: child.relationshipId,
+          });
 
           //* ****************************************************
           //* parents array for each child in the new item
@@ -176,6 +175,14 @@ export default function reducer(
       //* focusedItemId
       //* ****************************************************
       return { ...previous, focusedListItemId: focusedListItemId };
+    }
+    case "SET_SCHEDULING_DIALOG_OPEN": {
+      //* ****************************************************
+      //* appState
+      //* schedulingDialogOpen
+      //* ****************************************************
+      const { schedulingDialogOpen } = action.payload;
+      return { ...previous, schedulingDialogOpen };
     }
     case "SET_SIDE_DRAWER_OPEN": {
       //* ****************************************************
