@@ -1,26 +1,15 @@
 import { cloneDeep } from "lodash";
-import { getIndexById, getItemById, Item, scheduleItem } from "../utils/item";
+import { getIndexById, Item } from "../utils/item";
 
 export type AppState = typeof initialState;
 export type AppAction =
   | { type: "BATCH"; payload: AppAction[] }
   | {
     type: "CREATE_ITEM";
-    payload: { id: string; name: string; duration: number };
+    payload: { newItem: Item };
   }
   | { type: "DELETE_ITEM_BY_ID"; payload: { id: string | null } }
   | { type: "REMOVE_INSTANCES_BY_ID"; payload: { id: string | null } }
-  | {
-    type: "SCHEDULE_ITEM_BY_ID";
-    payload: { parentId: string; childId: string; start: number };
-  }
-  | {
-    type: "SCHEDULE_ITEMS_BY_ID";
-    payload: {
-      parentId: string;
-      schedules: Array<{ childId: string; start: number }>;
-    };
-  }
   | {
     type: "SET_FOCUSED_ITEM_BY_ID";
     payload: { focusedItemId: string | null };
@@ -34,6 +23,10 @@ export type AppAction =
     payload: { min: number; max: number };
   }
   | {
+    type: "SET_NEW_ITEM_DIALOG_OPEN";
+    payload: { newItemDialogOpen: boolean };
+  }
+  | {
     type: "SET_SCHEDULING_DIALOG_OPEN";
     payload: { schedulingDialogOpen: boolean };
   }
@@ -41,6 +34,10 @@ export type AppAction =
   | {
     type: "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID";
     payload: { id: string; showChildren: boolean };
+  }
+  | {
+    type: "UPDATE_ITEMS";
+    payload: { updatedItems: Item[] };
   };
 
 export const DEFAULT_WINDOW_RANGE_SIZE = 4;
@@ -52,6 +49,7 @@ export const initialState = {
   itemSearchWindowRange: { min: 0, max: DEFAULT_WINDOW_RANGE_SIZE },
   schedulingDialogOpen: true,
   sideDrawerOpen: false,
+  newItemDialogOpen: false,
 };
 
 export default function reducer(
@@ -67,24 +65,14 @@ export default function reducer(
       return newState;
     }
     case "CREATE_ITEM": {
-      const id = action.payload.id;
-      const name = action.payload.name;
-      const duration = action.payload.duration;
-      const items = previous.items;
-      const newItem = new Item({
-        id,
-        name,
-        duration,
-        children: [],
-        parents: [],
-        showChildren: false,
-      });
+      const { newItem } = action.payload;
+      if (!newItem) throw new Error("No new item provided to CREATE_ITEM");
 
       // Add the new item to the list
       //* ****************************************************
       //* items
       //* ****************************************************
-      const newItems = [...items, newItem];
+      const newItems = [...previous.items, newItem];
 
       // Sort by id
       newItems.sort((a, b) => a.id > b.id ? 1 : -1);
@@ -157,70 +145,6 @@ export default function reducer(
       //* ****************************************************
       return { ...previous, items: newItems };
     }
-    case "SCHEDULE_ITEM_BY_ID": {
-      const { parentId, childId, start } = action.payload;
-
-      const parentIndex = getIndexById(previous.items, parentId);
-      const parentItem = previous.items[parentIndex];
-      if (!parentItem) throw new Error("Parent item not found when scheduling");
-
-      const childIndex = getIndexById(previous.items, childId);
-      const childItem = getItemById(previous.items, childId);
-      if (!childItem) throw new Error("Child item not found when scheduling");
-
-      const { newChildItem, newParentItem } = scheduleItem({
-        childItem,
-        parentItem,
-        start,
-      });
-
-      //* ****************************************************
-      //* items
-      //* ****************************************************
-      const newItems = [...previous.items];
-
-      //* ****************************************************
-      //* item[childIndex]
-      //* item[parentIndex]
-      //* ****************************************************
-      newItems[parentIndex] = newParentItem;
-      newItems[childIndex] = newChildItem;
-
-      //* ****************************************************
-      //* appState
-      //* ****************************************************
-      return { ...previous, items: newItems };
-    }
-    case "SCHEDULE_ITEMS_BY_ID": {
-      const { parentId, schedules } = action.payload;
-      const parentIndex = getIndexById(previous.items, parentId);
-      const parentItem = previous.items[parentIndex];
-
-      if (!parentItem) {
-        throw new Error("Parent item not found when bulk scheduling");
-      }
-
-      const newItems = [...previous.items];
-      let currentParentItem = parentItem;
-      for (const { childId, start } of schedules) {
-        const childIndex = getIndexById(newItems, childId);
-        const childItem = getItemById(newItems, childId);
-        if (!childItem) throw new Error("Child item not found when scheduling");
-
-        const { newChildItem, newParentItem } = scheduleItem({
-          childItem,
-          parentItem: currentParentItem,
-          start,
-        });
-
-        newItems[childIndex] = newChildItem;
-        currentParentItem = newParentItem;
-      }
-
-      newItems[parentIndex] = currentParentItem;
-
-      return { ...previous, items: newItems };
-    }
     case "SET_FOCUSED_ITEM_BY_ID": {
       const { focusedItemId } = action.payload;
       if (!focusedItemId) return previous;
@@ -261,6 +185,14 @@ export default function reducer(
       const { min, max } = action.payload;
       return { ...previous, itemSearchWindowRange: { min, max } };
     }
+    case "SET_NEW_ITEM_DIALOG_OPEN": {
+      //* ****************************************************
+      //* appState
+      //* newItemDialogOpen
+      //* ****************************************************
+      const { newItemDialogOpen } = action.payload;
+      return { ...previous, newItemDialogOpen };
+    }
     case "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID": {
       const { id, showChildren } = action.payload;
       const index = getIndexById(previous.items, id);
@@ -277,6 +209,23 @@ export default function reducer(
       //* ****************************************************
       //* items
       //* ****************************************************
+      //* *****************************************************
+      //* appState
+      //* items
+      //* *****************************************************
+      return { ...previous, items: [...previous.items] };
+    }
+    case "UPDATE_ITEMS": {
+      const { updatedItems } = action.payload;
+      if (updatedItems.length === 0) return previous;
+
+      updatedItems.forEach((item) => {
+        const index = getIndexById(previous.items, item.id);
+        if (index === -1) {
+          throw new Error("Item not found when trying to update items");
+        }
+        previous.items[index] = item;
+      });
       //* *****************************************************
       //* appState
       //* items
