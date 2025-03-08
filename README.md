@@ -4,8 +4,8 @@
 
 - Scheduling
   - Any and all changes to items are treated as immutable
-    - Add Parents to the Item constructor
     - update TOGGLE_ITEM_SHOW_CHILDREN_BY_ID
+    - Look through usage of getItemById and getIndexById
   - Time input component
     - New Item Dialog update
     - Schedule Item Dialog

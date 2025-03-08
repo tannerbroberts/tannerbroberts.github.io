@@ -102,7 +102,6 @@ export function scheduleItem({
   const newChildItem = childItem.addParent(parentReference);
   const newParentItem = parentItem.addChild(childReference);
 
-  // TODO: Create new item class instances via Item functions that return new Items for immutability's sake
   return { newChildItem, newParentItem };
 }
 
