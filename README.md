@@ -5,6 +5,8 @@
 - Scheduling
   - Time input component
     - New Item Dialog update
+      - scheduleSelectedListItem
+        - Create new item button
     - Schedule Item Dialog
 - // TODO: Instert rules for scheduling here
 - groom backlog for updates

@@ -3,54 +3,58 @@ import { useCallback } from "react";
 import { v4 as uuid } from "uuid";
 import { useAppDispatch, useAppState } from "../context/App";
 import getRandomName from "../store/utils/getRandomName";
-import { getItemById, Item } from "../store/utils/item";
+import { Item, scheduleItem } from "../store/utils/item";
 
 export default function CreateRandomItemFromTemplatesButton() {
   const { items } = useAppState()
   const appDispatch = useAppDispatch()
 
   const createRandomItemFromTemplates = useCallback(() => {
-    const generateRandomNonOverlappingChildrenFromItems = (parentId: string, duration: number) => {
-      const schedules: Array<{ childId: string; start: number }> = [];
+    const generateNestingUpdates = (parentItem: Item, duration: number) => {
+      const childItems: Item[] = [];
 
       for (const item of items) {
         if (item.duration > duration) continue;
 
         let nextAvailableMoment = 0;
-        if (schedules.length) {
-          const lastChild = schedules[schedules.length - 1];
-          const lastChildItem = getItemById(items, lastChild.childId) as Item;
-          nextAvailableMoment = lastChild.start + lastChildItem.duration;
+        if (childItems.length > 0) {
+          const lastItem = childItems[childItems.length - 1];
+          nextAvailableMoment = lastItem.duration + nextAvailableMoment;
         }
 
         if (nextAvailableMoment + item.duration > duration) continue;
 
-        schedules.push({
-          childId: item.id,
-          start: nextAvailableMoment,
-        });
+        // schedule the item
+        const { newChildItem, newParentItem } = scheduleItem({
+          childItem: item,
+          parentItem: parentItem,
+          start: nextAvailableMoment
+        })
+
+        childItems.push(newChildItem);
+        parentItem = newParentItem;
       }
 
       return {
-        type: "SCHEDULE_ITEMS_BY_ID" as const,
-        payload: { parentId, schedules }
+        type: "UPDATE_ITEMS" as const,
+        payload: { updatedItems: [parentItem, ...childItems] }
       };
     }
 
     const name = getRandomName();
     const duration = Math.floor(Math.random() * 10_000);
-    const id = uuid();
+    const newItem = new Item({ name, duration });
 
     const createAction = {
       type: "CREATE_ITEM" as const,
-      payload: { id, name, duration }
+      payload: { newItem }
     };
 
-    const scheduleAction = generateRandomNonOverlappingChildrenFromItems(id, duration);
+    const scheduledItemUpdates = generateNestingUpdates(newItem, duration);
 
     appDispatch({
       type: "BATCH",
-      payload: [createAction, scheduleAction]
+      payload: [createAction, scheduledItemUpdates]
     });
   }, [appDispatch, items])
 

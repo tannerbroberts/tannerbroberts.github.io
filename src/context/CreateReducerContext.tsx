@@ -17,7 +17,7 @@ export default function CreateReducerContext<Action, State>(reducer: React.Reduc
 
   const useDispatchContext = () => {
     const context = useContext(DispatchContext)
-    if (!context) {
+    if (context === null) {
       throw new Error(`dispatch consumer of type ${typeof DispatchContext} must be used within it's provider`)
     }
     return context
