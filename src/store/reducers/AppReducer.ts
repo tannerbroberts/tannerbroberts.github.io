@@ -66,6 +66,7 @@ export default function reducer(
         name,
         duration,
         children,
+        parents: [],
         showChildren: false,
       });
 
@@ -217,6 +218,7 @@ export default function reducer(
             name,
             duration,
             children,
+            parents: item.parents,
             showChildren: !showChildren,
           });
           return newItem;

@@ -3,15 +3,18 @@
 ### Scheduling
 
 - Scheduling
-  - scheduleItem function
+  - Any and all changes to items are treated as immutable
+    - Add Parents to the Item constructor
+    - update TOGGLE_ITEM_SHOW_CHILDREN_BY_ID
   - Time input component
     - New Item Dialog update
     - Schedule Item Dialog
-- Any and all changes to items are treated as immutable
+- // TODO: Instert rules for scheduling here
 - groom backlog for updates
 
 ### UnScheduling
-  - Unscheduling button on items?
+
+- Unscheduling button on items?
 
 ### Saving Items
 

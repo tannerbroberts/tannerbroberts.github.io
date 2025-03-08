@@ -13,20 +13,32 @@ export class Item {
     name,
     duration,
     children,
+    parents,
     showChildren,
   }: {
     id: string;
     name: string;
     duration: number;
     children: Child[];
+    parents: Parent[];
     showChildren: boolean;
   }) {
     this.id = id;
     this.name = name;
     this.duration = duration;
     this.children = children;
-    this.parents = [];
+    this.parents = parents;
     this.showChildren = showChildren;
+  }
+
+  addChild(child: Child): Item {
+    const newChildren = [...this.children, child];
+    return new Item({ ...this, children: newChildren });
+  }
+
+  addParent(parent: Parent): Item {
+    const newParents = [...this.parents, parent];
+    return new Item({ ...this, parents: newParents });
   }
 }
 
@@ -56,6 +68,42 @@ export class Parent {
     this.id = id;
     this.relationshipId = relationshipId;
   }
+}
+
+/**
+ * Create two new items based on the parent and child items.
+ *
+ * The new child will be an Item that has a Parent reference to the parent item,
+ *
+ * The new parent will be an Item that has a Child reference to the child item.
+ */
+export function scheduleItem({
+  childItem,
+  parentItem,
+  start,
+}: {
+  childItem: Item;
+  parentItem: Item;
+  start: number;
+}): { newChildItem: Item; newParentItem: Item } {
+  const relationshipId = uuid();
+  const childReference = new Child({
+    id: uuid(),
+    relationshipId,
+    start,
+  });
+  const parentReference = new Parent({
+    id: uuid(),
+    relationshipId,
+  });
+
+  // TODO: Instert rules for scheduling here
+
+  const newChildItem = childItem.addParent(parentReference);
+  const newParentItem = parentItem.addChild(childReference);
+
+  // TODO: Create new item class instances via Item functions that return new Items for immutability's sake
+  return { newChildItem, newParentItem };
 }
 
 /**
