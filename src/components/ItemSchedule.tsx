@@ -33,11 +33,11 @@ export default function ItemSchedule({ item, start = null }: { item: Item, start
       </Typography>
       {item.showChildren &&
         item.children.map((child) => {
-          const { id, start: childStart } = child
+          const { id, start: childStart, relationshipId } = child
           const childItem = getItemById(items, id);
           if (childItem === null) throw new Error(`Item with id ${id} not found whilest rendering children in ItemSchedule of ${item.name}`);
           return (
-            <div key={id}>
+            <div key={relationshipId}>
               <ItemSchedule item={childItem} start={childStart} />
             </div>
           )

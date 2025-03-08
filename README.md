@@ -6,7 +6,8 @@
   - Time input component
     - New Item Dialog update
       - scheduleSelectedListItem
-        - Create new item button
+      - BUG: Scheduled items start at 0 always
+      - BUG: total is always zero on new item creation
     - Schedule Item Dialog
 - // TODO: Instert rules for scheduling here
 - groom backlog for updates

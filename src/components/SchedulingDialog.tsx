@@ -2,29 +2,36 @@ import { Button, Dialog } from "@mui/material";
 import { useCallback } from "react";
 import { useAppDispatch, useAppState } from "../context/App";
 import TimeQuantityInput from "./TimeQuantityInput.tsx";
+import { getItemById, scheduleItem } from "../store/utils/item.ts";
+import { useTimeInputState } from "../context/TimeInput.ts";
 
 export default function SchedulingDialog() {
-  const { schedulingDialogOpen } = useAppState()
+  const { schedulingDialogOpen, items, focusedItemId, focusedListItemId } = useAppState()
+  const { total } = useTimeInputState()
   const dispatch = useAppDispatch()
 
   const handleClose = useCallback(() => {
     dispatch({ type: 'SET_SCHEDULING_DIALOG_OPEN', payload: { schedulingDialogOpen: false } })
   }, [dispatch])
 
-  const scheduleSelectedItem = useCallback(() => {
+  const scheduleSelectedListItem = useCallback(() => {
+    const focusedItem = getItemById(items, focusedItemId)
+    const focusedListItem = getItemById(items, focusedListItemId)
+    if (focusedItem === null) throw new Error(`Item with id ${focusedItemId} not found`)
+    if (focusedListItem === null) throw new Error(`Item with id ${focusedListItemId} not found`)
+    const { newParentItem, newChildItem } = scheduleItem({
+      childItem: focusedListItem,
+      parentItem: focusedItem,
+      start: total,
+    })
 
-    // TODO: Create a new child object out of the focused item and the focusedListItem
-    // TODO: Add that new child to the focusedItem's children array
-
-    // TODO: Create a new parent object out of the focusedListItem and the focusedItem
-    // TODO: Add the parent to the focusedListItem's parents array
-
-  }, [dispatch])
+    dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [newParentItem, newChildItem] } })
+  }, [dispatch, focusedItemId, focusedListItemId, items, total])
 
   return (
     <Dialog open={schedulingDialogOpen} onClose={handleClose}>
       <TimeQuantityInput />
-      <Button onClick={scheduleSelectedItem}>
+      <Button onClick={scheduleSelectedListItem}>
         Schedule
       </Button>
     </Dialog>
