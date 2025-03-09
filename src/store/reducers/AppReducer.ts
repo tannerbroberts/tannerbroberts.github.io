@@ -47,7 +47,7 @@ export const initialState = {
   focusedListItemId: null as string | null,
   items: new Array<Item>(),
   itemSearchWindowRange: { min: 0, max: DEFAULT_WINDOW_RANGE_SIZE },
-  schedulingDialogOpen: true,
+  schedulingDialogOpen: false,
   sideDrawerOpen: false,
   newItemDialogOpen: false,
 };

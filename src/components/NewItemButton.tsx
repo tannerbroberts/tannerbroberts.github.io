@@ -18,10 +18,12 @@ export default function NewItemButton() {
 
 function NewItemDialog() {
   const { newItemDialogOpen } = useAppState();
+  const dispatch = useAppDispatch();
+
   const { total } = useTimeInputState();
+
   const { name } = useNewItemState();
   const newItemDispatch = useNewItemDispatch();
-  const dispatch = useAppDispatch();
 
   const openNewItemDialog = useCallback(() => {
     dispatch({ type: "SET_NEW_ITEM_DIALOG_OPEN", payload: { newItemDialogOpen: true } });
@@ -48,27 +50,21 @@ function NewItemDialog() {
 
   return (
     <>
-      <Button
-        variant="contained"
-        onClick={openNewItemDialog}
-      >
+      <Button variant="contained" onClick={openNewItemDialog} >
         CREATE NEW ITEM
       </Button>
       <Dialog
         open={newItemDialogOpen}
         onClose={() => dispatch({ type: "SET_NEW_ITEM_DIALOG_OPEN", payload: { newItemDialogOpen: false } })}
       >
-        <TimeInputProvider>
-          <Input type="text" placeholder="Item Name" value={name}
-            onChange={setName}
-          />
-          <TimeQuantityInput />
-        </TimeInputProvider>
+        <Input type="text" placeholder="Item Name" value={name}
+          onChange={setName}
+        />
+        <TimeQuantityInput />
         <Button onClick={createNewItem}>
           Create
         </Button>
       </Dialog>
-
     </>
   )
 }
