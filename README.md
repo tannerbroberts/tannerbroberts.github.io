@@ -6,8 +6,11 @@
   - Time input component
     - New Item Dialog update
       - scheduleSelectedListItem
-      - BUG: Scheduled items start at 0 always
       - BUG: total is always zero on new item creation
+        - TimeQuantityInput needs to use the TimeInputContext
+          - BUG: total kept getting set to zeor
+            - TimeInputProvider was doubled up
+      - BUG: Scheduled items start at 0 always
     - Schedule Item Dialog
 - // TODO: Instert rules for scheduling here
 - groom backlog for updates
