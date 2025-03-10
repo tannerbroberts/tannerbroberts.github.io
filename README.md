@@ -1,12 +1,9 @@
 # Features Roadmap
 
-### UnScheduling
-
-- Unscheduling button on items?
-
 ### Item List
 
 - Item representing focusedItemId, if visible, shows with an eyeball
+- Filter
 
 ### Item Schedule
 
@@ -25,6 +22,10 @@
 
 - Getter function emulates fetch by batching multiple item id's into a single
   "get" call
+
+### UnScheduling
+
+- Unscheduling button on items?
 
 # Item
 
@@ -63,8 +64,10 @@
   - Highlighted search match portion in searched items
 
 ### Felxibility...
+
 - What the hell happens when I launch the app and users can't stand the UI?
-  - To gaurd against that, hows about making the crucial elements MUCH more composable.
+  - To gaurd against that, hows about making the crucial elements MUCH more
+    composable.
 
 # Product Launch Vision
 

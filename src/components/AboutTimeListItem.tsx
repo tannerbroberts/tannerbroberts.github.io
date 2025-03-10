@@ -2,9 +2,10 @@ import { ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import { useAppDispatch, useAppState } from "../context/App";
 import { Item } from "../store/utils/item";
+import { Visibility } from "@mui/icons-material";
 
 export default function PaginatedItemListItem({ item }: { item: Item }) {
-  const { focusedListItemId } = useAppState()
+  const { focusedListItemId, focusedItemId } = useAppState()
   const dispatch = useAppDispatch()
 
   const lengthString = useMemo(() => {
@@ -20,11 +21,14 @@ export default function PaginatedItemListItem({ item }: { item: Item }) {
     dispatch({ type: 'SET_FOCUSED_LIST_ITEM_BY_ID', payload: { focusedListItemId: item.id } })
   }, [dispatch, item.id])
 
-  const isFocused = useMemo(() => focusedListItemId === item.id, [focusedListItemId, item.id])
+  const isFocusedListItem = useMemo(() => focusedListItemId === item.id, [focusedListItemId, item.id])
+  const isFocusedItem = useMemo(() => focusedItemId === item.id, [focusedItemId, item.id])
 
   return (
-    <ListItem>
-      <ListItemButton selected={isFocused} onClick={setFocusedListItem}>
+    <ListItem
+      secondaryAction={isFocusedItem ? <Visibility /> : null}
+    >
+      <ListItemButton selected={isFocusedListItem} onClick={setFocusedListItem} >
         <ListItemText primary={item.name} secondary={`length: ${lengthString}`} />
       </ListItemButton>
     </ListItem >

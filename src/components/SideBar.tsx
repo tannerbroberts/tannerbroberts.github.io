@@ -47,6 +47,11 @@ export default function SideBar() {
     return true
   }, [focusedItem, focusedListItem])
 
+  const disableSetFocusedItem = useMemo(() => {
+    if (!focusedListItemId) return true
+    if (focusedItemId === focusedListItemId) return true
+  }, [focusedItemId, focusedListItemId])
+
   return (
     <>
       <Drawer
@@ -71,7 +76,7 @@ export default function SideBar() {
             </ListItem>
             <hr />
             <ButtonGroup sx={{ display: 'flex', justifyContent: 'space-around' }}>
-              <IconButton disabled={!focusedListItemId} onClick={setFocusedItem}>
+              <IconButton disabled={disableSetFocusedItem} onClick={setFocusedItem}>
                 <Visibility />
               </IconButton>
               <IconButton disabled={!focusedListItemId} onClick={deleteFocusedListItemById}>
