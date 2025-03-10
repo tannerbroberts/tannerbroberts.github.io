@@ -1,33 +1,12 @@
 # Features Roadmap
 
-### Scheduling
-
-- Scheduling
-  - Time input component
-    - New Item Dialog update
-      - scheduleSelectedListItem
-      - BUG: total is always zero on new item creation
-        - TimeQuantityInput needs to use the TimeInputContext
-          - BUG: total kept getting set to zeor
-            - TimeInputProvider was doubled up
-      - BUG: Scheduled items start at 0 always
-    - Schedule Item Dialog
-- // TODO: Instert rules for scheduling here
-- groom backlog for updates
-  - Break SideBar into it's component pieces
-
 ### UnScheduling
 
 - Unscheduling button on items?
 
-### Saving Items
+### Item List
 
-- Needs to be one item object at a time to avoid the need for saving super
-  complex trees, and loading only what's needed
-- Save an object to localStorage for now
-- Save each ID as the key in localStorage, and the item as the value
-- Getter function emulates fetch by batching multiple item id's into a single
-  "get" call
+- Item representing focusedItemId, if visible, shows with an eyeball
 
 ### Item Schedule
 
@@ -35,13 +14,19 @@
 
 - Time interval
 
-### Item List
+### Saving Items
 
-- Item representing focusedItemId, if visible, shows with an eyeball
+- Needs to be one item object at a time to avoid the need for saving super
+  complex trees, and loading only what's needed
 
-- Remove an item from another's schedule
+- Save an object to localStorage for now
 
-### Item Model
+- Save each ID as the key in localStorage, and the item as the value
+
+- Getter function emulates fetch by batching multiple item id's into a single
+  "get" call
+
+# Item
 
 - variables in items
 
@@ -49,17 +34,20 @@
   - variable summary
   - custom variable summary view
 
-### Dev
+## Item View
 
-- Get testing environment setup
+- Overlapping items
+  - Overlapping containers
+  - Overlapping Busy items
 
-- better test item scafolding
+- Busy/Container item addition
+  - Container item names show in a dropdown on the edge of any item view
 
 ### Accounting
 
 - Accounting for the largest recent past item option, top-down
 
-- Moving real-time scrolling with scheduled items
+- Force priority decision for overlapping Busy items
 
 - Items can have a "scheduled" timestamp which allows derriving the "now" moment
   - "scheduled" items can't be scheduled in a larger item
@@ -73,6 +61,10 @@
 
 - Simple exact match search filter
   - Highlighted search match portion in searched items
+
+### Felxibility...
+- What the hell happens when I launch the app and users can't stand the UI?
+  - To gaurd against that, hows about making the crucial elements MUCH more composable.
 
 # Product Launch Vision
 

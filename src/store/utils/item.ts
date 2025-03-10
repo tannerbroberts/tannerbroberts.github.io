@@ -104,8 +104,6 @@ export function scheduleItem({
     relationshipId,
   });
 
-  // TODO: Instert rules for scheduling here
-
   const newChildItem = childItem.addParent(parentReference);
   const newParentItem = parentItem.addChild(childReference);
 
