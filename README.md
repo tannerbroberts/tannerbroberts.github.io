@@ -1,10 +1,5 @@
 # Features Roadmap
 
-### Item List
-
-- Item representing focusedItemId, if visible, shows with an eyeball
-- Filter
-
 ### Item Schedule
 
 - ledger lines

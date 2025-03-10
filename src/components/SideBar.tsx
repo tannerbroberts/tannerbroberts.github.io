@@ -1,6 +1,6 @@
 import { Delete, Schedule, Visibility } from "@mui/icons-material";
 import { Box, ButtonGroup, Drawer, IconButton, List, ListItem, Toolbar, Typography } from "@mui/material";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAppDispatch, useAppState } from "../context/App";
 import NewItemButton from "./NewItemButton.tsx";
 import PaginatedItemList from "./PaginatedItemList";
@@ -8,10 +8,13 @@ import RandomItemButton from "./RandomItemButton.tsx";
 import SchedulingDialog from "./SchedulingDialog.tsx";
 import { getItemById } from "../store/utils/item.ts";
 import { TimeInputProvider } from "../context/TimeInput.ts";
+import ItemListFilter from "./ItemListFilter.tsx";
 
 export default function SideBar() {
   const { sideDrawerOpen, focusedItemId, focusedListItemId, items } = useAppState()
   const appDispatch = useAppDispatch()
+
+  const [filterString, setFilterString] = useState('')
 
   const closeDrawer = useCallback(() => {
     appDispatch({ type: 'SET_SIDE_DRAWER_OPEN', payload: { sideDrawerOpen: false } })
@@ -87,7 +90,8 @@ export default function SideBar() {
               </IconButton>
             </ButtonGroup>
             <hr />
-            <PaginatedItemList />
+            <ItemListFilter value={filterString} setValue={setFilterString} />
+            <PaginatedItemList filterString={filterString} />
           </List>
           <hr />
           <List>
