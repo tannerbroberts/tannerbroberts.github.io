@@ -8,7 +8,7 @@ export default function MainBody() {
   const focusedItem = getItemById(items, focusedItemId)
 
   return (
-    <div style={{ margin: 50, width: '100%' }}>
+    <div style={{ marginTop: 100, margin: 50, width: '100%', position: 'relative' }}>
       {focusedItem &&
         <>
           <LedgerLines />

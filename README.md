@@ -1,16 +1,5 @@
 # Features Roadmap
 
-### Item Schedule
-
-- ledger lines
-  - BUG: Setting intervals is all messed up
-  - Choose the spacing programatically with a single exported value
-  - A few more intervals?
-  - Intervals that aren't labeled?
-  - Create a component designed to be the spacing that offsets the start of
-    ledger lines and schedules from the top of the screen so I can change the
-    height of that programatically and in one place
-
 ### Saving Items
 
 - Needs to be one item object at a time to avoid the need for saving super

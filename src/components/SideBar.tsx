@@ -1,14 +1,14 @@
 import { Delete, Schedule, Visibility } from "@mui/icons-material";
-import { Box, ButtonGroup, Drawer, IconButton, List, ListItem, Toolbar, Typography } from "@mui/material";
+import { Box, ButtonGroup, Drawer, IconButton, List, ListItem, TextField, Toolbar, Typography } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import { useAppDispatch, useAppState } from "../context/App";
+import { TimeInputProvider } from "../context/TimeInput.ts";
+import { getItemById } from "../store/utils/item.ts";
+import ItemListFilter from "./ItemListFilter.tsx";
 import NewItemButton from "./NewItemButton.tsx";
 import PaginatedItemList from "./PaginatedItemList";
 import RandomItemButton from "./RandomItemButton.tsx";
 import SchedulingDialog from "./SchedulingDialog.tsx";
-import { getItemById } from "../store/utils/item.ts";
-import { TimeInputProvider } from "../context/TimeInput.ts";
-import ItemListFilter from "./ItemListFilter.tsx";
 
 export default function SideBar() {
   const { sideDrawerOpen, focusedItemId, focusedListItemId, items } = useAppState()

@@ -23,12 +23,20 @@ export type AppAction =
     payload: { min: number; max: number };
   }
   | {
+    type: "SET_MILLISECONDS_PER_SEGMENT";
+    payload: { millisecondsPerSegment: number };
+  }
+  | {
     type: "SET_NEW_ITEM_DIALOG_OPEN";
     payload: { newItemDialogOpen: boolean };
   }
   | {
     type: "SET_SCHEDULING_DIALOG_OPEN";
     payload: { schedulingDialogOpen: boolean };
+  }
+  | {
+    type: "SET_PIXELS_PER_SEGMENT";
+    payload: { pixelsPerSegment: number };
   }
   | { type: "SET_SIDE_DRAWER_OPEN"; payload: { sideDrawerOpen: boolean } }
   | {
@@ -42,6 +50,8 @@ export type AppAction =
 
 export const DEFAULT_WINDOW_RANGE_SIZE = 4;
 export const initialState = {
+  millisecondsPerSegment: 100,
+  pixelsPerSegment: 40,
   expandSearchItems: false,
   focusedItemId: null as string | null,
   focusedListItemId: null as string | null,
@@ -185,6 +195,19 @@ export default function reducer(
       const { min, max } = action.payload;
       return { ...previous, itemSearchWindowRange: { min, max } };
     }
+    case "SET_MILLISECONDS_PER_SEGMENT": {
+      const { millisecondsPerSegment } = action.payload;
+      if (millisecondsPerSegment <= 0) {
+        throw new Error(
+          "millisecondsPerSegment must be greater than 0",
+        );
+      }
+      //* ****************************************************
+      //* appState
+      //* millisecondsPerSegment
+      //* ****************************************************
+      return { ...previous, millisecondsPerSegment };
+    }
     case "SET_NEW_ITEM_DIALOG_OPEN": {
       //* ****************************************************
       //* appState
@@ -192,6 +215,17 @@ export default function reducer(
       //* ****************************************************
       const { newItemDialogOpen } = action.payload;
       return { ...previous, newItemDialogOpen };
+    }
+    case "SET_PIXELS_PER_SEGMENT": {
+      const { pixelsPerSegment } = action.payload;
+      if (pixelsPerSegment <= 0) {
+        throw new Error("pixelsPerSegment must be greater than 0");
+      }
+      //* ****************************************************
+      //* appState
+      //* pixelsPerSegment
+      //* ****************************************************
+      return { ...previous, pixelsPerSegment };
     }
     case "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID": {
       const { id, showChildren } = action.payload;

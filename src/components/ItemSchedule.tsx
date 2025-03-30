@@ -1,10 +1,10 @@
 import { Typography } from "@mui/material";
+import { useCallback } from "react";
 import { useAppDispatch, useAppState } from "../context/App.ts";
 import { getItemById, Item } from "../store/utils/item";
-import { useCallback } from "react";
 
 export default function ItemSchedule({ item, start = null }: { item: Item, start?: number | null }) {
-  const { items } = useAppState();
+  const { items, millisecondsPerSegment, pixelsPerSegment } = useAppState();
   const appDispatch = useAppDispatch();
   const { duration } = item;
 
@@ -16,17 +16,20 @@ export default function ItemSchedule({ item, start = null }: { item: Item, start
     });
   }, [item, appDispatch]);
 
+  const scheduleHeight = (duration * pixelsPerSegment) / millisecondsPerSegment;
+  const startHeight = start !== null ? start * pixelsPerSegment / millisecondsPerSegment : 0;
+
   return (
     <div
       onClick={updateShowChildren}
       style={{
         boxSizing: 'border-box',
-        width: start !== null ? 'calc(100% - 40px)' : '100%',
-        position: 'relative',
-        top: start !== null ? `${start}px` : 0,
-        height: duration + 'px',
+        width: 'calc(100% - 40px)',
+        position: 'absolute',
+        top: start !== null ? `${startHeight}px` : 0,
+        height: scheduleHeight + 'px',
         backgroundColor: 'rgba(0, 0, 150, 0.3)',
-        marginLeft: start !== null ? `40px` : '0px',
+        marginLeft: `40px`,
       }}>
       <Typography>
         {`${item.name} (${item.showChildren ? '-' : '+'})`}
