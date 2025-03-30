@@ -3,8 +3,13 @@
 ### Item Schedule
 
 - ledger lines
-
-- Time interval
+  - BUG: Setting intervals is all messed up
+  - Choose the spacing programatically with a single exported value
+  - A few more intervals?
+  - Intervals that aren't labeled?
+  - Create a component designed to be the spacing that offsets the start of
+    ledger lines and schedules from the top of the screen so I can change the
+    height of that programatically and in one place
 
 ### Saving Items
 
@@ -64,21 +69,7 @@
   - To gaurd against that, hows about making the crucial elements MUCH more
     composable.
 
-# Product Launch Vision
-
-I share mealplans with other individuals in such a compelling way that they
-begin using my app for food
-
-- Easy building of the "lasagna dinner" meal
-- Scheduling/saving a schedule (in localStorage is fine)
-- Easy Summaries like calories, macros, vitamins/minerals, dollars, required
-  equipment, etc.
-- Easy sharing of the item (hard coded on a github pages site is fine)
-- Easy scheduling
-- Easy follow-along
-- Easy accounting with celabrations for completion
-- Simple priorities based conflict resolution (show this or that on the main
-  schedule)
-- Container items don't conflict
-- Easy understanding of scheduling contract (clean kitchen before and after,
-  calories, etc.)
+# Key Product Indicators
+- Users can quickly swap one meal for another
+- Users maintain all benefits of meal scheduling through a swap
+- Share mealplans with other individuals

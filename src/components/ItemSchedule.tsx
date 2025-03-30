@@ -8,7 +8,7 @@ export default function ItemSchedule({ item, start = null }: { item: Item, start
   const appDispatch = useAppDispatch();
   const { duration } = item;
 
-  const toggleShowChildren = useCallback((e: React.MouseEvent) => {
+  const updateShowChildren = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     appDispatch({
       type: "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID",
@@ -18,12 +18,12 @@ export default function ItemSchedule({ item, start = null }: { item: Item, start
 
   return (
     <div
-      onClick={toggleShowChildren}
+      onClick={updateShowChildren}
       style={{
         boxSizing: 'border-box',
         width: start !== null ? 'calc(100% - 40px)' : '100%',
-        position: start !== null ? 'absolute' : 'relative',
-        top: start !== null ? `${start}px` : '0px',
+        position: 'relative',
+        top: start !== null ? `${start}px` : 0,
         height: duration + 'px',
         backgroundColor: 'rgba(0, 0, 150, 0.3)',
         marginLeft: start !== null ? `40px` : '0px',

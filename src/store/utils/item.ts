@@ -31,17 +31,31 @@ export class Item {
     this.showChildren = showChildren;
   }
 
-  addChild(child: Child): Item {
-    const newChildren = [...this.children, child];
+  updateChildren(children: Child[]): Item {
+    const newChildren = [...this.children, ...children];
     return new Item({ ...this, children: newChildren });
   }
 
-  addParent(parent: Parent): Item {
-    const newParents = [...this.parents, parent];
+  updateDuration(duration: number): Item {
+    return new Item({
+      ...this,
+      duration,
+    });
+  }
+
+  updateName(name: string): Item {
+    return new Item({
+      ...this,
+      name,
+    });
+  }
+
+  updateParents(parents: Parent[]): Item {
+    const newParents = [...this.parents, ...parents];
     return new Item({ ...this, parents: newParents });
   }
 
-  toggleShowChildren(showChildren?: boolean): Item {
+  updateShowChildren(showChildren?: boolean): Item {
     return new Item({
       ...this,
       showChildren: showChildren ?? !this.showChildren,
@@ -104,8 +118,8 @@ export function scheduleItem({
     relationshipId,
   });
 
-  const newChildItem = childItem.addParent(parentReference);
-  const newParentItem = parentItem.addChild(childReference);
+  const newChildItem = childItem.updateParents([parentReference]);
+  const newParentItem = parentItem.updateChildren([childReference]);
 
   return { newChildItem, newParentItem };
 }

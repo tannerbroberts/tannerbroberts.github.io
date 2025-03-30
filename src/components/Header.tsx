@@ -1,5 +1,5 @@
 import { AppBar, Toolbar, IconButton, Typography } from '@mui/material';
-import { Menu, MenuOpen } from '@mui/icons-material';
+import { Menu, MenuOpen, Update } from '@mui/icons-material';
 import { useAppDispatch, useAppState } from '../context/App';
 import { getItemById } from '../store/utils/item';
 import { useMemo } from 'react';
@@ -24,7 +24,9 @@ export default function Header() {
         >
           {sideDrawerOpen ? <MenuOpen /> : <Menu />}
         </IconButton>
-        <Typography variant="h6" noWrap component="div">
+        {/* Render the Update icon with blue and gray colors with a large size */}
+        <Update sx={{ color: 'skyblue', fontSize: "50px" }} />
+        <Typography variant="h4" noWrap component="div">
           {focusedItem ? focusedItem.name : 'About Time'}
         </Typography>
       </Toolbar>

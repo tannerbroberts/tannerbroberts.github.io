@@ -204,7 +204,7 @@ export default function reducer(
       //* item[index]
       //* ****************************************************
       const item = previous.items[index];
-      previous.items[index] = item.toggleShowChildren(showChildren);
+      previous.items[index] = item.updateShowChildren(showChildren);
 
       //* ****************************************************
       //* items
