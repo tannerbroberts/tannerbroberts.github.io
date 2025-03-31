@@ -2,6 +2,7 @@ import { useAppState } from "../context/App"
 import { getItemById } from "../store/utils/item"
 
 const formatTime = (ms: number) => {
+  const milliseconds = ms % 1000
   const seconds = Math.floor(ms / 1000)
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)
@@ -9,9 +10,9 @@ const formatTime = (ms: number) => {
   const remainingSeconds = seconds % 60
 
   if (hours > 0) {
-    return `${hours}:${remainingMinutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
+    return `${hours}:${remainingMinutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}.${milliseconds.toString()}`
   }
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}.${milliseconds.toString()}`
 }
 
 export default function LedgerLines() {
