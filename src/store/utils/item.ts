@@ -9,22 +9,22 @@ export class Item {
   showChildren: boolean;
 
   constructor({
-    id = uuid(),
     name,
+    id = uuid(),
     duration,
     children = [],
     parents = [],
     showChildren = false,
   }: {
-    id?: string;
     name: string;
+    id?: string;
     duration: number;
     children?: Child[];
     parents?: Parent[];
     showChildren?: boolean;
   }) {
-    this.id = id;
     this.name = name;
+    this.id = id;
     this.duration = duration;
     this.children = children;
     this.parents = parents;

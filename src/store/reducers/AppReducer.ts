@@ -139,13 +139,13 @@ export default function reducer(
           const children = [
             ...item.children.filter((child) => child.id !== id),
           ];
-          return { ...item, children };
+          return new Item({ ...item, children });
         }
         if (item.parents.some((parent) => parent.id === id)) {
           const parents = [
             ...item.parents.filter((parent) => parent.id !== id),
           ];
-          return { ...item, parents };
+          return new Item({ ...item, parents });
         }
         return item;
       });
