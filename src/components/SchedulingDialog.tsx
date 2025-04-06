@@ -1,9 +1,9 @@
 import { Button, Dialog } from "@mui/material";
 import { useCallback } from "react";
-import { useAppDispatch, useAppState } from "../context/App";
+import { useAppDispatch, useAppState } from "../reducerContexts/App.ts";
 import TimeQuantityInput from "./TimeQuantityInput.tsx";
-import { getItemById, scheduleItem } from "../store/utils/item.ts";
-import { useTimeInputState } from "../context/TimeInput.ts";
+import { getItemById, scheduleItem } from "../functions/utils/item.ts";
+import { useTimeInputState } from "../reducerContexts/TimeInput.ts";
 
 export default function SchedulingDialog() {
   const { schedulingDialogOpen, items, focusedItemId, focusedListItemId } = useAppState()

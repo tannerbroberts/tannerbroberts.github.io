@@ -1,5 +1,5 @@
-import reducer, { initialState } from "../store/reducers/NewItemReducer.ts";
-import CreateReducerContext from "./CreateReducerContext";
+import reducer, { initialState } from "../functions/reducers/NewItemReducer.ts";
+import CreateReducerContext from "./CreateReducerContext.tsx";
 const {
   Provider: NewItemProvider,
   useStateContext: useNewItemState,

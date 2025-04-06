@@ -1,7 +1,7 @@
 import { ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { useCallback, useMemo } from "react";
-import { useAppDispatch, useAppState } from "../context/App";
-import { Item } from "../store/utils/item";
+import { useAppDispatch, useAppState } from "../reducerContexts/App";
+import { Item } from "../functions/utils/item";
 import { Visibility } from "@mui/icons-material";
 
 export default function PaginatedItemListItem({ item }: { item: Item }) {

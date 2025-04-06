@@ -1,8 +1,8 @@
 import { Button } from "@mui/material";
 import { useCallback } from "react";
-import { useAppDispatch, useAppState } from "../context/App";
-import getRandomName from "../store/utils/getRandomName";
-import { Item, scheduleItem } from "../store/utils/item";
+import { useAppDispatch, useAppState } from "../reducerContexts/App";
+import getRandomName from "../functions/utils/getRandomName";
+import { Item, scheduleItem } from "../functions/utils/item";
 
 export default function CreateRandomItemFromTemplatesButton() {
   const { items } = useAppState()

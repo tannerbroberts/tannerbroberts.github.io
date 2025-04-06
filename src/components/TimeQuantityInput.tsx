@@ -1,6 +1,6 @@
 import { Box, Input } from "@mui/material";
 import { useMemo } from "react";
-import { useTimeInputDispatch, useTimeInputState } from "../context/TimeInput";
+import { useTimeInputDispatch, useTimeInputState } from "../reducerContexts/TimeInput";
 
 interface TimeUnit {
   label: string;

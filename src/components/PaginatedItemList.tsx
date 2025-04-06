@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from "react"
-import { useAppDispatch, useAppState } from "../context/App.ts"
+import { useAppDispatch, useAppState } from "../reducerContexts/App.ts"
 import AboutTimeListItem from "./AboutTimeListItem.tsx"
 import { Pagination } from "@mui/material"
-import { DEFAULT_WINDOW_RANGE_SIZE } from "../store/reducers/AppReducer.ts"
+import { DEFAULT_WINDOW_RANGE_SIZE } from "../functions/reducers/AppReducer.ts"
 
 export default function PaginatedItemList({ filterString }: { filterString: string }) {
   const { items, itemSearchWindowRange: { min, max } } = useAppState()

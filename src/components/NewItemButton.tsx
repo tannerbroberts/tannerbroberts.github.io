@@ -1,10 +1,10 @@
 import { Button, Dialog, Input } from "@mui/material";
 import { useCallback } from "react";
-import { useAppDispatch, useAppState } from "../context/App";
-import { TimeInputProvider, useTimeInputState } from "../context/TimeInput";
-import { NewItemProvider, useNewItemDispatch, useNewItemState } from "../context/NewItem";
+import { useAppDispatch, useAppState } from "../reducerContexts/App.ts";
+import { TimeInputProvider, useTimeInputState } from "../reducerContexts/TimeInput.ts";
+import { NewItemProvider, useNewItemDispatch, useNewItemState } from "../reducerContexts/NewItem.ts";
 import TimeQuantityInput from "./TimeQuantityInput.tsx";
-import { Item } from "../store/utils/item.ts";
+import { Item } from "../functions/utils/item.ts";
 
 export default function NewItemButton() {
   return (

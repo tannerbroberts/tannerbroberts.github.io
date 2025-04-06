@@ -1,9 +1,9 @@
 import { Delete, Schedule, Visibility } from "@mui/icons-material";
 import { Box, ButtonGroup, Drawer, IconButton, List, ListItem, Toolbar, Typography } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
-import { useAppDispatch, useAppState } from "../context/App";
-import { TimeInputProvider } from "../context/TimeInput.ts";
-import { getItemById } from "../store/utils/item.ts";
+import { useAppDispatch, useAppState } from "../reducerContexts/App.ts";
+import { TimeInputProvider } from "../reducerContexts/TimeInput.ts";
+import { getItemById } from "../functions/utils/item.ts";
 import ItemListFilter from "./ItemListFilter.tsx";
 import NewItemButton from "./NewItemButton.tsx";
 import PaginatedItemList from "./PaginatedItemList";

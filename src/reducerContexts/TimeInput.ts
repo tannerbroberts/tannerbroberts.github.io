@@ -1,4 +1,4 @@
-import reducer, { initialState } from "../store/reducers/TimeInputReducer";
+import reducer, { initialState } from "../functions/reducers/TimeInputReducer";
 import CreateReducerContext from "./CreateReducerContext";
 const {
   Provider: TimeInputProvider,

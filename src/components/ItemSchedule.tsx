@@ -1,7 +1,7 @@
 import { Typography } from "@mui/material";
 import { useCallback } from "react";
-import { useAppDispatch, useAppState } from "../context/App.ts";
-import { getItemById, Item } from "../store/utils/item";
+import { useAppDispatch, useAppState } from "../reducerContexts/App.ts";
+import { getItemById, Item } from "../functions/utils/item.ts";
 
 export default function ItemSchedule({ item, start = null }: { item: Item, start?: number | null }) {
   const { items, millisecondsPerSegment, pixelsPerSegment } = useAppState();
