@@ -1,5 +1,5 @@
-import { Menu, MenuOpen, Update } from '@mui/icons-material';
-import { AppBar, ButtonGroup, Button, IconButton, Slider, Toolbar, Typography } from '@mui/material';
+import { Menu, MenuOpen } from '@mui/icons-material';
+import { AppBar, Button, ButtonGroup, IconButton, Slider, Toolbar, Typography } from '@mui/material';
 import { useMemo } from 'react';
 import { useAppDispatch, useAppState } from '../context/App';
 import { getItemById } from '../store/utils/item';

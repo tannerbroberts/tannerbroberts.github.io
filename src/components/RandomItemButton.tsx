@@ -1,6 +1,5 @@
 import { Button } from "@mui/material";
 import { useCallback } from "react";
-import { v4 as uuid } from "uuid";
 import { useAppDispatch, useAppState } from "../context/App";
 import getRandomName from "../store/utils/getRandomName";
 import { Item, scheduleItem } from "../store/utils/item";
