@@ -1,5 +1,14 @@
 import { v4 as uuid } from "uuid";
 
+export interface ItemJSON {
+  id: string;
+  name: string;
+  duration: number;
+  children: Child[];
+  parents: Parent[];
+  showChildren: boolean;
+}
+
 export class Item {
   id: string;
   name: string;
@@ -60,6 +69,36 @@ export class Item {
       ...this,
       showChildren: showChildren ?? !this.showChildren,
     });
+  }
+
+  toJSON(): ItemJSON {
+    return {
+      id: this.id,
+      name: this.name,
+      duration: this.duration,
+      children: this.children,
+      parents: this.parents,
+      showChildren: this.showChildren,
+    };
+  }
+
+  static toJSONArray(items: Item[]): ItemJSON[] {
+    return items.map((item) => item.toJSON());
+  }
+
+  static fromJSON(json: ItemJSON): Item {
+    return new Item({
+      id: json.id,
+      name: json.name,
+      duration: json.duration,
+      children: json.children || [],
+      parents: json.parents || [],
+      showChildren: json.showChildren || false,
+    });
+  }
+
+  static fromJSONArray(jsonArray: ItemJSON[]): Item[] {
+    return jsonArray.map((json) => Item.fromJSON(json));
   }
 }
 
