@@ -1,65 +1,77 @@
-import { Button } from "@mui/material";
-import { useCallback } from "react";
-import { useAppDispatch, useAppState } from "../reducerContexts/App";
-import getRandomName from "../functions/utils/getRandomName";
-import { Item, scheduleItem } from "../functions/utils/item";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
+import { useState, useCallback } from "react";
+import { useAppDispatch } from "../reducerContexts/App";
+import { Item, ItemJSON } from "../functions/utils/item";
 
-export default function CreateRandomItemFromTemplatesButton() {
-  const { items } = useAppState()
-  const appDispatch = useAppDispatch()
+export default function ImportButton() {
+  const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const appDispatch = useAppDispatch();
 
-  const createRandomItemFromTemplates = useCallback(() => {
-    const generateNestingUpdates = (parentItem: Item, duration: number) => {
-      const childItems: Item[] = [];
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
-      for (const item of items) {
-        if (item.duration > duration) continue;
+  const handleImport = useCallback(() => {
+    try {
+      const parsedData = JSON.parse(inputValue);
 
-        let nextAvailableMoment = 0;
-        if (childItems.length > 0) {
-          const lastItem = childItems[childItems.length - 1];
-          nextAvailableMoment = lastItem.duration + nextAvailableMoment;
-        }
+      const isValidItemJSON = (data: any): data is ItemJSON => {
+        return (
+          typeof data.id === "string" &&
+          typeof data.name === "string" &&
+          typeof data.duration === "number" &&
+          Array.isArray(data.children) &&
+          Array.isArray(data.parents) &&
+          typeof data.showChildren === "boolean"
+        );
+      };
 
-        if (nextAvailableMoment + item.duration > duration) continue;
+      const itemsToImport = Array.isArray(parsedData) ? parsedData : [parsedData];
 
-        // schedule the item
-        const { newChildItem, newParentItem } = scheduleItem({
-          childItem: item,
-          parentItem: parentItem,
-          start: nextAvailableMoment
-        })
-
-        childItems.push(newChildItem);
-        parentItem = newParentItem;
+      if (!itemsToImport.every(isValidItemJSON)) {
+        throw new Error("Invalid JSON structure.");
       }
 
-      return {
-        type: "UPDATE_ITEMS" as const,
-        payload: { updatedItems: [parentItem, ...childItems] }
-      };
+      const newItems = itemsToImport.map(Item.fromJSON);
+
+      appDispatch({
+        type: "BATCH",
+        payload: newItems.map(newItem => ({
+          type: "CREATE_ITEM" as const,
+          payload: { newItem },
+        })),
+      });
+
+      handleClose();
+    } catch (error) {
+      alert("Invalid JSON input. Please check your data.");
     }
-
-    const name = getRandomName();
-    const duration = Math.floor(Math.random() * 10_000);
-    const newItem = new Item({ name, duration });
-
-    const createAction = {
-      type: "CREATE_ITEM" as const,
-      payload: { newItem }
-    };
-
-    const scheduledItemUpdates = generateNestingUpdates(newItem, duration);
-
-    appDispatch({
-      type: "BATCH",
-      payload: [createAction, scheduledItemUpdates]
-    });
-  }, [appDispatch, items])
+  }, [inputValue, appDispatch]);
 
   return (
-    <Button variant='contained' onClick={createRandomItemFromTemplates}>
-      RANDOM
-    </Button>
-  )
+    <>
+      <Button variant="contained" onClick={handleOpen}>
+        IMPORT
+      </Button>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Import Items</DialogTitle>
+        <DialogContent>
+          <TextField
+            multiline
+            fullWidth
+            rows={10}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="Paste Item JSON or Item JSON Array here"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleImport} variant="contained">
+            Import
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
 }
