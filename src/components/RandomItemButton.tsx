@@ -15,14 +15,16 @@ export default function ImportButton() {
     try {
       const parsedData = JSON.parse(inputValue);
 
-      const isValidItemJSON = (data: any): data is ItemJSON => {
+      const isValidItemJSON = (data: unknown): data is ItemJSON => {
         return (
-          typeof data.id === "string" &&
-          typeof data.name === "string" &&
-          typeof data.duration === "number" &&
-          Array.isArray(data.children) &&
-          Array.isArray(data.parents) &&
-          typeof data.showChildren === "boolean"
+          data !== null &&
+          typeof data === "object" &&
+          "id" in data && typeof (data as { id: unknown }).id === "string" &&
+          "name" in data && typeof (data as { name: unknown }).name === "string" &&
+          "duration" in data && typeof (data as { duration: unknown }).duration === "number" &&
+          Array.isArray((data as unknown as { children: unknown }).children) &&
+          Array.isArray((data as unknown as { parents: unknown }).parents) &&
+          "showChildren" in data && typeof (data as { showChildren: unknown }).showChildren === "boolean"
         );
       };
 
