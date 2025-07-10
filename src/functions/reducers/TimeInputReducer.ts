@@ -1,12 +1,13 @@
-type TimeInputState = typeof initialState;
-type TimeInputAction =
+export type TimeInputState = typeof initialState;
+export type TimeInputAction =
   | { type: "SET_MILLIS"; payload: { millis: number } }
   | { type: "SET_SECONDS"; payload: { seconds: number } }
   | { type: "SET_MINUTES"; payload: { minutes: number } }
   | { type: "SET_HOURS"; payload: { hours: number } }
   | { type: "SET_DAYS"; payload: { days: number } }
   | { type: "SET_WEEKS"; payload: { weeks: number } }
-  | { type: "SET_YEARS"; payload: { years: number } };
+  | { type: "SET_YEARS"; payload: { years: number } }
+  | { type: "RESET" };
 
 export const initialState = {
   total: 0,
@@ -115,6 +116,8 @@ export default function reducer(
         total: getTotal({ ...rest, years }),
       };
     }
+    case "RESET":
+      return initialState;
     default:
       return previous;
   }

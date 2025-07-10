@@ -1,5 +1,5 @@
-type NewItemState = typeof initialState;
-type NewItemAction = { type: "SET_NAME"; payload: { name: string } };
+export type NewItemState = typeof initialState;
+export type NewItemAction = { type: "SET_NAME"; payload: { name: string } };
 
 export const initialState = {
   name: "",

@@ -1,10 +1,10 @@
 import { Button, Dialog, Input } from "@mui/material";
 import { useCallback } from "react";
-import { useAppDispatch, useAppState } from "../reducerContexts/App.ts";
-import { TimeInputProvider, useTimeInputState } from "../reducerContexts/TimeInput.ts";
-import { NewItemProvider, useNewItemDispatch, useNewItemState } from "../reducerContexts/NewItem.ts";
-import TimeQuantityInput from "./TimeQuantityInput.tsx";
-import { Item } from "../functions/utils/item.ts";
+import { useAppDispatch, useAppState } from "../reducerContexts/App";
+import { TimeInputProvider, useTimeInputDispatch, useTimeInputState } from "../reducerContexts/TimeInput";
+import { NewItemProvider, useNewItemDispatch, useNewItemState } from "../reducerContexts/NewItem";
+import TimeQuantityInput from "./TimeQuantityInput";
+import { Item } from "../functions/utils/item";
 
 export default function NewItemButton() {
   return (
@@ -21,6 +21,7 @@ function NewItemDialog() {
   const dispatch = useAppDispatch();
 
   const { total } = useTimeInputState();
+  const timeInputDispatch = useTimeInputDispatch();
 
   const { name } = useNewItemState();
   const newItemDispatch = useNewItemDispatch();
@@ -46,7 +47,8 @@ function NewItemDialog() {
     dispatch({ type: "CREATE_ITEM", payload: { newItem } });
     dispatch({ type: "SET_NEW_ITEM_DIALOG_OPEN", payload: { newItemDialogOpen: false } });
     newItemDispatch({ type: "SET_NAME", payload: { name: "" } });
-  }, [dispatch, name, newItemDispatch, total]);
+    timeInputDispatch({ type: "RESET" });
+  }, [dispatch, name, newItemDispatch, total, timeInputDispatch]);
 
   return (
     <>

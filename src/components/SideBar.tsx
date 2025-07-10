@@ -1,14 +1,16 @@
 import { Delete, Schedule, Visibility } from "@mui/icons-material";
 import { Box, ButtonGroup, Drawer, IconButton, List, ListItem, Toolbar, Typography } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
-import { useAppDispatch, useAppState } from "../reducerContexts/App.ts";
-import { TimeInputProvider } from "../reducerContexts/TimeInput.ts";
-import { getItemById } from "../functions/utils/item.ts";
-import ItemListFilter from "./ItemListFilter.tsx";
-import NewItemButton from "./NewItemButton.tsx";
+import { useAppDispatch, useAppState } from "../reducerContexts/App";
+import { TimeInputProvider } from "../reducerContexts/TimeInput";
+import { getItemById } from "../functions/utils/item";
+import ExportButton from "./ExportButton";
+import ImportButton from "./ImportButton";
+import ItemListFilter from "./ItemListFilter";
+import NewItemButton from "./NewItemButton";
 import PaginatedItemList from "./PaginatedItemList";
-import RandomItemButton from "./RandomItemButton.tsx";
-import SchedulingDialog from "./SchedulingDialog.tsx";
+import RandomItemButton from "./RandomItemButton";
+import SchedulingDialog from "./SchedulingDialog";
 
 export default function SideBar() {
   const { sideDrawerOpen, focusedItemId, focusedListItemId, items } = useAppState()
@@ -75,6 +77,8 @@ export default function SideBar() {
               <ButtonGroup>
                 <RandomItemButton />
                 <NewItemButton />
+                <ImportButton />
+                <ExportButton />
               </ButtonGroup>
             </ListItem>
             <hr />

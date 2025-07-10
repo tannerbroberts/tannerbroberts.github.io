@@ -1,9 +1,9 @@
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Box } from "@mui/material";
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { useCallback } from "react";
-import { useAppDispatch, useAppState } from "../reducerContexts/App.ts";
-import TimeQuantityInput from "./TimeQuantityInput.tsx";
-import { getItemById, scheduleItem } from "../functions/utils/item.ts";
-import { useTimeInputState } from "../reducerContexts/TimeInput.ts";
+import { useAppDispatch, useAppState } from "../reducerContexts/App";
+import TimeQuantityInput from "./TimeQuantityInput";
+import { getItemById, scheduleItem } from "../functions/utils/item";
+import { useTimeInputState } from "../reducerContexts/TimeInput";
 
 export default function SchedulingDialog() {
   const { schedulingDialogOpen, items, focusedItemId, focusedListItemId } = useAppState()
@@ -26,7 +26,8 @@ export default function SchedulingDialog() {
     })
 
     dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [newParentItem, newChildItem] } })
-  }, [dispatch, focusedItemId, focusedListItemId, items, total])
+    handleClose()
+  }, [dispatch, focusedItemId, focusedListItemId, items, total, handleClose])
 
   return (
     <Dialog open={schedulingDialogOpen} onClose={handleClose}>

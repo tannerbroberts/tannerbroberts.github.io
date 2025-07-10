@@ -1,5 +1,5 @@
 import { Box, Input } from "@mui/material";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useTimeInputDispatch, useTimeInputState } from "../reducerContexts/TimeInput";
 
 interface TimeUnit {
@@ -9,15 +9,17 @@ interface TimeUnit {
 }
 
 function TimeUnitInput({ label, stateValue, setArg }: TimeUnit) {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value);
+    setArg(isNaN(val) ? stateValue : val);
+  }, [setArg, stateValue]);
+
   return (
     <Box>
       <Input
         type="number"
         value={stateValue}
-        onChange={(e) => {
-          const val = parseInt(e.target.value);
-          setArg(isNaN(val) ? stateValue : val);
-        }}
+        onChange={handleChange}
         sx={{
           // 4 characters wide looks like:
           width: "8ch",
