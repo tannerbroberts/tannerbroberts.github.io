@@ -1,4 +1,4 @@
-import { Button, Dialog } from "@mui/material";
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Box } from "@mui/material";
 import { useCallback } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App.ts";
 import TimeQuantityInput from "./TimeQuantityInput.tsx";
@@ -30,10 +30,16 @@ export default function SchedulingDialog() {
 
   return (
     <Dialog open={schedulingDialogOpen} onClose={handleClose}>
-      <TimeQuantityInput />
-      <Button onClick={scheduleSelectedListItem}>
-        Schedule
-      </Button>
+      <DialogTitle>Schedule Item</DialogTitle>
+      <DialogContent sx={{ padding: 3, minWidth: 300 }}>
+        <TimeQuantityInput />
+      </DialogContent>
+      <DialogActions sx={{ padding: 2 }}>
+        <Button onClick={handleClose} color="inherit">Cancel</Button>
+        <Button onClick={scheduleSelectedListItem} variant="contained" color="primary">
+          Schedule
+        </Button>
+      </DialogActions>
     </Dialog>
   )
 }
