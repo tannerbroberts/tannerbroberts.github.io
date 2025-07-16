@@ -2,6 +2,7 @@ import { useAppState } from "../reducerContexts/App"
 import { getItemById } from "../functions/utils/item"
 import ItemSchedule from "./ItemSchedule"
 import LedgerLines from "./LedgerLines"
+import ExecutionView from "./ExecutionView"
 
 export default function MainBody() {
   const { focusedItemId, items } = useAppState()
@@ -15,7 +16,9 @@ export default function MainBody() {
           <ItemSchedule item={focusedItem} />
         </>
       }
-{/* TODO: This is the place where the base calendar/schedule will go. All other views above based on the currently focusedItem are edit views, but this view will be the one for execution of tasks that the user has actually scheduled in their life, as opposed to just having the task in their library, or scheduled inside of another task. */}
+
+      {/* Execution View - Shows the base calendar and current task execution */}
+      <ExecutionView />
     </div>
   )
 }
