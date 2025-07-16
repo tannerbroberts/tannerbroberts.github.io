@@ -10,15 +10,15 @@ export default function MainBody() {
 
   return (
     <div style={{ marginTop: 100, margin: 50, width: '100%', position: 'relative' }}>
-      {focusedItem &&
+      {focusedItem ? (
         <>
           <LedgerLines />
           <ItemSchedule item={focusedItem} />
         </>
-      }
-
-      {/* Execution View - Shows the base calendar and current task execution */}
-      <ExecutionView />
+      ) : (
+        /* Execution View - Shows the base calendar and current task execution */
+        <ExecutionView />
+      )}
     </div>
   )
 }

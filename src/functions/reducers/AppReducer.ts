@@ -157,7 +157,12 @@ export default function reducer(
     }
     case "SET_FOCUSED_ITEM_BY_ID": {
       const { focusedItemId } = action.payload;
-      if (!focusedItemId) return previous;
+
+      //* ****************************************************
+      //* appState
+      //* focusedItemId
+      //* ****************************************************
+      if (!focusedItemId) return { ...previous, focusedItemId: null, focusedListItemId: null };
 
       //* ****************************************************
       //* appState
