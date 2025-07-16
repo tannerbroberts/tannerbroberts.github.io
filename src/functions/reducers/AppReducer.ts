@@ -1,7 +1,16 @@
 import { cloneDeep } from "lodash";
 import { getIndexById, Item } from "../utils/item";
+import { v4 as uuid } from "uuid";
 
 export type AppState = typeof initialState;
+
+// Base calendar entry representing a scheduled item
+export interface BaseCalendarEntry {
+  readonly id: string;
+  readonly itemId: string;
+  readonly startTime: number; // Milliseconds from Apple epoch
+}
+
 export type AppAction =
   | { type: "BATCH"; payload: AppAction[] }
   | {
@@ -47,6 +56,18 @@ export type AppAction =
   | {
     type: "UPDATE_ITEMS";
     payload: { updatedItems: Item[] };
+  }
+  | {
+    type: "ADD_BASE_CALENDAR_ENTRY";
+    payload: { entry: BaseCalendarEntry };
+  }
+  | {
+    type: "REMOVE_BASE_CALENDAR_ENTRY";
+    payload: { entryId: string };
+  }
+  | {
+    type: "UPDATE_BASE_CALENDAR_ENTRY";
+    payload: { entry: BaseCalendarEntry };
   };
 
 export const DEFAULT_WINDOW_RANGE_SIZE = 4;
@@ -57,6 +78,7 @@ export const initialState = {
   focusedItemId: null as string | null,
   focusedListItemId: null as string | null,
   items: new Array<Item>(),
+  baseCalendar: new Map<string, BaseCalendarEntry>(),
   itemSearchWindowRange: { min: 0, max: DEFAULT_WINDOW_RANGE_SIZE },
   schedulingDialogOpen: false,
   sideDrawerOpen: false,
@@ -300,8 +322,53 @@ export default function reducer(
       //* *****************************************************
       return { ...previous, items: [...previous.items] };
     }
+    case "ADD_BASE_CALENDAR_ENTRY": {
+      const { entry } = action.payload;
+      const newBaseCalendar = new Map(previous.baseCalendar);
+      newBaseCalendar.set(entry.id, entry);
+
+      //* *****************************************************
+      //* appState
+      //* baseCalendar
+      //* *****************************************************
+      return { ...previous, baseCalendar: newBaseCalendar };
+    }
+    case "REMOVE_BASE_CALENDAR_ENTRY": {
+      const { entryId } = action.payload;
+      const newBaseCalendar = new Map(previous.baseCalendar);
+      newBaseCalendar.delete(entryId);
+
+      //* *****************************************************
+      //* appState
+      //* baseCalendar
+      //* *****************************************************
+      return { ...previous, baseCalendar: newBaseCalendar };
+    }
+    case "UPDATE_BASE_CALENDAR_ENTRY": {
+      const { entry } = action.payload;
+      if (!previous.baseCalendar.has(entry.id)) {
+        throw new Error(`Base calendar entry with id ${entry.id} not found`);
+      }
+      const newBaseCalendar = new Map(previous.baseCalendar);
+      newBaseCalendar.set(entry.id, entry);
+
+      //* *****************************************************
+      //* appState
+      //* baseCalendar
+      //* *****************************************************
+      return { ...previous, baseCalendar: newBaseCalendar };
+    }
 
     default:
       return previous;
   }
+}
+
+// Utility function to create a base calendar entry
+export function createBaseCalendarEntry(itemId: string, startTime: number): BaseCalendarEntry {
+  return {
+    id: uuid(),
+    itemId,
+    startTime
+  };
 }

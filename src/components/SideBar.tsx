@@ -45,7 +45,7 @@ export default function SideBar() {
     return getItemById(items, focusedListItemId)
   }, [focusedListItemId, items])
   const canSchedule = useMemo(() => {
-    if (!focusedItem) return false
+    if (!focusedItem) return true // Can always schedule to the base calendar
     if (!focusedListItem) return false
     if (focusedItem.id === focusedListItem.id) return false
     if (focusedItem.duration < focusedListItem.duration) return false
@@ -65,6 +65,7 @@ export default function SideBar() {
         onClose={closeDrawer}
         sx={{
           // Mobile, fullscreen width
+          
           '&.MuiDrawer-modal': {
             width: '66%',
           },
