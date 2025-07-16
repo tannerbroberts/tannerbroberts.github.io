@@ -8,7 +8,7 @@ interface TimeUnit {
   setArg: (val: number) => void;
 }
 
-function TimeUnitInput({ label, stateValue, setArg }: TimeUnit) {
+function TimeUnitInput({ label, stateValue, setArg }: Readonly<TimeUnit>) {
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value);
     setArg(isNaN(val) ? stateValue : val);

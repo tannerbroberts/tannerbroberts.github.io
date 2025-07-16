@@ -4,7 +4,7 @@ import AboutTimeListItem from "./AboutTimeListItem"
 import { Pagination } from "@mui/material"
 import { DEFAULT_WINDOW_RANGE_SIZE } from "../functions/reducers/AppReducer"
 
-export default function PaginatedItemList({ filterString }: { filterString: string }) {
+export default function PaginatedItemList({ filterString }: Readonly<{ filterString: string }>) {
   const { items, itemSearchWindowRange: { min, max } } = useAppState()
 
   const appDispatch = useAppDispatch()

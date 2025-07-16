@@ -15,6 +15,7 @@ export default function MainBody() {
           <ItemSchedule item={focusedItem} />
         </>
       }
+{/* TODO: This is the place where the base calendar/schedule will go. All other views above based on the currently focusedItem are edit views, but this view will be the one for execution of tasks that the user has actually scheduled in their life, as opposed to just having the task in their library, or scheduled inside of another task. */}
     </div>
   )
 }
