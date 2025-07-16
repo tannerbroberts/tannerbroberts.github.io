@@ -10,6 +10,7 @@ export type AppAction =
   }
   | { type: "DELETE_ITEM_BY_ID"; payload: { id: string | null } }
   | { type: "REMOVE_INSTANCES_BY_ID"; payload: { id: string | null } }
+  | { type: "REMOVE_INSTANCE_BY_RELATIONSHIP_ID"; payload: { relationshipId: string | null } }
   | {
     type: "SET_FOCUSED_ITEM_BY_ID";
     payload: { focusedItemId: string | null };
@@ -144,6 +145,34 @@ export default function reducer(
         if (item.parents.some((parent) => parent.id === id)) {
           const parents = [
             ...item.parents.filter((parent) => parent.id !== id),
+          ];
+          return new Item({ ...item, parents });
+        }
+        return item;
+      });
+
+      //* ****************************************************
+      //* appState
+      //* ****************************************************
+      return { ...previous, items: newItems };
+    }
+    case "REMOVE_INSTANCE_BY_RELATIONSHIP_ID": {
+      const relationshipId = action.payload.relationshipId;
+      if (!relationshipId) return previous;
+
+      //* ****************************************************
+      //* parents and children with relationshipId
+      //* ****************************************************
+      const newItems = previous.items.map((item) => {
+        if (item.children.some((child) => child.relationshipId === relationshipId)) {
+          const children = [
+            ...item.children.filter((child) => child.relationshipId !== relationshipId),
+          ];
+          return new Item({ ...item, children });
+        }
+        if (item.parents.some((parent) => parent.relationshipId === relationshipId)) {
+          const parents = [
+            ...item.parents.filter((parent) => parent.relationshipId !== relationshipId),
           ];
           return new Item({ ...item, parents });
         }

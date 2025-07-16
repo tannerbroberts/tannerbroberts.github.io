@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
 import { getItemById, Item } from "../functions/utils/item";
 
-export default function ItemSchedule({ item, start = null }: Readonly<{ item: Item, start?: number | null }>) {
+export default function ItemSchedule({ item, start = null, relationshipId = null }: Readonly<{ item: Item, start?: number | null, relationshipId?: string | null }>) {
   const { items, millisecondsPerSegment, pixelsPerSegment } = useAppState();
   const appDispatch = useAppDispatch();
   const { duration } = item;
@@ -19,16 +19,23 @@ export default function ItemSchedule({ item, start = null }: Readonly<{ item: It
   const handleMoveItem = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     // TODO: Implement move functionality
-    console.log('Move item:', item.id);
-  }, [item]);
+    console.log('Move item:', relationshipId || item.id);
+  }, [item, relationshipId]);
 
   const handleDeleteFromSchedule = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    appDispatch({
-      type: "REMOVE_INSTANCES_BY_ID",
-      payload: { id: item.id },
-    });
-  }, [item, appDispatch]);
+    if (relationshipId) {
+      appDispatch({
+        type: "REMOVE_INSTANCE_BY_RELATIONSHIP_ID",
+        payload: { relationshipId },
+      });
+    } else {
+      appDispatch({
+        type: "REMOVE_INSTANCES_BY_ID",
+        payload: { id: item.id },
+      });
+    }
+  }, [item, appDispatch, relationshipId]);
 
   const scheduleHeight = (duration * pixelsPerSegment) / millisecondsPerSegment;
   const startHeight = start !== null ? start * pixelsPerSegment / millisecondsPerSegment : 0;
@@ -52,19 +59,42 @@ export default function ItemSchedule({ item, start = null }: Readonly<{ item: It
         {item.showChildren && start !== null && (
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
-              variant="outlined"
+              variant="contained"
               size="small"
               onClick={handleMoveItem}
-              sx={{ minWidth: '60px', height: '24px', fontSize: '0.75rem' }}
+              sx={{
+                minWidth: '70px',
+                height: '28px',
+                fontSize: '0.75rem',
+                fontWeight: 'bold',
+                backgroundColor: '#2196f3',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: '#1976d2',
+                },
+                boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                border: 'none'
+              }}
             >
               Move
             </Button>
             <Button
-              variant="outlined"
+              variant="contained"
               size="small"
               onClick={handleDeleteFromSchedule}
-              color="error"
-              sx={{ minWidth: '60px', height: '24px', fontSize: '0.75rem' }}
+              sx={{
+                minWidth: '70px',
+                height: '28px',
+                fontSize: '0.75rem',
+                fontWeight: 'bold',
+                backgroundColor: '#f44336',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: '#d32f2f',
+                },
+                boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                border: 'none'
+              }}
             >
               Delete
             </Button>
@@ -78,7 +108,7 @@ export default function ItemSchedule({ item, start = null }: Readonly<{ item: It
           if (childItem === null) throw new Error(`Item with id ${id} not found whilest rendering children in ItemSchedule of ${item.name}`);
           return (
             <div key={relationshipId}>
-              <ItemSchedule item={childItem} start={childStart} />
+              <ItemSchedule item={childItem} start={childStart} relationshipId={relationshipId} />
             </div>
           )
         })
