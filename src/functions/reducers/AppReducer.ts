@@ -45,6 +45,10 @@ export type AppAction =
     payload: { schedulingDialogOpen: boolean };
   }
   | {
+    type: "SET_DURATION_DIALOG_OPEN";
+    payload: { durationDialogOpen: boolean };
+  }
+  | {
     type: "SET_PIXELS_PER_SEGMENT";
     payload: { pixelsPerSegment: number };
   }
@@ -81,6 +85,7 @@ export const initialState = {
   baseCalendar: new Map<string, BaseCalendarEntry>(),
   itemSearchWindowRange: { min: 0, max: DEFAULT_WINDOW_RANGE_SIZE },
   schedulingDialogOpen: false,
+  durationDialogOpen: false,
   sideDrawerOpen: false,
   newItemDialogOpen: false,
 };
@@ -238,6 +243,14 @@ export default function reducer(
       //* ****************************************************
       const { schedulingDialogOpen } = action.payload;
       return { ...previous, schedulingDialogOpen };
+    }
+    case "SET_DURATION_DIALOG_OPEN": {
+      //* ****************************************************
+      //* appState
+      //* durationDialogOpen
+      //* ****************************************************
+      const { durationDialogOpen } = action.payload;
+      return { ...previous, durationDialogOpen };
     }
     case "SET_SIDE_DRAWER_OPEN": {
       //* ****************************************************

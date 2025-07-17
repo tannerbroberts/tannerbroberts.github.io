@@ -1,4 +1,4 @@
-import { Delete, Schedule, Visibility } from "@mui/icons-material";
+import { Delete, Schedule, Visibility, Timer } from "@mui/icons-material";
 import { Box, ButtonGroup, Drawer, IconButton, List, ListItem, Toolbar, Typography } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
@@ -11,6 +11,7 @@ import NewItemButton from "./NewItemButton";
 import PaginatedItemList from "./PaginatedItemList";
 import RandomItemButton from "./RandomItemButton";
 import SchedulingDialog from "./SchedulingDialog";
+import DurationDialog from "./DurationDialog";
 
 export default function SideBar() {
   const { sideDrawerOpen, focusedItemId, focusedListItemId, items } = useAppState()
@@ -33,6 +34,10 @@ export default function SideBar() {
 
   const openSchedulingDialog = useCallback(() => {
     appDispatch({ type: 'SET_SCHEDULING_DIALOG_OPEN', payload: { schedulingDialogOpen: true } })
+  }, [appDispatch])
+
+  const openDurationDialog = useCallback(() => {
+    appDispatch({ type: 'SET_DURATION_DIALOG_OPEN', payload: { durationDialogOpen: true } })
   }, [appDispatch])
 
   // Can schedule if:
@@ -65,7 +70,7 @@ export default function SideBar() {
         onClose={closeDrawer}
         sx={{
           // Mobile, fullscreen width
-          
+
           '&.MuiDrawer-modal': {
             width: '66%',
           },
@@ -90,9 +95,14 @@ export default function SideBar() {
               <IconButton disabled={!focusedListItemId} onClick={deleteFocusedListItemById}>
                 <Delete />
               </IconButton>
-              <IconButton disabled={!canSchedule} onClick={openSchedulingDialog}>
+
+              {focusedItemId ? (
+                <IconButton disabled={!focusedListItemId} onClick={openDurationDialog}>
+                  <Timer />
+                </IconButton>
+              ) : (<IconButton disabled={!canSchedule} onClick={openSchedulingDialog}>
                 <Schedule />
-              </IconButton>
+              </IconButton>)}
             </ButtonGroup>
             <hr />
             <ItemListFilter value={filterString} setValue={setFilterString} />
@@ -125,6 +135,7 @@ export default function SideBar() {
       </Drawer>
       <TimeInputProvider>
         <SchedulingDialog />
+        <DurationDialog />
       </TimeInputProvider>
     </>
   )
