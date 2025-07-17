@@ -8,10 +8,12 @@ export default function App() {
   useItemListValidation();
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <Header />
-      <SideBar />
-      <MainBody />
+      <Box sx={{ display: 'flex', flex: 1, marginTop: '64px' }}>
+        <SideBar />
+        <MainBody />
+      </Box>
     </Box>
   );
 }

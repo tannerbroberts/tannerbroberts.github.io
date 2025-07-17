@@ -16,8 +16,8 @@ export default function MainBody() {
 
   return (
     <div style={{
-      marginTop: 100,
-      margin: 50,
+      flex: 1,
+      padding: '20px',
       width: '100%',
       position: 'relative',
       // Add overflow scrolling when items exceed maximum height
