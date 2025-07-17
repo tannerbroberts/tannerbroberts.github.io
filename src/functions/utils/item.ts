@@ -239,7 +239,7 @@ export function getCurrentTaskChain(
  * Find the top-most item that is active at the current time
  */
 function findTopMostActiveItem(items: Item[], currentTime: number, baseCalendar?: Map<string, BaseCalendarEntry>): Item | null {
-  // First check base calendar entries
+  // Only check base calendar entries - items must be scheduled to be executable
   if (baseCalendar) {
     for (const [, entry] of baseCalendar) {
       const item = getItemById(items, entry.itemId);
@@ -249,12 +249,7 @@ function findTopMostActiveItem(items: Item[], currentTime: number, baseCalendar?
     }
   }
 
-  // Then check items with no parents (top-level items)
-  for (const item of items) {
-    if (item.parents.length === 0 && isItemActiveAtTime(item, currentTime)) {
-      return item;
-    }
-  }
+  // No fallback to unscheduled items - only scheduled items should be executable
   return null;
 }/**
  * Build the task chain recursively from parent to child

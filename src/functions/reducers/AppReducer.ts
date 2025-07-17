@@ -73,7 +73,7 @@ export type AppAction =
 export const DEFAULT_WINDOW_RANGE_SIZE = 4;
 export const initialState = {
   millisecondsPerSegment: 100,
-  pixelsPerSegment: 40,
+  pixelsPerSegment: 30,
   expandSearchItems: false,
   focusedItemId: null as string | null,
   focusedListItemId: null as string | null,

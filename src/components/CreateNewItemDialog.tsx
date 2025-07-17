@@ -11,7 +11,7 @@ import {
   Stack,
   Chip
 } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
 import { TimeInputProvider, useTimeInputDispatch, useTimeInputState } from "../reducerContexts/TimeInput";
 import { NewItemProvider, useNewItemDispatch, useNewItemState } from "../reducerContexts/NewItem";
@@ -64,11 +64,28 @@ function savePresets(presets: TimePreset[]): void {
 
 function EditableTimePresets({ presets, setPresets }: Readonly<{ presets: TimePreset[], setPresets: (presets: TimePreset[]) => void }>) {
   const timeInputDispatch = useTimeInputDispatch();
+  const { total } = useTimeInputState();
   const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedPresetIndex, setSelectedPresetIndex] = useState<number | null>(null);
 
-  const applyPreset = useCallback((milliseconds: number) => {
+  // Check if the current total matches any preset exactly
+  const currentMatchingPresetIndex = presets.findIndex(preset => preset.milliseconds === total);
+
+  // Update selected preset when total changes
+  useEffect(() => {
+    if (currentMatchingPresetIndex !== -1) {
+      setSelectedPresetIndex(currentMatchingPresetIndex);
+    } else {
+      setSelectedPresetIndex(null);
+    }
+  }, [total, currentMatchingPresetIndex]);
+
+  const applyPreset = useCallback((milliseconds: number, index: number) => {
     // Reset first
     timeInputDispatch({ type: "RESET" });
+
+    // Set the selected preset index
+    setSelectedPresetIndex(index);
 
     // Calculate the most appropriate unit representation
     const totalSeconds = Math.floor(milliseconds / 1000);
@@ -123,9 +140,10 @@ function EditableTimePresets({ presets, setPresets }: Readonly<{ presets: TimePr
           <Chip
             key={`${preset.label}-${index}`}
             label={formatDuration(preset.milliseconds)}
-            variant="outlined"
+            variant={selectedPresetIndex === index ? "filled" : "outlined"}
+            color={selectedPresetIndex === index ? "primary" : "default"}
             size="medium"
-            onClick={isEditMode ? undefined : () => applyPreset(preset.milliseconds)}
+            onClick={isEditMode ? undefined : () => applyPreset(preset.milliseconds, index)}
             onDelete={isEditMode ? () => handleDeletePreset(index) : undefined}
             deleteIcon={<CloseIcon />}
             sx={{

@@ -1,5 +1,5 @@
 import { Menu, MenuOpen } from '@mui/icons-material';
-import { AppBar, Button, ButtonGroup, IconButton, Slider, Toolbar, Typography } from '@mui/material';
+import { AppBar, Button, ButtonGroup, IconButton, Toolbar, Typography } from '@mui/material';
 import { useMemo, useCallback } from 'react';
 import { useAppDispatch, useAppState } from '../reducerContexts/App';
 import { getItemById } from '../functions/utils/item';
@@ -75,24 +75,6 @@ export default function Header() {
               payload: { millisecondsPerSegment: 604800000 }
             })}>Week</Button>
           </ButtonGroup>
-          <Slider
-            size="small"
-            defaultValue={40}
-            min={10}
-            max={300}
-            valueLabelDisplay="auto"
-            onChange={(_, value) => {
-              appDispatch({ type: "SET_PIXELS_PER_SEGMENT", payload: { pixelsPerSegment: value as number } });
-            }}
-            sx={{
-              width: '200px',
-              color: 'white',
-              '& .MuiSlider-valueLabel': {
-                backgroundColor: 'white',
-                color: 'black',
-              }
-            }}
-          />
         </div>
       </Toolbar>
     </AppBar>

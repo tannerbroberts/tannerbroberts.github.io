@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, useEffect } from "react"
 import { useAppDispatch, useAppState } from "../reducerContexts/App"
 import AboutTimeListItem from "./AboutTimeListItem"
 import { Pagination } from "@mui/material"
@@ -14,6 +14,20 @@ export default function PaginatedItemList({ filterString }: Readonly<{ filterStr
     if (!filterString) return sortedByDurationItems
     return sortedByDurationItems.filter(item => item.name.toLowerCase().includes(filterString.toLowerCase()))
   }, [filterString, sortedByDurationItems])
+
+  // Reset pagination to first page when filter changes
+  useEffect(() => {
+    const currentPage = Math.floor(min / DEFAULT_WINDOW_RANGE_SIZE) + 1
+    const totalPages = Math.ceil(filteredItems.length / DEFAULT_WINDOW_RANGE_SIZE)
+
+    // If current page is beyond the available pages, reset to page 1
+    if (currentPage > totalPages && totalPages > 0) {
+      appDispatch({
+        type: 'SET_ITEM_SEARCH_WINDOW_RANGE',
+        payload: { min: 0, max: DEFAULT_WINDOW_RANGE_SIZE }
+      })
+    }
+  }, [filteredItems.length, min, appDispatch])
 
   const paginatedItems = useMemo(() => {
     const minDuration = min
