@@ -17,12 +17,3 @@ export default function App() {
     </Box>
   );
 }
-
-/**
-** TODO: Move and delete need to act on the relationshipId, not the item id.
-
-** TODO: The Main calendar should show headers for item lineage
-
-** TODO: Varibles aren't implemented at all
-
- */

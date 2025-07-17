@@ -2,8 +2,7 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Box, Typogra
 import { Add, Remove } from "@mui/icons-material";
 import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
-import { getItemById } from "../functions/utils/item";
-import { createBaseCalendarEntry } from "../functions/reducers/AppReducer";
+import { getItemById, scheduleItem } from "../functions/utils/item";
 import { useTimeInputState, useTimeInputDispatch } from "../reducerContexts/TimeInput";
 
 interface TimeUnitControlProps {
@@ -74,7 +73,7 @@ function TimeUnitControl({ label, value, onChange }: Readonly<TimeUnitControlPro
 }
 
 export default function DurationDialog() {
-  const { durationDialogOpen, items, focusedListItemId } = useAppState();
+  const { durationDialogOpen, items, focusedListItemId, focusedItemId } = useAppState();
   const { weeks, days, hours, minutes, seconds, millis, total } = useTimeInputState();
   const dispatch = useAppDispatch();
   const timeInputDispatch = useTimeInputDispatch();
@@ -94,31 +93,38 @@ export default function DurationDialog() {
     const focusedListItem = getItemById(items, focusedListItemId);
     if (focusedListItem === null) throw new Error(`Item with id ${focusedListItemId} not found`);
 
-    // Use the current time plus the duration from the time input
+    // Must have a focused item to schedule as a child (relative time scheduling)
+    if (focusedItemId === null) throw new Error('DurationDialog requires a focused item to schedule as a child');
+
+    const focusedItem = getItemById(items, focusedItemId);
+    if (focusedItem === null) throw new Error(`Item with id ${focusedItemId} not found`);
+
+    // Use the current time plus the duration from the time input as relative start time
     const scheduledTime = Date.now() + total;
 
-    // Schedule directly onto the base calendar
-    const baseCalendarEntry = createBaseCalendarEntry(focusedListItem.id, scheduledTime);
-    dispatch({
-      type: "ADD_BASE_CALENDAR_ENTRY",
-      payload: { entry: baseCalendarEntry }
+    const { newParentItem, newChildItem } = scheduleItem({
+      childItem: focusedListItem,
+      parentItem: focusedItem,
+      start: scheduledTime,
     });
 
-    handleClose();
-  }, [dispatch, focusedListItemId, items, total, handleClose]);
+    dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [newParentItem, newChildItem] } });
 
-  // Can schedule if we have a focused list item
-  const canSchedule = focusedListItemId !== null;
+    handleClose();
+  }, [dispatch, focusedItemId, focusedListItemId, items, total, handleClose]);
+
+  // Can schedule if we have both a focused list item and a focused item (to schedule as child)
+  const canSchedule = focusedListItemId !== null && focusedItemId !== null;
 
   return (
     <Dialog open={durationDialogOpen} onClose={handleClose}>
       <DialogTitle>
-        Schedule Item in Duration
+        Schedule Item Inside Focused Item
       </DialogTitle>
       <DialogContent sx={{ padding: 3, minWidth: 450 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           <Typography variant="subtitle1" sx={{ mb: 2 }}>
-            Set Duration from Now:
+            Set Duration from Now (relative to parent):
           </Typography>
 
           <TimeUnitControl
@@ -160,10 +166,15 @@ export default function DurationDialog() {
           <Box sx={{ mt: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
             <Typography variant="body2" color="text.secondary">
               {total === 0 ?
-                "Will schedule immediately" :
-                `Will schedule in ${total}ms (${new Date(Date.now() + total).toLocaleString()})`
+                "Will schedule as child immediately" :
+                `Will schedule as child in ${total}ms (${new Date(Date.now() + total).toLocaleString()})`
               }
             </Typography>
+            {focusedItemId === null && (
+              <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+                ⚠ No focused item selected. Please select an item in the schedule to add as child.
+              </Typography>
+            )}
           </Box>
         </Box>
       </DialogContent>

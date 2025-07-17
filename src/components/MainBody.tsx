@@ -26,13 +26,38 @@ export default function MainBody() {
         overflowY: 'auto',
         border: '2px solid rgba(255, 165, 0, 0.8)', // Orange border to indicate truncation
         borderRadius: '4px',
-        padding: '8px'
       })
     }}>
       {focusedItem ? (
         <>
           <LedgerLines />
-          <ItemSchedule item={focusedItem} />
+          {/* Render children of the focused item instead of the focused item itself */}
+          {focusedItem.children.map((child) => {
+            const childItem = getItemById(items, child.id);
+            if (childItem === null) throw new Error(`Item with id ${child.id} not found while rendering children in MainBody`);
+            return (
+              <ItemSchedule
+                key={child.relationshipId}
+                item={childItem}
+                start={child.start}
+                relationshipId={child.relationshipId}
+              />
+            );
+          })}
+          {/* Show a message when there are no children */}
+          {focusedItem.children.length === 0 && (
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              textAlign: 'center',
+              color: 'rgba(0, 0, 0, 0.6)',
+              fontSize: '16px'
+            }}>
+              No scheduled items. Use the schedule dialog to add items to this timeline.
+            </div>
+          )}
         </>
       ) : (
         /* Execution View - Shows the base calendar and current task execution */

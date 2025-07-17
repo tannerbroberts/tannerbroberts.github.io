@@ -2,7 +2,7 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/
 import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
 import SchedulingTimeInput from "./SchedulingTimeInput";
-import { getItemById, scheduleItem } from "../functions/utils/item";
+import { getItemById } from "../functions/utils/item";
 import { createBaseCalendarEntry } from "../functions/reducers/AppReducer";
 import { useTimeInputState, useTimeInputDispatch } from "../reducerContexts/TimeInput";
 
@@ -30,29 +30,15 @@ export default function SchedulingDialog() {
     // Use the absolute timestamp from the time input
     const scheduledTime = total;
 
-    if (focusedItemId === null) {
-      // Schedule directly onto the base calendar
-      const baseCalendarEntry = createBaseCalendarEntry(focusedListItem.id, scheduledTime)
-      dispatch({
-        type: "ADD_BASE_CALENDAR_ENTRY",
-        payload: { entry: baseCalendarEntry }
-      })
-    } else {
-      // Schedule as a child of the focused item
-      const focusedItem = getItemById(items, focusedItemId)
-      if (focusedItem === null) throw new Error(`Item with id ${focusedItemId} not found`)
-
-      const { newParentItem, newChildItem } = scheduleItem({
-        childItem: focusedListItem,
-        parentItem: focusedItem,
-        start: scheduledTime,
-      })
-
-      dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [newParentItem, newChildItem] } })
-    }
+    // Schedule directly onto the base calendar (absolute time scheduling)
+    const baseCalendarEntry = createBaseCalendarEntry(focusedListItem.id, scheduledTime)
+    dispatch({
+      type: "ADD_BASE_CALENDAR_ENTRY",
+      payload: { entry: baseCalendarEntry }
+    })
 
     handleClose()
-  }, [dispatch, focusedItemId, focusedListItemId, items, total, handleClose])
+  }, [dispatch, focusedListItemId, items, total, handleClose])
 
   // Can schedule if we have a focused list item
   const canSchedule = focusedListItemId !== null

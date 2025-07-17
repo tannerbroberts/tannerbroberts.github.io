@@ -3,12 +3,10 @@ import { useCallback } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
 import { getItemById, Item } from "../functions/utils/item";
 import { ExpandMore } from "@mui/icons-material";
-import { useViewportHeight } from "../hooks/useViewportHeight";
 
 export default function ItemSchedule({ item, start = null, relationshipId = null }: Readonly<{ item: Item, start?: number | null, relationshipId?: string | null }>) {
   const { items, millisecondsPerSegment, pixelsPerSegment } = useAppState();
   const appDispatch = useAppDispatch();
-  const viewportHeight = useViewportHeight();
   const { duration } = item;
 
   const updateShowChildren = useCallback((e: React.SyntheticEvent, expanded: boolean) => {
@@ -40,11 +38,8 @@ export default function ItemSchedule({ item, start = null, relationshipId = null
     }
   }, [item, appDispatch, relationshipId]);
 
-  // Calculate the natural height based on duration
-  const naturalHeight = (duration * pixelsPerSegment) / millisecondsPerSegment;
-  // Limit to maximum of 2 screen heights
-  const maxHeight = viewportHeight * 2;
-  const scheduleHeight = Math.min(naturalHeight, maxHeight);
+  // Calculate the height based on duration and pixel ratio
+  const scheduleHeight = (duration * pixelsPerSegment) / millisecondsPerSegment;
   const startHeight = start !== null ? start * pixelsPerSegment / millisecondsPerSegment : 0;
 
   return (
@@ -57,11 +52,9 @@ export default function ItemSchedule({ item, start = null, relationshipId = null
         height: scheduleHeight + 'px',
         backgroundColor: 'rgba(0, 0, 150, 0.3)',
         marginLeft: `40px`,
-        // Add overflow scrolling when content exceeds maximum height
-        ...(naturalHeight > maxHeight && {
-          overflowY: 'auto',
-          border: '2px solid rgba(255, 165, 0, 0.8)', // Orange border to indicate truncation
-        }),
+        border: '1px solid rgba(0, 0, 150, 0.6)',
+        borderRadius: '4px',
+        zIndex: 1, // Ensure items appear above ledger lines
       }}>
 
       <Accordion
@@ -92,7 +85,8 @@ export default function ItemSchedule({ item, start = null, relationshipId = null
               {item.name}
             </Typography>
 
-            {start !== null && (
+            {/* Always show move and delete buttons when this is a scheduled child */}
+            {relationshipId && (
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button
                   variant="contained"
@@ -139,15 +133,18 @@ export default function ItemSchedule({ item, start = null, relationshipId = null
           </Box>
         </AccordionSummary>
 
-        <AccordionDetails sx={{ p: 1 }}>
+        <AccordionDetails sx={{ p: 1, position: 'relative' }}>
           {item.children.map((child) => {
             const { id, start: childStart, relationshipId } = child
             const childItem = getItemById(items, id);
-            if (childItem === null) throw new Error(`Item with id ${id} not found whilest rendering children in ItemSchedule of ${item.name}`);
+            if (childItem === null) throw new Error(`Item with id ${id} not found while rendering children in ItemSchedule of ${item.name}`);
             return (
-              <div key={relationshipId}>
-                <ItemSchedule item={childItem} start={childStart} relationshipId={relationshipId} />
-              </div>
+              <ItemSchedule
+                key={relationshipId}
+                item={childItem}
+                start={childStart}
+                relationshipId={relationshipId}
+              />
             )
           })}
         </AccordionDetails>

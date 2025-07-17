@@ -29,8 +29,8 @@ export default function LedgerLines() {
   const maxHeight = viewportHeight * 2
   const totalHeight = Math.min(naturalHeight, maxHeight)
 
-  // Calculate number of lines based on actual displayed height
-  const numberOfLines = Math.floor((totalHeight * millisecondsPerSegment) / (focusedItem.duration * pixelsPerSegment) * focusedItem.duration / millisecondsPerSegment)
+  // Calculate number of lines based on time segments
+  const numberOfLines = Math.floor(totalHeight / pixelsPerSegment)
 
   const shouldShowLabel = (index: number) => {
     if (index === 0) return false
@@ -40,7 +40,7 @@ export default function LedgerLines() {
   }
 
   return (
-    <div style={{ position: 'absolute', width: '100%', height: totalHeight + 'px' }}>
+    <div style={{ position: 'absolute', width: '100%', height: totalHeight + 'px', zIndex: 0 }}>
       {Array.from({ length: numberOfLines + 1 }, (_, i) => {
         const timeAtLine = i * millisecondsPerSegment
         const linePosition = i * pixelsPerSegment
