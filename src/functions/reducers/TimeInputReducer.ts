@@ -7,6 +7,7 @@ export type TimeInputAction =
   | { type: "SET_DAYS"; payload: { days: number } }
   | { type: "SET_WEEKS"; payload: { weeks: number } }
   | { type: "SET_YEARS"; payload: { years: number } }
+  | { type: "SET_ABSOLUTE_TIMESTAMP"; payload: { timestamp: number } }
   | { type: "RESET" };
 
 export const initialState = {
@@ -18,6 +19,7 @@ export const initialState = {
   days: 0,
   weeks: 0,
   years: 0,
+  absoluteTimestamp: null as number | null,
 };
 
 const getTotal = ({
@@ -114,6 +116,14 @@ export default function reducer(
         ...rest,
         years,
         total: getTotal({ ...rest, years }),
+      };
+    }
+    case "SET_ABSOLUTE_TIMESTAMP": {
+      const { timestamp } = action.payload;
+      return {
+        ...previous,
+        absoluteTimestamp: timestamp,
+        total: timestamp,
       };
     }
     case "RESET":

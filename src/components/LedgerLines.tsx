@@ -1,5 +1,6 @@
 import { useAppState } from "../reducerContexts/App"
 import { getItemById } from "../functions/utils/item"
+import { useViewportHeight } from "../hooks/useViewportHeight"
 
 const formatTime = (ms: number) => {
   const milliseconds = ms % 1000
@@ -17,12 +18,19 @@ const formatTime = (ms: number) => {
 
 export default function LedgerLines() {
   const { focusedItemId, items, millisecondsPerSegment, pixelsPerSegment } = useAppState()
+  const viewportHeight = useViewportHeight()
   const focusedItem = getItemById(items, focusedItemId)
 
   if (!focusedItem) return null
 
-  const totalHeight = focusedItem.duration * pixelsPerSegment / millisecondsPerSegment
-  const numberOfLines = Math.floor(focusedItem.duration / millisecondsPerSegment)
+  // Calculate the natural height based on duration
+  const naturalHeight = focusedItem.duration * pixelsPerSegment / millisecondsPerSegment
+  // Limit to maximum of 2 screen heights
+  const maxHeight = viewportHeight * 2
+  const totalHeight = Math.min(naturalHeight, maxHeight)
+
+  // Calculate number of lines based on actual displayed height
+  const numberOfLines = Math.floor((totalHeight * millisecondsPerSegment) / (focusedItem.duration * pixelsPerSegment) * focusedItem.duration / millisecondsPerSegment)
 
   const shouldShowLabel = (index: number) => {
     if (index === 0) return false

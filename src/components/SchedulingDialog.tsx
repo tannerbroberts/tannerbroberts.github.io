@@ -1,15 +1,23 @@
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
-import TimeQuantityInput from "./TimeQuantityInput";
+import SchedulingTimeInput from "./SchedulingTimeInput";
 import { getItemById, scheduleItem } from "../functions/utils/item";
 import { createBaseCalendarEntry } from "../functions/reducers/AppReducer";
-import { useTimeInputState } from "../reducerContexts/TimeInput";
+import { useTimeInputState, useTimeInputDispatch } from "../reducerContexts/TimeInput";
 
 export default function SchedulingDialog() {
   const { schedulingDialogOpen, items, focusedItemId, focusedListItemId } = useAppState()
   const { total } = useTimeInputState()
   const dispatch = useAppDispatch()
+  const timeInputDispatch = useTimeInputDispatch()
+
+  // Reset time input when dialog opens
+  useEffect(() => {
+    if (schedulingDialogOpen) {
+      timeInputDispatch({ type: 'RESET' })
+    }
+  }, [schedulingDialogOpen, timeInputDispatch])
 
   const handleClose = useCallback(() => {
     dispatch({ type: 'SET_SCHEDULING_DIALOG_OPEN', payload: { schedulingDialogOpen: false } })
@@ -19,10 +27,12 @@ export default function SchedulingDialog() {
     const focusedListItem = getItemById(items, focusedListItemId)
     if (focusedListItem === null) throw new Error(`Item with id ${focusedListItemId} not found`)
 
+    // Use the absolute timestamp from the time input
+    const scheduledTime = total;
+
     if (focusedItemId === null) {
       // Schedule directly onto the base calendar
-      const currentTime = Date.now()
-      const baseCalendarEntry = createBaseCalendarEntry(focusedListItem.id, currentTime + total)
+      const baseCalendarEntry = createBaseCalendarEntry(focusedListItem.id, scheduledTime)
       dispatch({
         type: "ADD_BASE_CALENDAR_ENTRY",
         payload: { entry: baseCalendarEntry }
@@ -35,7 +45,7 @@ export default function SchedulingDialog() {
       const { newParentItem, newChildItem } = scheduleItem({
         childItem: focusedListItem,
         parentItem: focusedItem,
-        start: total,
+        start: scheduledTime,
       })
 
       dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [newParentItem, newChildItem] } })
@@ -52,8 +62,8 @@ export default function SchedulingDialog() {
       <DialogTitle>
         {focusedItemId === null ? "Schedule Item to Base Calendar" : "Schedule Item"}
       </DialogTitle>
-      <DialogContent sx={{ padding: 3, minWidth: 300 }}>
-        <TimeQuantityInput />
+      <DialogContent sx={{ padding: 3, minWidth: 400 }}>
+        <SchedulingTimeInput />
       </DialogContent>
       <DialogActions sx={{ padding: 2 }}>
         <Button onClick={handleClose} color="inherit">Cancel</Button>
