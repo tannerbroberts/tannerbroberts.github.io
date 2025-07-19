@@ -1,75 +1,117 @@
+
 import { v4 as uuid } from "uuid";
 import type { BaseCalendarEntry } from "../reducers/AppReducer";
+
+
+
+// --- Types and Interfaces ---
 
 export interface ItemJSON {
   id: string;
   name: string;
   duration: number;
-  children: Child[];
-  parents: Parent[];
-  showChildren: boolean;
+  parents: Array<{ id: string }>;
+  allOrNothing: boolean;
+  type: string;
+  // Add additional properties as needed for serialization, but do not use an index signature
+  priority?: number;
+  children?: unknown[];
+  sortType?: SortType;
 }
+
+// ...existing code...
+
+// --- Classes ---
+
+export class Parent {
+  id: string;
+  relationshipId: string;
+  constructor({ id, relationshipId = uuid() }: { id: string; relationshipId?: string }) {
+    this.id = id;
+    this.relationshipId = relationshipId;
+  }
+}
+
+export class Child {
+  id: string;
+  start: number;
+  relationshipId: string;
+  constructor({ id, start, relationshipId = uuid() }: { id: string; start: number; relationshipId?: string }) {
+    this.id = id;
+    this.start = start;
+    this.relationshipId = relationshipId;
+  }
+}
+
+class IntervalTree<T> {
+  intervals: { start: number; end: number; data: T }[] = [];
+
+  insert(start: number, end: number, data: T) {
+    this.intervals.push({ start, end, data });
+    // Keep sorted for easier queries
+    this.intervals.sort((a, b) => a.start - b.start);
+  }
+
+  overlaps(start: number, end: number): boolean {
+    return this.intervals.some(
+      (iv) => Math.max(iv.start, start) < Math.min(iv.end, end)
+    );
+  }
+
+  removeByData(data: T) {
+    this.intervals = this.intervals.filter((iv) => iv.data !== data);
+  }
+
+  findAllOverlapping(start: number, end: number): T[] {
+    return this.intervals.filter(
+      (iv) => Math.max(iv.start, start) < Math.min(iv.end, end)
+    ).map((iv) => iv.data);
+  }
+}
+
+
 
 export class Item {
   id: string;
   name: string;
   duration: number;
-  children: Child[];
   parents: Parent[];
-  showChildren: boolean;
+  allOrNothing: boolean;
 
   constructor({
-    name,
     id = uuid(),
+    name,
     duration,
-    children = [],
     parents = [],
-    showChildren = false,
+    allOrNothing = false,
   }: {
-    name: string;
     id?: string;
+    name: string;
     duration: number;
-    children?: Child[];
     parents?: Parent[];
-    showChildren?: boolean;
+    allOrNothing?: boolean;
   }) {
-    this.name = name;
     this.id = id;
+    this.name = name;
     this.duration = duration;
-    this.children = children;
     this.parents = parents;
-    this.showChildren = showChildren;
+    this.allOrNothing = allOrNothing;
   }
 
-  updateChildren(children: Child[]): Item {
-    const newChildren = [...this.children, ...children];
-    return new Item({ ...this, children: newChildren });
+  updateDuration(duration: number): this {
+    const Ctor = Object.getPrototypeOf(this).constructor as new (args: any) => this;
+    return new Ctor({ ...this, duration });
   }
 
-  updateDuration(duration: number): Item {
-    return new Item({
-      ...this,
-      duration,
-    });
+  updateName(name: string): this {
+    const Ctor = Object.getPrototypeOf(this).constructor as new (args: any) => this;
+    return new Ctor({ ...this, name });
   }
 
-  updateName(name: string): Item {
-    return new Item({
-      ...this,
-      name,
-    });
-  }
-
-  updateParents(parents: Parent[]): Item {
+  updateParents(parents: Parent[]): this {
     const newParents = [...this.parents, ...parents];
-    return new Item({ ...this, parents: newParents });
-  }
-
-  updateShowChildren(showChildren?: boolean): Item {
-    return new Item({
-      ...this,
-      showChildren: showChildren ?? !this.showChildren,
-    });
+    const Ctor = Object.getPrototypeOf(this).constructor as new (args: any) => this;
+    return new Ctor({ ...this, parents: newParents });
   }
 
   toJSON(): ItemJSON {
@@ -77,92 +119,171 @@ export class Item {
       id: this.id,
       name: this.name,
       duration: this.duration,
-      children: this.children,
       parents: this.parents,
-      showChildren: this.showChildren,
+      allOrNothing: this.allOrNothing,
+      type: this.constructor.name,
     };
   }
 
   static toJSONArray(items: Item[]): ItemJSON[] {
     return items.map((item) => item.toJSON());
   }
+}
 
-  static fromJSON(json: ItemJSON): Item {
-    return new Item({
+export class BasicItem extends Item {
+  priority: number;
+
+  constructor({
+    priority = 0,
+    ...rest
+  }: {
+    id?: string;
+    name: string;
+    duration: number;
+    parents?: Parent[];
+    allOrNothing?: boolean;
+    priority?: number;
+  }) {
+    super(rest);
+    this.priority = priority;
+  }
+
+  toJSON(): ItemJSON {
+    return {
+      ...super.toJSON(),
+      priority: this.priority,
+    };
+  }
+
+  static fromJSON(json: ItemJSON): BasicItem {
+    return new BasicItem({
       id: json.id,
       name: json.name,
       duration: json.duration,
-      children: json.children || [],
-      parents: json.parents || [],
-      showChildren: json.showChildren || false,
+      parents: Array.isArray(json.parents) ? json.parents.map((p) => new Parent(p as { id: string; relationshipId?: string })) : [],
+      allOrNothing: json.allOrNothing || false,
+      priority: typeof json.priority === 'number' ? json.priority : 0,
     });
   }
+}
 
-  static fromJSONArray(jsonArray: ItemJSON[]): Item[] {
-    return jsonArray.map((json) => Item.fromJSON(json));
+export class SubCalendarItem extends Item {
+  children: Child[];
+  private readonly intervalTree: IntervalTree<Child>;
+
+  constructor({
+    children = [],
+    ...rest
+  }: {
+    id?: string;
+    name: string;
+    duration: number;
+    parents?: Parent[];
+    allOrNothing?: boolean;
+    children?: Child[];
+  }) {
+    super(rest);
+    this.children = children;
+    this.intervalTree = new IntervalTree<Child>();
+    // No-op: do not pre-populate intervalTree, as duration lookup is external
+  }
+
+  scheduleChild(child: Child, getDuration: (itemId: string) => number): boolean {
+    const duration = getDuration(child.id);
+    const start = child.start;
+    const end = start + duration;
+    if (this.intervalTree.overlaps(start, end)) {
+      return false;
+    }
+    this.children.push(child);
+    this.intervalTree.insert(start, end, child);
+    return true;
+  }
+
+  removeChild(child: Child): void {
+    this.children = this.children.filter((c) => c.relationshipId !== child.relationshipId);
+    this.intervalTree.removeByData(child);
+  }
+
+  toJSON(): ItemJSON {
+    return {
+      ...super.toJSON(),
+      children: this.children,
+    };
+  }
+
+  static fromJSON(json: ItemJSON): SubCalendarItem {
+    return new SubCalendarItem({
+      id: json.id,
+      name: json.name,
+      duration: json.duration,
+      parents: Array.isArray(json.parents) ? json.parents.map((p) => new Parent(p as { id: string; relationshipId?: string })) : [],
+      allOrNothing: json.allOrNothing || false,
+      children: Array.isArray(json.children) ? json.children.map((c) => new Child(c as { id: string; start: number; relationshipId?: string })) : [],
+    });
   }
 }
 
-export class Child {
-  id: string;
+export type SortType = "alphabetical" | "manual" | "duration";
+
+export class CheckListChild {
+  itemId: string;
+  complete: boolean;
   relationshipId: string;
-  start: number;
 
-  constructor(
-    { id, relationshipId, start }: {
-      id: string;
-      relationshipId: string;
-      start: number;
-    },
-  ) {
-    this.id = id;
-    this.relationshipId = relationshipId;
-    this.start = start;
-  }
-}
-
-export class Parent {
-  id: string;
-  relationshipId: string;
-
-  constructor({ id, relationshipId }: { id: string; relationshipId: string }) {
-    this.id = id;
+  constructor({ itemId, complete = false, relationshipId = uuid() }: { itemId: string; complete?: boolean; relationshipId?: string }) {
+    this.itemId = itemId;
+    this.complete = complete;
     this.relationshipId = relationshipId;
   }
 }
 
-/**
- * Create two new items based on the parent and child items.
- *
- * The new child will be an Item that has a Parent reference to the parent item,
- *
- * The new parent will be an Item that has a Child reference to the child item.
- */
-export function scheduleItem({
-  childItem,
-  parentItem,
-  start,
-}: {
-  childItem: Item;
-  parentItem: Item;
-  start: number;
-}): { newChildItem: Item; newParentItem: Item } {
-  const relationshipId = uuid();
-  const childReference = new Child({
-    id: childItem.id,
-    relationshipId,
-    start,
-  });
-  const parentReference = new Parent({
-    id: parentItem.id,
-    relationshipId,
-  });
+export class CheckListItem extends Item {
+  children: CheckListChild[];
+  sortType: SortType;
 
-  const newChildItem = childItem.updateParents([parentReference]);
-  const newParentItem = parentItem.updateChildren([childReference]);
+  constructor({
+    children = [],
+    sortType = "manual",
+    ...rest
+  }: {
+    id?: string;
+    name: string;
+    duration: number;
+    parents?: Parent[];
+    allOrNothing?: boolean;
+    children?: CheckListChild[];
+    sortType?: SortType;
+  }) {
+    super(rest);
+    this.children = children;
+    this.sortType = sortType;
+  }
 
-  return { newChildItem, newParentItem };
+  toJSON(): ItemJSON {
+    return {
+      ...super.toJSON(),
+      children: this.children,
+      sortType: this.sortType,
+    };
+  }
+
+  static fromJSON(json: ItemJSON): CheckListItem {
+    return new CheckListItem({
+      id: json.id,
+      name: json.name,
+      duration: json.duration,
+      parents: Array.isArray(json.parents) ? json.parents.map((p) => new Parent(p as { id: string; relationshipId?: string })) : [],
+      allOrNothing: json.allOrNothing || false,
+      children: Array.isArray(json.children) ? json.children.map((c) => new CheckListChild(c as { itemId: string; complete?: boolean; relationshipId?: string })) : [],
+      sortType: typeof json.sortType === 'string' ? json.sortType : "manual",
+    });
+  }
 }
+
+
+// ...existing code...
+
 
 /**
  * Binary search through the sorted items array for an item with the given id
@@ -213,6 +334,10 @@ export function getIndexById(items: Item[], id: string | null): number {
 
   return -1;
 }
+
+// ...existing code...
+
+// ...existing code...
 
 /**
  * Get the current task chain based on the current time
@@ -268,11 +393,22 @@ function buildChainRecursively(items: Item[], currentItem: Item, currentTime: nu
  * Find a child item that is active at the given time
  */
 function findActiveChildAtTime(items: Item[], parentItem: Item, currentTime: number): Item | null {
-  for (const childRef of parentItem.children) {
-    const childItem = getItemById(items, childRef.id);
-    if (childItem && isItemActiveAtTime(childItem, currentTime, childRef.start)) {
-      return childItem;
+  if (parentItem instanceof SubCalendarItem) {
+    for (const childRef of parentItem.children) {
+      const childItem = getItemById(items, childRef.id);
+      if (childItem && isItemActiveAtTime(childItem, currentTime, childRef.start ?? 0)) {
+        return childItem;
+      }
     }
+    return null;
+  } else if (parentItem instanceof CheckListItem) {
+    for (const childRef of parentItem.children) {
+      const childItem = getItemById(items, childRef.itemId);
+      if (childItem) {
+        return childItem;
+      }
+    }
+    return null;
   }
   return null;
 }
@@ -422,8 +558,8 @@ function calculateChildOffset(taskChain: Item[], targetItem: Item): number {
       break;
     }
 
-    // Find the child reference to get the start offset
-    if (i + 1 < taskChain.length) {
+    // Only SubCalendarItem has children with start times
+    if (i + 1 < taskChain.length && currentItem instanceof SubCalendarItem) {
       const nextItem = taskChain[i + 1];
       const childRef = currentItem.children.find(child => child.id === nextItem.id);
       if (childRef) {
