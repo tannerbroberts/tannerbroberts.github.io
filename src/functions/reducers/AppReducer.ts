@@ -2,14 +2,14 @@ import { cloneDeep } from "lodash";
 import {
   getIndexById,
   Item,
-  hasChildWithId,
-  hasParentWithId,
   removeChildById,
-  removeParentById,
-  hasChildWithRelationshipId,
-  hasParentWithRelationshipId,
   removeChildByRelationshipId,
-  removeParentByRelationshipId
+  removeParentById,
+  removeParentByRelationshipId,
+  hasChildWithId,
+  hasChildWithRelationshipId,
+  hasParentWithId,
+  hasParentWithRelationshipId
 } from "../utils/item/index";
 import { v4 as uuid } from "uuid";
 
@@ -64,6 +64,10 @@ export type AppAction =
     payload: { pixelsPerSegment: number };
   }
   | { type: "SET_SIDE_DRAWER_OPEN"; payload: { sideDrawerOpen: boolean } }
+  | {
+    type: "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID";
+    payload: { id: string; showChildren: boolean };
+  }
   | {
     type: "UPDATE_ITEMS";
     payload: { updatedItems: Item[] };
@@ -291,6 +295,17 @@ export default function reducer(
       //* ****************************************************
       return { ...previous, pixelsPerSegment };
     }
+    // case "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID": {
+    //   // This functionality is not yet implemented - showChildren is not a property of Item
+    //   // const { id, showChildren } = action.payload;
+    //   // const index = getIndexById(previous.items, id);
+    //   // if (index === -1) {
+    //   //   throw new Error("Item not found when trying to toggle showChildren");
+    //   // }
+    //   // const item = previous.items[index];
+    //   // previous.items[index] = item.updateShowChildren(showChildren);
+    //   // return { ...previous, items: [...previous.items] };
+    // }
     case "UPDATE_ITEMS": {
       const { updatedItems } = action.payload;
       if (updatedItems.length === 0) return previous;

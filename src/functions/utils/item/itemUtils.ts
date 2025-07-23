@@ -2,6 +2,39 @@ import { Item } from "./Item";
 import { SubCalendarItem } from "./SubCalendarItem";
 import { CheckListItem } from "./CheckListItem";
 import { BasicItem } from "./BasicItem";
+import { Child } from "./Child";
+import { CheckListChild } from "./CheckListChild";
+
+/**
+ * Type guard to check if an item has children
+ */
+export function hasChildren(item: Item): item is SubCalendarItem | CheckListItem {
+  return item instanceof SubCalendarItem || item instanceof CheckListItem;
+}
+
+/**
+ * Safely get children from an item, returning empty array if no children
+ */
+export function getChildren(item: Item): Child[] | CheckListChild[] | [] {
+  if (item instanceof SubCalendarItem) {
+    return item.children;
+  } else if (item instanceof CheckListItem) {
+    return item.children;
+  }
+  return [];
+}
+
+/**
+ * Type for child references that can be either Child or CheckListChild
+ */
+export type ChildReference = Child | CheckListChild;
+
+/**
+ * Get child ID from either Child or CheckListChild
+ */
+export function getChildId(child: ChildReference): string {
+  return 'id' in child ? child.id : child.itemId;
+}
 
 /**
  * Remove a child from an item by ID, returning a new item instance

@@ -1,7 +1,11 @@
 import { Input } from "@mui/material";
 
+interface ItemListFilterProps {
+  readonly value: string;
+  readonly setValue: (value: string) => void;
+}
 
-export default function ItemListFilter({ value, setValue }: { value: string, setValue: (value: string) => void }) {
+export default function ItemListFilter({ value, setValue }: ItemListFilterProps) {
 
   return (
     <Input

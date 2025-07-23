@@ -12,7 +12,7 @@ import { ExpandMore } from "@mui/icons-material";
 import PieChartCountdown from "./PieChartCountdown";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
 import { useCurrentTime } from "../hooks/useCurrentTime";
-import { getItemById, getTaskProgress, getTaskStartTime, Item, SubCalendarItem, CheckListItem } from "../functions/utils/item/index";
+import { getItemById, getTaskProgress, getTaskStartTime, Item, SubCalendarItem, CheckListItem, type ChildReference } from "../functions/utils/item/index";
 
 interface ItemAccordionProps {
   readonly item: Item;
@@ -226,8 +226,8 @@ export default function ItemAccordion({
               <Typography variant="subtitle2" gutterBottom>
                 Child Tasks:
               </Typography>
-              {item.children.map((child: any, index: number) => {
-                const childId = child.id || child.itemId;
+              {item.children.map((child: ChildReference, index: number) => {
+                const childId = 'id' in child ? child.id : child.itemId;
                 const childItem = getItemById(items, childId);
                 if (!childItem) return null;
 
@@ -247,7 +247,7 @@ export default function ItemAccordion({
                         {childItem.name}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {child.start !== undefined ? `Starts at ${formatTime(child.start)} • ` : ''}Duration: {formatTime(childItem.duration)}
+                        {'start' in child && child.start !== undefined ? `Starts at ${formatTime(child.start)} • ` : ''}Duration: {formatTime(childItem.duration)}
                       </Typography>
                     </Box>
                     <Chip

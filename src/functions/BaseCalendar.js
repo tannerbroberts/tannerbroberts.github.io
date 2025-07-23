@@ -1,4 +1,4 @@
-F// Example: Using node-interval-tree for a base calendar
+// Example: Using node-interval-tree for a base calendar
 
 const IntervalTree = require('node-interval-tree');
 

@@ -1,5 +1,5 @@
 import { useAppState } from "../reducerContexts/App"
-import { getItemById } from "../functions/utils/item/index"
+import { getItemById, hasChildren, getChildren, getChildId, type ChildReference } from "../functions/utils/item/index"
 import { useViewportHeight } from "../hooks/useViewportHeight"
 import ItemSchedule from "./ItemSchedule"
 import LedgerLines from "./LedgerLines"
@@ -32,20 +32,21 @@ export default function MainBody() {
         <>
           <LedgerLines />
           {/* Render children of the focused item instead of the focused item itself */}
-          {focusedItem.children.map((child) => {
-            const childItem = getItemById(items, child.id);
-            if (childItem === null) throw new Error(`Item with id ${child.id} not found while rendering children in MainBody`);
+          {hasChildren(focusedItem) && getChildren(focusedItem).map((child: ChildReference) => {
+            const childId = getChildId(child);
+            const childItem = getItemById(items, childId);
+            if (childItem === null) throw new Error(`Item with id ${childId} not found while rendering children in MainBody`);
             return (
               <ItemSchedule
                 key={child.relationshipId}
                 item={childItem}
-                start={child.start}
+                start={'start' in child ? child.start : null}
                 relationshipId={child.relationshipId}
               />
             );
           })}
           {/* Show a message when there are no children */}
-          {focusedItem.children.length === 0 && (
+          {(!hasChildren(focusedItem) || getChildren(focusedItem).length === 0) && (
             <div style={{
               position: 'absolute',
               top: '50%',

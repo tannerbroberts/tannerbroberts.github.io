@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useAppState } from "../../reducerContexts/App";
-import { getIndexById } from "./item/index";
+import { getIndexById, getChildren, getChildId, type ChildReference } from "./item/index";
 
 export default function useItemListValidation() {
   const { items } = useAppState();
@@ -8,11 +8,13 @@ export default function useItemListValidation() {
   useEffect(() => {
     for (const item of items) {
       // Ensure all children's ids are in the items array
-      for (const child of item.children) {
-        const index = getIndexById(items, child.id);
+      const children = getChildren(item);
+      for (const child of children) {
+        const childId = getChildId(child as ChildReference);
+        const index = getIndexById(items, childId);
         if (index === -1) {
           throw new Error(
-            `Child item with id ${child} not found in items array`,
+            `Child item with id ${childId} not found in items array`,
           );
         }
       }

@@ -9,13 +9,11 @@ export default function reducer(
   previous: NewItemState,
   action: NewItemAction,
 ): NewItemState {
-  switch (action.type) {
-    case "SET_NAME":
-      return {
-        ...previous,
-        name: action.payload.name,
-      };
-    default:
-      return previous;
+  if (action.type === "SET_NAME") {
+    return {
+      ...previous,
+      name: action.payload.name,
+    };
   }
+  return previous;
 }

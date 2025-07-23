@@ -195,4 +195,4 @@ src/
 
 This architecture emphasizes separation of concerns, type safety, and predictable state management while maintaining component reusability and testability.
 
-When removing files, ensure that you type "y" after running the command to confirm the deletion.
+When removing files, run rm -f <file_path> to skip the confirmation prompt.
