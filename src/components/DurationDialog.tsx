@@ -2,7 +2,7 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Box, Typogra
 import { Add, Remove } from "@mui/icons-material";
 import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
-import { getItemById, SubCalendarItem, Child, Parent } from "../functions/utils/item/index";
+import { getItemById, SubCalendarItem, Child, Parent, addParentToItem } from "../functions/utils/item/index";
 import { useTimeInputState, useTimeInputDispatch } from "../reducerContexts/TimeInput";
 
 interface TimeUnitControlProps {
@@ -91,24 +91,23 @@ export default function DurationDialog() {
 
   const scheduleSelectedListItem = useCallback(() => {
     const focusedListItem = getItemById(items, focusedListItemId);
-    if (focusedListItem === null) throw new Error(`Item with id ${focusedListItemId} not found`);
+    if (!focusedListItem) throw new Error(`Item with id ${focusedListItemId} not found`);
 
-    // Must have a focused item to schedule as a child (relative time scheduling)
-    if (focusedItemId === null) throw new Error('DurationDialog requires a focused item to schedule as a child');
+    if (!focusedItemId) throw new Error('DurationDialog requires a focused item to schedule as a child');
 
     const focusedItem = getItemById(items, focusedItemId);
-    if (focusedItem === null) throw new Error(`Item with id ${focusedItemId} not found`);
+    if (!focusedItem) throw new Error(`Item with id ${focusedItemId} not found`);
 
-    // Use the current time plus the duration from the time input as relative start time
-    const scheduledTime = Date.now() + total;
+    // Create child relationship with relative start time
+    const childRelationship = new Child({
+      id: focusedListItem.id,
+      start: Date.now() + total
+    });
 
-    // Convert focusedItem to SubCalendarItem if it isn't already
-    let parentItem: SubCalendarItem;
-    if (focusedItem instanceof SubCalendarItem) {
-      parentItem = focusedItem;
-    } else {
-      // Create a new SubCalendarItem with the same properties
-      parentItem = new SubCalendarItem({
+    // Ensure parent is a SubCalendarItem (convert if needed)
+    const parentItem = focusedItem instanceof SubCalendarItem
+      ? focusedItem
+      : new SubCalendarItem({
         id: focusedItem.id,
         name: focusedItem.name,
         duration: focusedItem.duration,
@@ -116,33 +115,24 @@ export default function DurationDialog() {
         allOrNothing: focusedItem.allOrNothing,
         children: []
       });
-    }
 
-    // Create a new Child relationship
-    const childRelationship = new Child({
-      id: focusedListItem.id,
-      start: scheduledTime
-    });
-
-    // Try to schedule the child
-    const getDuration = (itemId: string) => {
-      const item = getItemById(items, itemId);
-      return item ? item.duration : 0;
-    };
-
+    // Schedule the child (with conflict detection)
+    const getDuration = (itemId: string) => getItemById(items, itemId)?.duration ?? 0;
     const scheduled = parentItem.scheduleChild(childRelationship, getDuration);
+
     if (!scheduled) {
       throw new Error('Unable to schedule item - time slot conflicts with existing children');
     }
 
-    // Update the parent item and add parent relationship to child
-    const updatedChild = focusedListItem.updateParents([new Parent({
+    // Create updated child with new parent relationship
+    const newParent = new Parent({
       id: parentItem.id,
       relationshipId: childRelationship.relationshipId
-    })]);
+    });
+
+    const updatedChild = addParentToItem(focusedListItem, newParent);
 
     dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [parentItem, updatedChild] } });
-
     handleClose();
   }, [dispatch, focusedItemId, focusedListItemId, items, total, handleClose]);
 

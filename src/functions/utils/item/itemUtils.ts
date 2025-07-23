@@ -4,6 +4,7 @@ import { CheckListItem } from "./CheckListItem";
 import { BasicItem } from "./BasicItem";
 import { Child } from "./Child";
 import { CheckListChild } from "./CheckListChild";
+import { Parent } from "./Parent";
 
 /**
  * Type guard to check if an item has children
@@ -210,4 +211,76 @@ export function hasParentWithId(item: Item, parentId: string): boolean {
  */
 export function hasParentWithRelationshipId(item: Item, relationshipId: string): boolean {
   return item.parents.some((parent) => parent.relationshipId === relationshipId);
+}
+
+/**
+ * Add a parent to an item, returning a new item instance
+ */
+export function addParentToItem(item: Item, parent: Parent): Item {
+  const newParents = [...item.parents, parent];
+
+  if (item instanceof BasicItem) {
+    return new BasicItem({
+      id: item.id,
+      name: item.name,
+      duration: item.duration,
+      parents: newParents,
+      allOrNothing: item.allOrNothing,
+      priority: item.priority,
+    });
+  } else if (item instanceof SubCalendarItem) {
+    return new SubCalendarItem({
+      id: item.id,
+      name: item.name,
+      duration: item.duration,
+      parents: newParents,
+      allOrNothing: item.allOrNothing,
+      children: item.children,
+    });
+  } else if (item instanceof CheckListItem) {
+    return new CheckListItem({
+      id: item.id,
+      name: item.name,
+      duration: item.duration,
+      parents: newParents,
+      allOrNothing: item.allOrNothing,
+      children: item.children,
+      sortType: item.sortType,
+    });
+  }
+
+  throw new Error(`Unknown item type: ${item.constructor.name}`);
+}
+
+/**
+ * Add a child to an item, returning a new item instance
+ * For SubCalendarItem: child must be a Child with start time
+ * For CheckListItem: child must be a CheckListChild 
+ */
+export function addChildToItem(item: Item, child: Child | CheckListChild): Item {
+  if (item instanceof SubCalendarItem && child instanceof Child) {
+    const newChildren = [...item.children, child];
+    return new SubCalendarItem({
+      id: item.id,
+      name: item.name,
+      duration: item.duration,
+      parents: item.parents,
+      allOrNothing: item.allOrNothing,
+      children: newChildren,
+    });
+  } else if (item instanceof CheckListItem && child instanceof CheckListChild) {
+    const newChildren = [...item.children, child];
+    return new CheckListItem({
+      id: item.id,
+      name: item.name,
+      duration: item.duration,
+      parents: item.parents,
+      allOrNothing: item.allOrNothing,
+      children: newChildren,
+      sortType: item.sortType,
+    });
+  }
+  
+  // BasicItem doesn't have children, or incompatible child type
+  throw new Error(`Cannot add child of type ${child.constructor.name} to item of type ${item.constructor.name}`);
 }

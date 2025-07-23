@@ -13,11 +13,16 @@ export default function ExecutionView({
   showHeader = true,
 }: ExecutionViewProps) {
   const { items, baseCalendar } = useAppState();
-  const currentTime = useCurrentTime(100); // Update every 100ms for smooth animation
+  const currentTime = useCurrentTime(500); // Reduced frequency to prevent performance issues
 
-  // Get the current task chain
+  // Get the current task chain (memoized to prevent excessive calculations)
   const taskChain = useMemo(() => {
-    return getCurrentTaskChain(items, currentTime, baseCalendar);
+    try {
+      return getCurrentTaskChain(items, currentTime, baseCalendar);
+    } catch (error) {
+      console.error('Error getting current task chain:', error);
+      return [];
+    }
   }, [items, currentTime, baseCalendar]);
 
   // If no current task chain, show idle state

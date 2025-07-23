@@ -9,7 +9,13 @@ import {
   hasChildWithId,
   hasChildWithRelationshipId,
   hasParentWithId,
-  hasParentWithRelationshipId
+  hasParentWithRelationshipId,
+  addChildToItem,
+  CheckListChild,
+  CheckListItem,
+  SubCalendarItem,
+  Parent,
+  addParentToItem
 } from "../utils/item/index";
 import { v4 as uuid } from "uuid";
 
@@ -60,6 +66,10 @@ export type AppAction =
     payload: { durationDialogOpen: boolean };
   }
   | {
+    type: "SET_CHECKLIST_CHILD_DIALOG_OPEN";
+    payload: { checkListChildDialogOpen: boolean };
+  }
+  | {
     type: "SET_PIXELS_PER_SEGMENT";
     payload: { pixelsPerSegment: number };
   }
@@ -71,6 +81,10 @@ export type AppAction =
   | {
     type: "UPDATE_ITEMS";
     payload: { updatedItems: Item[] };
+  }
+  | {
+    type: "ADD_CHILD_TO_ITEM";
+    payload: { parentId: string; childId: string };
   }
   | {
     type: "ADD_BASE_CALENDAR_ENTRY";
@@ -97,6 +111,7 @@ export const initialState = {
   itemSearchWindowRange: { min: 0, max: DEFAULT_WINDOW_RANGE_SIZE },
   schedulingDialogOpen: false,
   durationDialogOpen: false,
+  checkListChildDialogOpen: false,
   sideDrawerOpen: false,
   newItemDialogOpen: false,
 };
@@ -251,6 +266,14 @@ export default function reducer(
       const { durationDialogOpen } = action.payload;
       return { ...previous, durationDialogOpen };
     }
+    case "SET_CHECKLIST_CHILD_DIALOG_OPEN": {
+      //* ****************************************************
+      //* appState
+      //* checkListChildDialogOpen
+      //* ****************************************************
+      const { checkListChildDialogOpen } = action.payload;
+      return { ...previous, checkListChildDialogOpen };
+    }
     case "SET_SIDE_DRAWER_OPEN": {
       //* ****************************************************
       //* appState
@@ -295,17 +318,6 @@ export default function reducer(
       //* ****************************************************
       return { ...previous, pixelsPerSegment };
     }
-    // case "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID": {
-    //   // This functionality is not yet implemented - showChildren is not a property of Item
-    //   // const { id, showChildren } = action.payload;
-    //   // const index = getIndexById(previous.items, id);
-    //   // if (index === -1) {
-    //   //   throw new Error("Item not found when trying to toggle showChildren");
-    //   // }
-    //   // const item = previous.items[index];
-    //   // previous.items[index] = item.updateShowChildren(showChildren);
-    //   // return { ...previous, items: [...previous.items] };
-    // }
     case "UPDATE_ITEMS": {
       const { updatedItems } = action.payload;
       if (updatedItems.length === 0) return previous;
@@ -322,6 +334,56 @@ export default function reducer(
       //* items
       //* *****************************************************
       return { ...previous, items: [...previous.items] };
+    }
+    case "ADD_CHILD_TO_ITEM": {
+      const { parentId, childId } = action.payload;
+
+      // Find parent and child items
+      const parentIndex = getIndexById(previous.items, parentId);
+      const childIndex = getIndexById(previous.items, childId);
+
+      if (parentIndex === -1) {
+        throw new Error(`Parent item with id ${parentId} not found`);
+      }
+      if (childIndex === -1) {
+        throw new Error(`Child item with id ${childId} not found`);
+      }
+
+      const parentItem = previous.items[parentIndex];
+      const childItem = previous.items[childIndex];
+
+      // Create the appropriate child relationship
+      let updatedParent: Item;
+      let updatedChild: Item;
+
+      if (parentItem instanceof CheckListItem) {
+        // For CheckListItem, create a CheckListChild
+        const checkListChild = new CheckListChild({ itemId: childId });
+        updatedParent = addChildToItem(parentItem, checkListChild);
+
+        // Add parent relationship to child
+        const parentRelationship = new Parent({
+          id: parentId,
+          relationshipId: checkListChild.relationshipId
+        });
+        updatedChild = addParentToItem(childItem, parentRelationship);
+      } else if (parentItem instanceof SubCalendarItem) {
+        // For SubCalendarItem, this should be handled by DurationDialog/scheduling
+        throw new Error("Use DurationDialog for adding children to SubCalendarItem with start times");
+      } else {
+        throw new Error(`Cannot add children to item of type ${parentItem.constructor.name}`);
+      }
+
+      // Update items in state
+      const newItems = [...previous.items];
+      newItems[parentIndex] = updatedParent;
+      newItems[childIndex] = updatedChild;
+
+      //* *****************************************************
+      //* appState
+      //* items
+      //* *****************************************************
+      return { ...previous, items: newItems };
     }
     case "ADD_BASE_CALENDAR_ENTRY": {
       const { entry } = action.payload;

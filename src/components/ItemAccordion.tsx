@@ -31,22 +31,32 @@ export default function ItemAccordion({
 }: ItemAccordionProps) {
   const { items, baseCalendar } = useAppState();
   const appDispatch = useAppDispatch();
-  const currentTime = useCurrentTime(100);
+  const currentTime = useCurrentTime(1000); // Reduced frequency to prevent performance issues
   const [expanded, setExpanded] = useState(true);
 
-  // Calculate progress for this item
+  // Calculate progress for this item (memoized with less frequent updates)
   const taskProgress = useMemo(() => {
     if (!item) return 0;
-    const startTime = getTaskStartTime(taskChain, item, baseCalendar);
-    return getTaskProgress(item, currentTime, startTime);
+    try {
+      const startTime = getTaskStartTime(taskChain, item, baseCalendar);
+      return getTaskProgress(item, currentTime, startTime);
+    } catch (error) {
+      console.error('Error calculating task progress:', error);
+      return 0;
+    }
   }, [item, currentTime, taskChain, baseCalendar]);
 
-  // Calculate remaining time
+  // Calculate remaining time (memoized with less frequent updates)
   const remainingTime = useMemo(() => {
     if (!item) return 0;
-    const startTime = getTaskStartTime(taskChain, item, baseCalendar);
-    const elapsed = currentTime - startTime;
-    return Math.max(0, item.duration - elapsed);
+    try {
+      const startTime = getTaskStartTime(taskChain, item, baseCalendar);
+      const elapsed = currentTime - startTime;
+      return Math.max(0, item.duration - elapsed);
+    } catch (error) {
+      console.error('Error calculating remaining time:', error);
+      return 0;
+    }
   }, [item, currentTime, taskChain, baseCalendar]);
 
   // Format time helper

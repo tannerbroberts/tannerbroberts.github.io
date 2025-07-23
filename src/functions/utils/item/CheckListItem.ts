@@ -26,6 +26,24 @@ export class CheckListItem extends Item {
     this.sortType = sortType;
   }
 
+  /**
+   * Add a child to this checklist item
+   * @param child The CheckListChild to add
+   * @returns void - modifies the current instance
+   */
+  addChild(child: CheckListChild): void {
+    this.children.push(child);
+  }
+
+  /**
+   * Remove a child from this checklist item by relationship ID
+   * @param relationshipId The relationship ID of the child to remove
+   * @returns void - modifies the current instance
+   */
+  removeChild(relationshipId: string): void {
+    this.children = this.children.filter((c) => c.relationshipId !== relationshipId);
+  }
+
   toJSON(): ItemJSON {
     return {
       id: this.id,

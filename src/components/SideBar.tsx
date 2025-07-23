@@ -1,9 +1,9 @@
-import { Delete, Schedule, Visibility, Timer } from "@mui/icons-material";
+import { Delete, Schedule, Visibility, Timer, PlaylistAdd } from "@mui/icons-material";
 import { Box, ButtonGroup, Drawer, IconButton, List, ListItem, Toolbar, Typography } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
 import { TimeInputProvider } from "../reducerContexts/TimeInput";
-import { getItemById, getChildren } from "../functions/utils/item/index";
+import { getItemById, getChildren, CheckListItem } from "../functions/utils/item/index";
 import ExportButton from "./ExportButton";
 import ImportButton from "./ImportButton";
 import ItemListFilter from "./ItemListFilter";
@@ -12,6 +12,7 @@ import PaginatedItemList from "./PaginatedItemList";
 import RandomItemButton from "./RandomItemButton";
 import SchedulingDialog from "./SchedulingDialog";
 import DurationDialog from "./DurationDialog";
+import CheckListChildDialog from "./CheckListChildDialog";
 
 export default function SideBar() {
   const { sideDrawerOpen, focusedItemId, focusedListItemId, items } = useAppState()
@@ -40,6 +41,10 @@ export default function SideBar() {
     appDispatch({ type: 'SET_DURATION_DIALOG_OPEN', payload: { durationDialogOpen: true } })
   }, [appDispatch])
 
+  const openCheckListChildDialog = useCallback(() => {
+    appDispatch({ type: 'SET_CHECKLIST_CHILD_DIALOG_OPEN', payload: { checkListChildDialogOpen: true } })
+  }, [appDispatch])
+
   // Can schedule if:
   const focusedItem = useMemo(() => {
     if (!focusedItemId) return null
@@ -61,6 +66,12 @@ export default function SideBar() {
     if (!focusedListItemId) return true
     if (focusedItemId === focusedListItemId) return true
   }, [focusedItemId, focusedListItemId])
+
+  const canAddToChecklist = useMemo(() => {
+    if (!focusedListItem || !focusedItem) return false
+    if (focusedItem.id === focusedListItem.id) return false // Can't add to itself
+    return focusedItem instanceof CheckListItem
+  }, [focusedItem, focusedListItem])
 
   return (
     <>
@@ -97,9 +108,14 @@ export default function SideBar() {
               </IconButton>
 
               {focusedItemId ? (
-                <IconButton disabled={!focusedListItemId} onClick={openDurationDialog}>
-                  <Timer />
-                </IconButton>
+                <>
+                  <IconButton disabled={!focusedListItemId} onClick={openDurationDialog}>
+                    <Timer />
+                  </IconButton>
+                  <IconButton disabled={!canAddToChecklist} onClick={openCheckListChildDialog}>
+                    <PlaylistAdd />
+                  </IconButton>
+                </>
               ) : (<IconButton disabled={!canSchedule} onClick={openSchedulingDialog}>
                 <Schedule />
               </IconButton>)}
@@ -136,6 +152,7 @@ export default function SideBar() {
       <TimeInputProvider>
         <SchedulingDialog />
         <DurationDialog />
+        <CheckListChildDialog />
       </TimeInputProvider>
     </>
   )

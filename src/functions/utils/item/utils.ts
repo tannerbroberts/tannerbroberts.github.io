@@ -62,16 +62,27 @@ export function getCurrentTaskChain(
   currentTime: number = Date.now(),
   baseCalendar?: Map<string, BaseCalendarEntry>
 ): Item[] {
+  const startTime = performance.now();
   const chain: Item[] = [];
 
-  // Find the top-most item that overlaps with current time
-  const topMostItem = findTopMostActiveItem(items, currentTime, baseCalendar);
-  if (!topMostItem) return chain;
+  try {
+    // Find the top-most item that overlaps with current time
+    const topMostItem = findTopMostActiveItem(items, currentTime, baseCalendar);
+    if (!topMostItem) return chain;
 
-  // Build chain recursively from top-most parent to deepest child
-  buildChainRecursively(items, topMostItem, currentTime, chain);
+    // Build chain recursively from top-most parent to deepest child
+    buildChainRecursively(items, topMostItem, currentTime, chain, 0);
 
-  return chain;
+    const duration = performance.now() - startTime;
+    if (duration > 10) { // Log if it takes more than 10ms
+      console.warn(`getCurrentTaskChain took ${duration.toFixed(2)}ms to complete`);
+    }
+
+    return chain;
+  } catch (error) {
+    console.error('Error in getCurrentTaskChain:', error);
+    return chain;
+  }
 }
 
 /**
@@ -81,6 +92,11 @@ function findTopMostActiveItem(items: Item[], currentTime: number, baseCalendar?
   // Only check base calendar entries - items must be scheduled to be executable
   if (baseCalendar) {
     for (const [, entry] of baseCalendar) {
+      if (!entry?.itemId) {
+        console.warn('Invalid base calendar entry found:', entry);
+        continue;
+      }
+
       const item = getItemById(items, entry.itemId);
       if (item && isItemActiveAtTime(item, currentTime, entry.startTime)) {
         return item;
@@ -95,13 +111,26 @@ function findTopMostActiveItem(items: Item[], currentTime: number, baseCalendar?
 /**
  * Build the task chain recursively from parent to child
  */
-function buildChainRecursively(items: Item[], currentItem: Item, currentTime: number, chain: Item[]): void {
+function buildChainRecursively(items: Item[], currentItem: Item, currentTime: number, chain: Item[], depth: number = 0): void {
+  // Prevent infinite recursion by limiting depth
+  const MAX_DEPTH = 50;
+  if (depth > MAX_DEPTH) {
+    console.warn(`Maximum recursion depth (${MAX_DEPTH}) reached while building task chain. Stopping to prevent freeze.`);
+    return;
+  }
+
+  // Prevent infinite recursion by checking if we've already added this item
+  if (chain.some(item => item.id === currentItem.id)) {
+    console.warn(`Circular reference detected: item ${currentItem.id} (${currentItem.name}) already in chain`);
+    return;
+  }
+
   chain.push(currentItem);
 
   // Find child items that are active at current time
   const activeChild = findActiveChildAtTime(items, currentItem, currentTime);
   if (activeChild) {
-    buildChainRecursively(items, activeChild, currentTime, chain);
+    buildChainRecursively(items, activeChild, currentTime, chain, depth + 1);
   }
 }
 
@@ -110,21 +139,45 @@ function buildChainRecursively(items: Item[], currentItem: Item, currentTime: nu
  */
 function findActiveChildAtTime(items: Item[], parentItem: Item, currentTime: number): Item | null {
   if (parentItem instanceof SubCalendarItem) {
-    for (const childRef of parentItem.children) {
-      const childItem = getItemById(items, childRef.id);
-      if (childItem && isItemActiveAtTime(childItem, currentTime, childRef.start ?? 0)) {
-        return childItem;
-      }
-    }
-    return null;
+    return findActiveSubCalendarChild(items, parentItem, currentTime);
   } else if (parentItem instanceof CheckListItem) {
-    for (const childRef of parentItem.children) {
-      const childItem = getItemById(items, childRef.itemId);
-      if (childItem) {
-        return childItem;
-      }
+    return findActiveCheckListChild(items, parentItem);
+  }
+  return null;
+}
+
+/**
+ * Find active child in SubCalendarItem
+ */
+function findActiveSubCalendarChild(items: Item[], parentItem: SubCalendarItem, currentTime: number): Item | null {
+  for (const childRef of parentItem.children) {
+    if (!childRef?.id) {
+      console.warn(`Invalid child reference found in SubCalendarItem ${parentItem.id}:`, childRef);
+      continue;
     }
-    return null;
+
+    const childItem = getItemById(items, childRef.id);
+    if (childItem && isItemActiveAtTime(childItem, currentTime, childRef.start ?? 0)) {
+      return childItem;
+    }
+  }
+  return null;
+}
+
+/**
+ * Find active child in CheckListItem
+ */
+function findActiveCheckListChild(items: Item[], parentItem: CheckListItem): Item | null {
+  for (const childRef of parentItem.children) {
+    if (!childRef?.itemId) {
+      console.warn(`Invalid child reference found in CheckListItem ${parentItem.id}:`, childRef);
+      continue;
+    }
+
+    const childItem = getItemById(items, childRef.itemId);
+    if (childItem) {
+      return childItem;
+    }
   }
   return null;
 }
@@ -139,20 +192,7 @@ function isItemActiveAtTime(item: Item, currentTime: number, startTime: number =
   const itemStart = startTime;
   const itemEnd = startTime + item.duration;
 
-  // For repeating items, check if current time falls within any cycle
-  if (item.duration > 0) {
-    // If we're before the start time, not active
-    if (currentTime < itemStart) return false;
-
-    // Calculate position within the cycle
-    const cycleTime = currentTime - itemStart;
-    const cyclePosition = cycleTime % item.duration;
-
-    // Item is active if we're within the duration of the current cycle
-    return cyclePosition >= 0 && cyclePosition < item.duration;
-  }
-
-  // For non-repeating items, simple range check
+  // Simple range check - item is active if current time is within its duration
   return currentTime >= itemStart && currentTime < itemEnd;
 }
 
