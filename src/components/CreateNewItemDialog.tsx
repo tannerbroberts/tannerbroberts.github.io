@@ -15,7 +15,7 @@ import { useCallback, useState, useEffect } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
 import { TimeInputProvider, useTimeInputDispatch, useTimeInputState } from "../reducerContexts/TimeInput";
 import { NewItemProvider, useNewItemDispatch, useNewItemState } from "../reducerContexts/NewItem";
-import { Item } from "../functions/utils/item";
+import { BasicItem } from "../functions/utils/item/index";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
@@ -348,7 +348,7 @@ function CreateNewItemDialogContent() {
       alert("Please enter a duration for the new item");
       return;
     }
-    const newItem = new Item({ name: name.trim(), duration: total });
+    const newItem = new BasicItem({ name: name.trim(), duration: total });
     dispatch({ type: "CREATE_ITEM", payload: { newItem } });
     handleClose();
   }, [dispatch, name, total, handleClose]);

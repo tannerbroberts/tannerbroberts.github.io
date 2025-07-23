@@ -194,3 +194,5 @@ src/
 6. **Implement proper TypeScript types** for all new interfaces
 
 This architecture emphasizes separation of concerns, type safety, and predictable state management while maintaining component reusability and testability.
+
+When removing files, ensure that you type "y" after running the command to confirm the deletion.

@@ -43,7 +43,12 @@ export class SubCalendarItem extends Item {
 
   toJSON(): ItemJSON {
     return {
-      ...super.toJSON(),
+      id: this.id,
+      name: this.name,
+      duration: this.duration,
+      parents: this.parents,
+      allOrNothing: this.allOrNothing,
+      type: this.constructor.name,
       children: this.children,
     };
   }

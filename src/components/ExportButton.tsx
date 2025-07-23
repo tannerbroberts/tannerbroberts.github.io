@@ -1,7 +1,7 @@
 import { Button } from "@mui/material";
 import { useCallback } from "react";
 import { useAppState } from "../reducerContexts/App";
-import { Item } from "../functions/utils/item";
+import { Item } from "../functions/utils/item/index";
 
 export default function ExportButton() {
   const { items } = useAppState();

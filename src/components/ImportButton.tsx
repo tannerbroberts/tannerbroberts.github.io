@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import { useState, useCallback } from "react";
 import { useAppDispatch } from "../reducerContexts/App";
-import { Item, ItemJSON } from "../functions/utils/item";
+import { ItemFactory, ItemJSON } from "../functions/utils/item/index";
 
 export default function ImportButton() {
   const [open, setOpen] = useState(false);
@@ -34,7 +34,7 @@ export default function ImportButton() {
         throw new Error("Invalid JSON structure.");
       }
 
-      const newItems = itemsToImport.map(Item.fromJSON);
+      const newItems = itemsToImport.map(ItemFactory.fromJSON);
 
       appDispatch({
         type: "BATCH",

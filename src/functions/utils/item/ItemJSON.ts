@@ -1,3 +1,5 @@
+import type { SortType } from "./SortType";
+
 export interface ItemJSON {
   id: string;
   name: string;

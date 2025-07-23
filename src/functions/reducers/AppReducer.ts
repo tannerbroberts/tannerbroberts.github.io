@@ -1,5 +1,16 @@
 import { cloneDeep } from "lodash";
-import { getIndexById, Item } from "../utils/item";
+import {
+  getIndexById,
+  Item,
+  hasChildWithId,
+  hasParentWithId,
+  removeChildById,
+  removeParentById,
+  hasChildWithRelationshipId,
+  hasParentWithRelationshipId,
+  removeChildByRelationshipId,
+  removeParentByRelationshipId
+} from "../utils/item/index";
 import { v4 as uuid } from "uuid";
 
 export type AppState = typeof initialState;
@@ -53,10 +64,6 @@ export type AppAction =
     payload: { pixelsPerSegment: number };
   }
   | { type: "SET_SIDE_DRAWER_OPEN"; payload: { sideDrawerOpen: boolean } }
-  | {
-    type: "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID";
-    payload: { id: string; showChildren: boolean };
-  }
   | {
     type: "UPDATE_ITEMS";
     payload: { updatedItems: Item[] };
@@ -163,17 +170,11 @@ export default function reducer(
       //* parents and children with id
       //* ****************************************************
       const newItems = previous.items.map((item) => {
-        if (item.children.some((child) => child.id === id)) {
-          const children = [
-            ...item.children.filter((child) => child.id !== id),
-          ];
-          return new Item({ ...item, children });
+        if (hasChildWithId(item, id)) {
+          return removeChildById(item, id);
         }
-        if (item.parents.some((parent) => parent.id === id)) {
-          const parents = [
-            ...item.parents.filter((parent) => parent.id !== id),
-          ];
-          return new Item({ ...item, parents });
+        if (hasParentWithId(item, id)) {
+          return removeParentById(item, id);
         }
         return item;
       });
@@ -191,17 +192,11 @@ export default function reducer(
       //* parents and children with relationshipId
       //* ****************************************************
       const newItems = previous.items.map((item) => {
-        if (item.children.some((child) => child.relationshipId === relationshipId)) {
-          const children = [
-            ...item.children.filter((child) => child.relationshipId !== relationshipId),
-          ];
-          return new Item({ ...item, children });
+        if (hasChildWithRelationshipId(item, relationshipId)) {
+          return removeChildByRelationshipId(item, relationshipId);
         }
-        if (item.parents.some((parent) => parent.relationshipId === relationshipId)) {
-          const parents = [
-            ...item.parents.filter((parent) => parent.relationshipId !== relationshipId),
-          ];
-          return new Item({ ...item, parents });
+        if (hasParentWithRelationshipId(item, relationshipId)) {
+          return removeParentByRelationshipId(item, relationshipId);
         }
         return item;
       });
@@ -295,28 +290,6 @@ export default function reducer(
       //* pixelsPerSegment
       //* ****************************************************
       return { ...previous, pixelsPerSegment };
-    }
-    case "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID": {
-      const { id, showChildren } = action.payload;
-      const index = getIndexById(previous.items, id);
-      if (index === -1) {
-        throw new Error("Item not found when trying to toggle showChildren");
-      }
-
-      //* ****************************************************
-      //* item[index]
-      //* ****************************************************
-      const item = previous.items[index];
-      previous.items[index] = item.updateShowChildren(showChildren);
-
-      //* ****************************************************
-      //* items
-      //* ****************************************************
-      //* *****************************************************
-      //* appState
-      //* items
-      //* *****************************************************
-      return { ...previous, items: [...previous.items] };
     }
     case "UPDATE_ITEMS": {
       const { updatedItems } = action.payload;

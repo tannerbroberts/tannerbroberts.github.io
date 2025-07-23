@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Box, Typography } from "@mui/material";
 import ItemAccordion from "./ItemAccordion";
-import { Item } from "../functions/utils/item";
+import { Item } from "../functions/utils/item/index";
 
 interface TaskChainAccordionProps {
   readonly taskChain: Item[];

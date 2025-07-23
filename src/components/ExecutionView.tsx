@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material";
 import TaskChainAccordion from "./TaskChainAccordion";
 import { useAppState } from "../reducerContexts/App";
 import { useCurrentTime } from "../hooks/useCurrentTime";
-import { getCurrentTaskChain } from "../functions/utils/item";
+import { getCurrentTaskChain } from "../functions/utils/item/index";
 
 interface ExecutionViewProps {
   readonly showHeader?: boolean;

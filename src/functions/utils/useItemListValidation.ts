@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useAppState } from "../../reducerContexts/App";
-import { getIndexById } from "./item";
+import { getIndexById } from "./item/index";
 
 export default function useItemListValidation() {
   const { items } = useAppState();

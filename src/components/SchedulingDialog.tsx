@@ -2,7 +2,7 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/
 import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
 import SchedulingTimeInput from "./SchedulingTimeInput";
-import { getItemById } from "../functions/utils/item";
+import { getItemById } from "../functions/utils/item/index";
 import { createBaseCalendarEntry } from "../functions/reducers/AppReducer";
 import { useTimeInputState, useTimeInputDispatch } from "../reducerContexts/TimeInput";
 

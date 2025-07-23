@@ -12,7 +12,7 @@ import { ExpandMore } from "@mui/icons-material";
 import PieChartCountdown from "./PieChartCountdown";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
 import { useCurrentTime } from "../hooks/useCurrentTime";
-import { getItemById, getTaskProgress, getTaskStartTime, Item } from "../functions/utils/item";
+import { getItemById, getTaskProgress, getTaskStartTime, Item, SubCalendarItem, CheckListItem } from "../functions/utils/item/index";
 
 interface ItemAccordionProps {
   readonly item: Item;
@@ -147,7 +147,7 @@ export default function ItemAccordion({
               size="small"
               color="primary"
             />
-            {item.children.length > 0 && (
+            {(item instanceof SubCalendarItem || item instanceof CheckListItem) && item.children.length > 0 && (
               <Chip
                 label={`${item.children.length} child${item.children.length > 1 ? 'ren' : ''}`}
                 size="small"
@@ -221,13 +221,14 @@ export default function ItemAccordion({
           </Box>
 
           {/* Children Info */}
-          {item.children.length > 0 && (
+          {(item instanceof SubCalendarItem || item instanceof CheckListItem) && item.children.length > 0 && (
             <Box>
               <Typography variant="subtitle2" gutterBottom>
                 Child Tasks:
               </Typography>
-              {item.children.map((child, index) => {
-                const childItem = getItemById(items, child.id);
+              {item.children.map((child: any, index: number) => {
+                const childId = child.id || child.itemId;
+                const childItem = getItemById(items, childId);
                 if (!childItem) return null;
 
                 return (
@@ -246,7 +247,7 @@ export default function ItemAccordion({
                         {childItem.name}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        Starts at {formatTime(child.start)} • Duration: {formatTime(childItem.duration)}
+                        {child.start !== undefined ? `Starts at ${formatTime(child.start)} • ` : ''}Duration: {formatTime(childItem.duration)}
                       </Typography>
                     </Box>
                     <Chip

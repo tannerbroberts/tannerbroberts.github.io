@@ -2,7 +2,7 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Box, Typogra
 import { Add, Remove } from "@mui/icons-material";
 import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
-import { getItemById, scheduleItem } from "../functions/utils/item";
+import { getItemById, SubCalendarItem, Child, Parent } from "../functions/utils/item/index";
 import { useTimeInputState, useTimeInputDispatch } from "../reducerContexts/TimeInput";
 
 interface TimeUnitControlProps {
@@ -102,13 +102,46 @@ export default function DurationDialog() {
     // Use the current time plus the duration from the time input as relative start time
     const scheduledTime = Date.now() + total;
 
-    const { newParentItem, newChildItem } = scheduleItem({
-      childItem: focusedListItem,
-      parentItem: focusedItem,
-      start: scheduledTime,
+    // Convert focusedItem to SubCalendarItem if it isn't already
+    let parentItem: SubCalendarItem;
+    if (focusedItem instanceof SubCalendarItem) {
+      parentItem = focusedItem;
+    } else {
+      // Create a new SubCalendarItem with the same properties
+      parentItem = new SubCalendarItem({
+        id: focusedItem.id,
+        name: focusedItem.name,
+        duration: focusedItem.duration,
+        parents: focusedItem.parents,
+        allOrNothing: focusedItem.allOrNothing,
+        children: []
+      });
+    }
+
+    // Create a new Child relationship
+    const childRelationship = new Child({
+      id: focusedListItem.id,
+      start: scheduledTime
     });
 
-    dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [newParentItem, newChildItem] } });
+    // Try to schedule the child
+    const getDuration = (itemId: string) => {
+      const item = getItemById(items, itemId);
+      return item ? item.duration : 0;
+    };
+
+    const scheduled = parentItem.scheduleChild(childRelationship, getDuration);
+    if (!scheduled) {
+      throw new Error('Unable to schedule item - time slot conflicts with existing children');
+    }
+
+    // Update the parent item and add parent relationship to child
+    const updatedChild = focusedListItem.updateParents([new Parent({
+      id: parentItem.id,
+      relationshipId: childRelationship.relationshipId
+    })]);
+
+    dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [parentItem, updatedChild] } });
 
     handleClose();
   }, [dispatch, focusedItemId, focusedListItemId, items, total, handleClose]);

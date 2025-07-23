@@ -1,5 +1,5 @@
 import React from 'react';
-import { Item } from '../functions/utils/item';
+import { Item } from '../functions/utils/item/index';
 
 interface TaskBreadcrumbsProps {
   readonly chain: Item[];

@@ -6,7 +6,7 @@ import type { SortType } from "./SortType";
 
 export class CheckListItem extends Item {
   children: CheckListChild[];
-  sortType: SortType;
+  readonly sortType: SortType;
 
   constructor({
     children = [],
@@ -28,7 +28,12 @@ export class CheckListItem extends Item {
 
   toJSON(): ItemJSON {
     return {
-      ...super.toJSON(),
+      id: this.id,
+      name: this.name,
+      duration: this.duration,
+      parents: this.parents,
+      allOrNothing: this.allOrNothing,
+      type: this.constructor.name,
       children: this.children,
       sortType: this.sortType,
     };
@@ -42,7 +47,7 @@ export class CheckListItem extends Item {
       parents: Array.isArray(json.parents) ? json.parents.map((p) => new Parent(p as { id: string; relationshipId?: string })) : [],
       allOrNothing: json.allOrNothing || false,
       children: Array.isArray(json.children) ? json.children.map((c) => new CheckListChild(c as { itemId: string; complete?: boolean; relationshipId?: string })) : [],
-      sortType: typeof json.sortType === 'string' ? json.sortType : "manual",
+      sortType: (typeof json.sortType === 'string' && (json.sortType === 'alphabetical' || json.sortType === 'manual' || json.sortType === 'duration')) ? json.sortType : "manual",
     });
   }
 }

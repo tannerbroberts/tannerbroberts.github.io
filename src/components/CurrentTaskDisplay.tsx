@@ -1,5 +1,5 @@
 import { Typography, Paper, LinearProgress, Box } from "@mui/material";
-import { Item } from "../functions/utils/item";
+import { Item, SubCalendarItem, CheckListItem } from "../functions/utils/item/index";
 
 interface CurrentTaskDisplayProps {
   task: Item;
@@ -102,7 +102,8 @@ export default function CurrentTaskDisplay({ task, currentTime }: Readonly<Curre
         </div>
       </Box>
 
-      {task.children.length > 0 && (
+      {/* Show children if this is a SubCalendarItem with scheduled children */}
+      {task instanceof SubCalendarItem && task.children.length > 0 && (
         <div style={{
           backgroundColor: '#f8f9fa',
           padding: '16px',
@@ -132,6 +133,39 @@ export default function CurrentTaskDisplay({ task, currentTime }: Readonly<Curre
               </div>
             ))
           }
+        </div>
+      )}
+
+      {/* Show checklist items if this is a CheckListItem */}
+      {task instanceof CheckListItem && task.children.length > 0 && (
+        <div style={{
+          backgroundColor: '#f8f9fa',
+          padding: '16px',
+          borderRadius: '8px',
+          marginTop: '16px'
+        }}>
+          <Typography variant="h6" style={{ marginBottom: '12px' }}>
+            Checklist Items
+          </Typography>
+
+          {task.children.slice(0, 3).map((child, index) => (
+            <div key={child.relationshipId} style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '8px 0',
+              borderBottom: index < 2 ? '1px solid #e0e0e0' : 'none'
+            }}>
+              <Typography variant="body2">
+                Item {index + 1}
+              </Typography>
+              <Typography variant="body2" style={{
+                color: child.complete ? '#4caf50' : '#666'
+              }}>
+                {child.complete ? 'Complete' : 'Pending'}
+              </Typography>
+            </div>
+          ))}
         </div>
       )}
     </Paper>

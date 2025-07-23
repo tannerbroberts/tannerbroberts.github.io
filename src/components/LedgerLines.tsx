@@ -1,5 +1,5 @@
 import { useAppState } from "../reducerContexts/App"
-import { getItemById } from "../functions/utils/item"
+import { getItemById } from "../functions/utils/item/index"
 import { useViewportHeight } from "../hooks/useViewportHeight"
 
 const formatTime = (ms: number) => {

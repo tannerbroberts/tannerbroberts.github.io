@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
-import { Item } from "../functions/utils/item";
+import { Item, SubCalendarItem, CheckListItem } from "../functions/utils/item/index";
 import { Visibility } from "@mui/icons-material";
 
 export default function PaginatedItemListItem({ item }: Readonly<{ item: Item }>) {
@@ -36,7 +36,7 @@ export default function PaginatedItemListItem({ item }: Readonly<{ item: Item }>
   const isFocusedItem = useMemo(() => focusedItemId === item.id, [focusedItemId, item.id])
 
   // If item has children, show as regular list item with child count
-  if (item.children.length > 0) {
+  if ((item instanceof SubCalendarItem || item instanceof CheckListItem) && item.children.length > 0) {
     return (
       <ListItem
         secondaryAction={isFocusedItem ? <Visibility /> : null}

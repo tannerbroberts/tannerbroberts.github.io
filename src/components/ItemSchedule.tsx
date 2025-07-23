@@ -1,7 +1,7 @@
 import { Typography, Button, Box, Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import { useCallback } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
-import { getItemById, Item } from "../functions/utils/item";
+import { getItemById, Item, SubCalendarItem, CheckListItem } from "../functions/utils/item/index";
 import { ExpandMore } from "@mui/icons-material";
 
 export default function ItemSchedule({ item, start = null, relationshipId = null }: Readonly<{ item: Item, start?: number | null, relationshipId?: string | null }>) {
@@ -11,11 +11,13 @@ export default function ItemSchedule({ item, start = null, relationshipId = null
 
   const updateShowChildren = useCallback((e: React.SyntheticEvent, expanded: boolean) => {
     e.stopPropagation();
-    appDispatch({
-      type: "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID",
-      payload: { id: item.id, showChildren: expanded },
-    });
-  }, [item, appDispatch]);
+    // TODO: Implement UI state management for showChildren
+    console.log('Toggle showChildren for item:', item.id, 'expanded:', expanded);
+    // appDispatch({
+    //   type: "TOGGLE_ITEM_SHOW_CHILDREN_BY_ID",
+    //   payload: { id: item.id, showChildren: expanded },
+    // });
+  }, [item]);
 
   const handleMoveItem = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -58,7 +60,7 @@ export default function ItemSchedule({ item, start = null, relationshipId = null
       }}>
 
       <Accordion
-        expanded={item.showChildren}
+        expanded={false} // TODO: Get from UI state
         onChange={updateShowChildren}
         sx={{
           height: '100%',
@@ -134,10 +136,14 @@ export default function ItemSchedule({ item, start = null, relationshipId = null
         </AccordionSummary>
 
         <AccordionDetails sx={{ p: 1, position: 'relative' }}>
-          {item.children.map((child) => {
-            const { id, start: childStart, relationshipId } = child
-            const childItem = getItemById(items, id);
-            if (childItem === null) throw new Error(`Item with id ${id} not found while rendering children in ItemSchedule of ${item.name}`);
+          {(item instanceof SubCalendarItem || item instanceof CheckListItem) && Array.isArray(item.children) && item.children.map((child: any) => {
+            // SubCalendarItem: child has id, start, relationshipId
+            // CheckListItem: child has itemId, complete, relationshipId
+            const childId = child.id || child.itemId;
+            const childStart = child.start;
+            const relationshipId = child.relationshipId;
+            const childItem = getItemById(items, childId);
+            if (childItem === null) throw new Error(`Item with id ${childId} not found while rendering children in ItemSchedule of ${item.name}`);
             return (
               <ItemSchedule
                 key={relationshipId}
@@ -145,7 +151,7 @@ export default function ItemSchedule({ item, start = null, relationshipId = null
                 start={childStart}
                 relationshipId={relationshipId}
               />
-            )
+            );
           })}
         </AccordionDetails>
       </Accordion>

@@ -8,3 +8,6 @@ export * from './SubCalendarItem';
 export * from './CheckListChild';
 export * from './CheckListItem';
 export * from './SortType';
+export * from './ItemFactory';
+export * from './utils';
+export * from './itemUtils';

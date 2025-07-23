@@ -3,7 +3,7 @@ import type { ItemJSON } from "./ItemJSON";
 import { Parent } from "./Parent";
 
 export class BasicItem extends Item {
-  priority: number;
+  readonly priority: number;
 
   constructor({
     priority = 0,
@@ -22,7 +22,12 @@ export class BasicItem extends Item {
 
   toJSON(): ItemJSON {
     return {
-      ...super.toJSON(),
+      id: this.id,
+      name: this.name,
+      duration: this.duration,
+      parents: this.parents,
+      allOrNothing: this.allOrNothing,
+      type: this.constructor.name,
       priority: this.priority,
     };
   }

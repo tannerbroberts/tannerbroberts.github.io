@@ -2,7 +2,7 @@ import { Menu, MenuOpen } from '@mui/icons-material';
 import { AppBar, Button, ButtonGroup, IconButton, Toolbar, Typography } from '@mui/material';
 import { useMemo, useCallback } from 'react';
 import { useAppDispatch, useAppState } from '../reducerContexts/App';
-import { getItemById } from '../functions/utils/item';
+import { getItemById } from '../functions/utils/item/index';
 
 export default function Header() {
   const { sideDrawerOpen, items, focusedItemId } = useAppState()
