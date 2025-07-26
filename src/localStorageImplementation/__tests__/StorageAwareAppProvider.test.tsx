@@ -34,13 +34,6 @@ class MockItem extends Item {
   }
 }
 
-// Mock the storage service
-vi.mock('../localStorageService');
-vi.mock('../dataValidation');
-
-const mockStorageService = vi.mocked(storageService);
-const mockDataValidation = vi.mocked(dataValidation);
-
 // Test component that uses the contexts
 function TestComponent(): React.JSX.Element {
   const state = useAppState();
