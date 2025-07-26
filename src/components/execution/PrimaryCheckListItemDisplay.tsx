@@ -137,7 +137,7 @@ export default function PrimaryCheckListItemDisplay({
             mb: 1
           }}>
             <Typography variant="body2" color="text.secondary">
-              Overall Progress
+              Time Remaining
             </Typography>
             <Typography
               variant="body2"

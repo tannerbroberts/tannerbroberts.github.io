@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import SubCalendarStatusBar from './SubCalendarStatusBar';
 import { SubCalendarItem } from '../../functions/utils/item/SubCalendarItem';
+import { BasicItem } from '../../functions/utils/item/BasicItem';
 import { Child } from '../../functions/utils/item/Child';
 
 // Mock data for testing
@@ -16,18 +17,16 @@ const mockSubCalendarItem = new SubCalendarItem({
 });
 
 const mockTaskChain = [
-  {
+  new BasicItem({
     id: 'child1',
     name: 'First Task',
-    duration: 30000,
-    type: 'BasicItem'
-  },
-  {
+    duration: 30000
+  }),
+  new BasicItem({
     id: 'child2',
     name: 'Second Task',
-    duration: 30000,
-    type: 'BasicItem'
-  }
+    duration: 30000
+  })
 ];
 
 describe('SubCalendarStatusBar', () => {

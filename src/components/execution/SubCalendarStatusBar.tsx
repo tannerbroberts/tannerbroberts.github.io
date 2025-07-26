@@ -22,7 +22,7 @@ const pulse = keyframes`
 `;
 
 // Styled components for enhanced visuals
-const StatusBarContainer = styled(Box)(({ theme }) => ({
+const StatusBarContainer = styled(Box)(() => ({
   width: '100%',
   height: 60, // Increased height for better visual presence
   borderRadius: '8px 8px 0 0',
@@ -52,12 +52,15 @@ interface SubCalendarStatusBarProps {
   readonly taskChain: Item[];
   readonly currentTime: number;
   readonly startTime: number;
+  readonly itemName?: string; // Optional item name to display instead of current child
+  readonly isExpandable?: boolean; // Whether this header can be expanded/collapsed
+  readonly isExpanded?: boolean; // Current expanded state
 }
 
 interface ChildStatus {
   child: Child; // Child from SubCalendarItem
   item: Item | null;
-  isActive: boolean; A
+  isActive: boolean;
   isCompleted: boolean;
   startTime: number;
   endTime: number;
@@ -67,7 +70,10 @@ export default function SubCalendarStatusBar({
   item,
   taskChain,
   currentTime,
-  startTime
+  startTime,
+  itemName,
+  isExpandable = false,
+  isExpanded = false
 }: SubCalendarStatusBarProps) {
   // Calculate overall progress for the SubCalendar
   const overallProgress = useMemo(() => {
@@ -206,7 +212,7 @@ export default function SubCalendarStatusBar({
           px: 3,
         }}
       >
-        {/* Left side: Progress percentage and current child */}
+        {/* Left side: Progress percentage and item name or current child */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
           <Tooltip
             title={`SubCalendar Progress: ${overallProgress.toFixed(1)}% complete`}
@@ -226,7 +232,40 @@ export default function SubCalendarStatusBar({
             </Typography>
           </Tooltip>
 
-          {childrenStatus.activeChild && (
+          {/* Show item name if provided (for parent headers) */}
+          {itemName && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: 'text.primary',
+                  fontWeight: 'bold',
+                  maxWidth: 250,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {itemName}
+              </Typography>
+              {/* Expand/collapse indicator */}
+              {isExpandable && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'text.secondary',
+                    fontWeight: 'medium',
+                    fontSize: '0.875rem'
+                  }}
+                >
+                  {isExpanded ? '▼' : '▶'}
+                </Typography>
+              )}
+            </Box>
+          )}
+
+          {/* Show current active child if no item name provided */}
+          {!itemName && childrenStatus.activeChild && (
             <Tooltip
               title={`Currently executing: ${childrenStatus.activeChild.item?.name || 'Unknown Task'}`}
               arrow
