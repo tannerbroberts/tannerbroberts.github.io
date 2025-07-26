@@ -1,4 +1,4 @@
 # File Removal
-- When removing files, run ```rm -f <file_path>``` to skip the confirmation prompt.
+- Use ```rm -f <file_path>``` to remove files. ALWAYS use the `-f` flag to force deletion without confirmation.
 # Testing
-- When running tests, use `npm run test:ai` for testing.
+- Use `npm run test:ai` to run tests.
