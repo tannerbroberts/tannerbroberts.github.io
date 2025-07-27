@@ -39,6 +39,10 @@ This folder contains a complete 7-step implementation plan for adding local stor
 - Sample data generation for testing
 - Performance monitoring tools
 - **Key Output:** `StorageDebugPanel.tsx`, `sampleData.ts`, `devTools.ts`
+- **File Removal**
+  - Use ```rm -f <file_path>``` to remove files. ALWAYS use the `-f` flag to force deletion without confirmation.
+# Testing
+- Use `npm run test:ai` to run tests.
 
 ### Step 6: Automatic Execution View Loading
 **File:** `step6-execution-view.md`
