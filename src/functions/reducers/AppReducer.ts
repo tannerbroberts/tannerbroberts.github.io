@@ -15,7 +15,14 @@ import {
   CheckListItem,
   SubCalendarItem,
   Parent,
-  addParentToItem
+  addParentToItem,
+  ItemInstance,
+  ItemInstanceImpl,
+  Variable,
+  VariableSummary,
+  createInstanceFromCalendarEntry,
+  hasChildren,
+  getChildren
 } from "../utils/item/index";
 import { v4 as uuid } from "uuid";
 
@@ -26,6 +33,7 @@ export interface BaseCalendarEntry {
   readonly id: string;
   readonly itemId: string;
   readonly startTime: number; // Milliseconds from Apple epoch
+  readonly instanceId?: string; // Link to ItemInstance
 }
 
 export type AppAction =
@@ -97,7 +105,24 @@ export type AppAction =
   | {
     type: "UPDATE_BASE_CALENDAR_ENTRY";
     payload: { entry: BaseCalendarEntry };
-  };
+  }
+  // Instance Management Actions
+  | { type: "CREATE_ITEM_INSTANCE"; payload: { instance: ItemInstanceImpl } }
+  | { type: "UPDATE_ITEM_INSTANCE"; payload: { instanceId: string; updates: Partial<ItemInstance> } }
+  | { type: "MARK_INSTANCE_STARTED"; payload: { instanceId: string; startTime?: number } }
+  | { type: "MARK_INSTANCE_COMPLETED"; payload: { instanceId: string; completedAt?: number } }
+  | { type: "DELETE_ITEM_INSTANCE"; payload: { instanceId: string } }
+  | { type: "CLEANUP_ORPHANED_INSTANCES"; payload: Record<string, never> }
+  // Variable Management Actions  
+  | { type: "SET_ITEM_VARIABLES"; payload: { itemId: string; variables: Variable[] } }
+  | { type: "ADD_ITEM_VARIABLE"; payload: { itemId: string; variable: Variable } }
+  | { type: "REMOVE_ITEM_VARIABLE"; payload: { itemId: string; variableIndex: number } }
+  | { type: "UPDATE_ITEM_VARIABLE"; payload: { itemId: string; variableIndex: number; variable: Variable } }
+  // Caching Actions
+  | { type: "INVALIDATE_VARIABLE_CACHE"; payload: { itemId?: string } }
+  | { type: "UPDATE_VARIABLE_CACHE"; payload: { itemId: string; summary: VariableSummary } }
+  // Enhanced calendar actions
+  | { type: "ADD_BASE_CALENDAR_ENTRY_WITH_INSTANCE"; payload: { entry: BaseCalendarEntry; createInstance?: boolean } };
 
 export const DEFAULT_WINDOW_RANGE_SIZE = 4;
 export const initialState = {
@@ -108,6 +133,9 @@ export const initialState = {
   focusedListItemId: null as string | null,
   items: new Array<Item>(),
   baseCalendar: new Map<string, BaseCalendarEntry>(),
+  itemInstances: new Map<string, ItemInstanceImpl>(),
+  itemVariables: new Map<string, Variable[]>(),
+  variableSummaryCache: new Map<string, VariableSummary>(),
   itemSearchWindowRange: { min: 0, max: DEFAULT_WINDOW_RANGE_SIZE },
   schedulingDialogOpen: false,
   durationDialogOpen: false,
@@ -386,26 +414,35 @@ export default function reducer(
       return { ...previous, items: newItems };
     }
     case "ADD_BASE_CALENDAR_ENTRY": {
+      // Enhance existing action to create instance
       const { entry } = action.payload;
-      const newBaseCalendar = new Map(previous.baseCalendar);
-      newBaseCalendar.set(entry.id, entry);
 
-      //* *****************************************************
-      //* appState
-      //* baseCalendar
-      //* *****************************************************
-      return { ...previous, baseCalendar: newBaseCalendar };
+      // Delegate to new action
+      return reducer(previous, {
+        type: "ADD_BASE_CALENDAR_ENTRY_WITH_INSTANCE",
+        payload: { entry, createInstance: true }
+      });
     }
     case "REMOVE_BASE_CALENDAR_ENTRY": {
       const { entryId } = action.payload;
+      const entry = previous.baseCalendar.get(entryId);
+
+      // Remove calendar entry
       const newBaseCalendar = new Map(previous.baseCalendar);
       newBaseCalendar.delete(entryId);
 
-      //* *****************************************************
-      //* appState
-      //* baseCalendar
-      //* *****************************************************
-      return { ...previous, baseCalendar: newBaseCalendar };
+      // Remove associated instance if it exists
+      let newInstances = previous.itemInstances;
+      if (entry?.instanceId) {
+        newInstances = new Map(previous.itemInstances);
+        newInstances.delete(entry.instanceId);
+      }
+
+      return {
+        ...previous,
+        baseCalendar: newBaseCalendar,
+        itemInstances: newInstances
+      };
     }
     case "UPDATE_BASE_CALENDAR_ENTRY": {
       const { entry } = action.payload;
@@ -422,9 +459,296 @@ export default function reducer(
       return { ...previous, baseCalendar: newBaseCalendar };
     }
 
+    // Instance Management Actions
+    case "CREATE_ITEM_INSTANCE": {
+      const { instance } = action.payload;
+      const newInstances = new Map(previous.itemInstances);
+      newInstances.set(instance.id, instance);
+
+      return {
+        ...previous,
+        itemInstances: newInstances
+      };
+    }
+
+    case "UPDATE_ITEM_INSTANCE": {
+      const { instanceId, updates } = action.payload;
+      const existingInstance = previous.itemInstances.get(instanceId);
+
+      if (!existingInstance) {
+        console.warn(`Instance ${instanceId} not found for update`);
+        return previous;
+      }
+
+      const updatedInstance = new ItemInstanceImpl({
+        ...existingInstance,
+        ...updates
+      });
+
+      const newInstances = new Map(previous.itemInstances);
+      newInstances.set(instanceId, updatedInstance);
+
+      return {
+        ...previous,
+        itemInstances: newInstances
+      };
+    }
+
+    case "MARK_INSTANCE_STARTED": {
+      const { instanceId, startTime = Date.now() } = action.payload;
+      const existingInstance = previous.itemInstances.get(instanceId);
+
+      if (!existingInstance) {
+        console.warn(`Instance ${instanceId} not found for start marking`);
+        return previous;
+      }
+
+      const startedInstance = existingInstance.markStarted(startTime);
+      const newInstances = new Map(previous.itemInstances);
+      newInstances.set(instanceId, startedInstance);
+
+      return {
+        ...previous,
+        itemInstances: newInstances
+      };
+    }
+
+    case "MARK_INSTANCE_COMPLETED": {
+      const { instanceId, completedAt = Date.now() } = action.payload;
+      const existingInstance = previous.itemInstances.get(instanceId);
+
+      if (!existingInstance) {
+        console.warn(`Instance ${instanceId} not found for completion marking`);
+        return previous;
+      }
+
+      const completedInstance = existingInstance.markCompleted(completedAt);
+      const newInstances = new Map(previous.itemInstances);
+      newInstances.set(instanceId, completedInstance);
+
+      return {
+        ...previous,
+        itemInstances: newInstances
+      };
+    }
+
+    case "DELETE_ITEM_INSTANCE": {
+      const { instanceId } = action.payload;
+      const newInstances = new Map(previous.itemInstances);
+      newInstances.delete(instanceId);
+
+      return {
+        ...previous,
+        itemInstances: newInstances
+      };
+    }
+
+    case "CLEANUP_ORPHANED_INSTANCES": {
+      // Remove instances that reference non-existent calendar entries or items
+      const validItemIds = new Set(previous.items.map(item => item.id));
+      const validCalendarEntryIds = new Set(Array.from(previous.baseCalendar.keys()));
+
+      const cleanedInstances = new Map<string, ItemInstanceImpl>();
+      for (const [instanceId, instance] of previous.itemInstances) {
+        if (validItemIds.has(instance.itemId) && validCalendarEntryIds.has(instance.calendarEntryId)) {
+          cleanedInstances.set(instanceId, instance);
+        }
+      }
+
+      return {
+        ...previous,
+        itemInstances: cleanedInstances
+      };
+    }
+
+    // Variable Management Actions
+    case "SET_ITEM_VARIABLES": {
+      const { itemId, variables } = action.payload;
+      const newVariables = new Map(previous.itemVariables);
+      newVariables.set(itemId, variables);
+
+      // Invalidate variable cache for affected items
+      const newCache = new Map(previous.variableSummaryCache);
+
+      // Remove cache entries for this item and any parent items
+      for (const [cachedItemId] of newCache) {
+        if (cachedItemId === itemId || itemHasDescendant(previous.items, cachedItemId, itemId)) {
+          newCache.delete(cachedItemId);
+        }
+      }
+
+      return {
+        ...previous,
+        itemVariables: newVariables,
+        variableSummaryCache: newCache
+      };
+    }
+
+    case "ADD_ITEM_VARIABLE": {
+      const { itemId, variable } = action.payload;
+      const existingVariables = previous.itemVariables.get(itemId) || [];
+      const newVariables = new Map(previous.itemVariables);
+      newVariables.set(itemId, [...existingVariables, variable]);
+
+      // Invalidate cache
+      const newCache = new Map(previous.variableSummaryCache);
+      for (const [cachedItemId] of newCache) {
+        if (cachedItemId === itemId || itemHasDescendant(previous.items, cachedItemId, itemId)) {
+          newCache.delete(cachedItemId);
+        }
+      }
+
+      return {
+        ...previous,
+        itemVariables: newVariables,
+        variableSummaryCache: newCache
+      };
+    }
+
+    case "REMOVE_ITEM_VARIABLE": {
+      const { itemId, variableIndex } = action.payload;
+      const existingVariables = previous.itemVariables.get(itemId) || [];
+
+      if (variableIndex < 0 || variableIndex >= existingVariables.length) {
+        console.warn(`Invalid variable index ${variableIndex} for item ${itemId}`);
+        return previous;
+      }
+
+      const newVariableArray = existingVariables.filter((_, index) => index !== variableIndex);
+      const newVariables = new Map(previous.itemVariables);
+
+      if (newVariableArray.length === 0) {
+        newVariables.delete(itemId);
+      } else {
+        newVariables.set(itemId, newVariableArray);
+      }
+
+      // Invalidate cache
+      const newCache = new Map(previous.variableSummaryCache);
+      for (const [cachedItemId] of newCache) {
+        if (cachedItemId === itemId || itemHasDescendant(previous.items, cachedItemId, itemId)) {
+          newCache.delete(cachedItemId);
+        }
+      }
+
+      return {
+        ...previous,
+        itemVariables: newVariables,
+        variableSummaryCache: newCache
+      };
+    }
+
+    case "UPDATE_ITEM_VARIABLE": {
+      const { itemId, variableIndex, variable } = action.payload;
+      const existingVariables = previous.itemVariables.get(itemId) || [];
+
+      if (variableIndex < 0 || variableIndex >= existingVariables.length) {
+        console.warn(`Invalid variable index ${variableIndex} for item ${itemId}`);
+        return previous;
+      }
+
+      const newVariableArray = [...existingVariables];
+      newVariableArray[variableIndex] = variable;
+      const newVariables = new Map(previous.itemVariables);
+      newVariables.set(itemId, newVariableArray);
+
+      // Invalidate cache
+      const newCache = new Map(previous.variableSummaryCache);
+      for (const [cachedItemId] of newCache) {
+        if (cachedItemId === itemId || itemHasDescendant(previous.items, cachedItemId, itemId)) {
+          newCache.delete(cachedItemId);
+        }
+      }
+
+      return {
+        ...previous,
+        itemVariables: newVariables,
+        variableSummaryCache: newCache
+      };
+    }
+
+    case "INVALIDATE_VARIABLE_CACHE": {
+      const { itemId } = action.payload;
+
+      if (itemId) {
+        // Invalidate cache for specific item and its ancestors
+        const newCache = new Map(previous.variableSummaryCache);
+        for (const [cachedItemId] of newCache) {
+          if (cachedItemId === itemId || itemHasDescendant(previous.items, cachedItemId, itemId)) {
+            newCache.delete(cachedItemId);
+          }
+        }
+
+        return {
+          ...previous,
+          variableSummaryCache: newCache
+        };
+      } else {
+        // Clear entire cache
+        return {
+          ...previous,
+          variableSummaryCache: new Map()
+        };
+      }
+    }
+
+    case "UPDATE_VARIABLE_CACHE": {
+      const { itemId, summary } = action.payload;
+      const newCache = new Map(previous.variableSummaryCache);
+      newCache.set(itemId, summary);
+
+      return {
+        ...previous,
+        variableSummaryCache: newCache
+      };
+    }
+
+    case "ADD_BASE_CALENDAR_ENTRY_WITH_INSTANCE": {
+      const { entry, createInstance = true } = action.payload;
+
+      // Add calendar entry
+      const newCalendar = new Map(previous.baseCalendar);
+      newCalendar.set(entry.id, entry);
+
+      let newInstances = previous.itemInstances;
+
+      // Create instance if requested and not already linked
+      if (createInstance && !entry.instanceId) {
+        const instance = createInstanceFromCalendarEntry(entry);
+        newInstances = new Map(previous.itemInstances);
+        newInstances.set(instance.id, instance);
+
+        // Update calendar entry to link to instance
+        const updatedEntry = { ...entry, instanceId: instance.id };
+        newCalendar.set(entry.id, updatedEntry);
+      }
+
+      return {
+        ...previous,
+        baseCalendar: newCalendar,
+        itemInstances: newInstances
+      };
+    }
+
     default:
       return previous;
   }
+}
+
+// Helper function for cache invalidation
+function itemHasDescendant(items: Item[], ancestorId: string, descendantId: string): boolean {
+  const ancestor = items.find(item => item.id === ancestorId);
+  if (!ancestor || !hasChildren(ancestor)) return false;
+
+  const children = getChildren(ancestor);
+  for (const childRef of children) {
+    const childId = 'id' in childRef ? childRef.id : childRef.itemId;
+    if (childId === descendantId) return true;
+
+    if (itemHasDescendant(items, childId, descendantId)) return true;
+  }
+
+  return false;
 }
 
 // Utility function to create a base calendar entry

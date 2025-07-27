@@ -1,5 +1,5 @@
-import { Item, ItemFactory } from '../functions/utils/item/index';
-import type { ItemJSON } from '../functions/utils/item/ItemJSON';
+import { Item, ItemFactory, ItemInstanceImpl, VariableImpl } from '../functions/utils/item/index';
+import type { ItemJSON, ItemInstanceJSON, VariableJSON, VariableSummary } from '../functions/utils/item/index';
 import { BaseCalendarEntry } from '../functions/reducers/AppReducer';
 import { STORAGE_KEYS, CURRENT_SCHEMA_VERSION, MAX_STORAGE_SIZE } from './constants';
 import type { StorageResult, StorageMetadata, SerializedStorageData } from './types';
@@ -667,4 +667,64 @@ export function clearAllDataFromStorage(): StorageResult<void> {
       error: `Failed to clear storage data: ${error instanceof Error ? error.message : 'Unknown error'}`
     };
   }
+}
+
+/**
+ * Enhanced App State Storage Operations for Step 2
+ */
+
+/**
+ * Serialize item instances map to array for storage
+ */
+export function serializeItemInstances(instances: Map<string, ItemInstanceImpl>): Array<[string, ItemInstanceJSON]> {
+  return Array.from(instances.entries()).map(([id, instance]) => [
+    id,
+    instance.toJSON()
+  ]);
+}
+
+/**
+ * Deserialize item instances from array to map
+ */
+export function deserializeItemInstances(serializedInstances: Array<[string, ItemInstanceJSON]>): Map<string, ItemInstanceImpl> {
+  const instances = new Map();
+  for (const [id, instanceData] of serializedInstances) {
+    instances.set(id, ItemInstanceImpl.fromJSON(instanceData));
+  }
+  return instances;
+}
+
+/**
+ * Serialize item variables map to array for storage
+ */
+export function serializeItemVariables(variables: Map<string, VariableImpl[]>): Array<[string, VariableJSON[]]> {
+  return Array.from(variables.entries()).map(([itemId, varArray]) => [
+    itemId,
+    varArray.map(v => v.toJSON())
+  ]);
+}
+
+/**
+ * Deserialize item variables from array to map
+ */
+export function deserializeItemVariables(serializedVariables: Array<[string, VariableJSON[]]>): Map<string, VariableImpl[]> {
+  const variables = new Map();
+  for (const [itemId, varArray] of serializedVariables) {
+    variables.set(itemId, varArray.map(v => VariableImpl.fromJSON(v)));
+  }
+  return variables;
+}
+
+/**
+ * Serialize variable summary cache map to array for storage
+ */
+export function serializeVariableSummaryCache(cache: Map<string, VariableSummary>): Array<[string, VariableSummary]> {
+  return Array.from(cache.entries());
+}
+
+/**
+ * Deserialize variable summary cache from array to map
+ */
+export function deserializeVariableSummaryCache(serializedCache: Array<[string, VariableSummary]>): Map<string, VariableSummary> {
+  return new Map(serializedCache);
 }
