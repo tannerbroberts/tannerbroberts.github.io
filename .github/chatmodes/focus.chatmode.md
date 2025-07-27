@@ -41,7 +41,7 @@ Create a folder in `src/` named `<feature_name>_implementation_plan/` containing
 Each step file must include:
 - **Step Title & Dependencies**: What this step accomplishes and what must be completed first
 - **Detailed Requirements**: Exact specifications for this step
-- **Code Changes Required**: Specific files to create/modify with detailed instructions
+- **Code Changes Required**: References to specific files to create/modify with detailed instructions, but no actual code snippets
 - **Testing Requirements**: Unit tests, integration tests, manual testing steps
 - **Acceptance Criteria**: Specific, testable criteria for step completion
 - **Rollback Plan**: How to undo changes if issues arise
