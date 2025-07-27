@@ -30,7 +30,7 @@ export function useItemInstances() {
     // Check if any instance is currently executing for an item
     hasExecutingInstance: (itemId: string): boolean => {
       const instances = getInstancesByItemId(itemInstances, itemId);
-      return instances.some(instance => 
+      return instances.some(instance =>
         instance.actualStartTime && !instance.isComplete
       );
     },
@@ -38,7 +38,7 @@ export function useItemInstances() {
     // Get currently executing instance for an item
     getExecutingInstance: (itemId: string): ItemInstance | null => {
       const instances = getInstancesByItemId(itemInstances, itemId);
-      return instances.find(instance => 
+      return instances.find(instance =>
         instance.actualStartTime && !instance.isComplete
       ) || null;
     }

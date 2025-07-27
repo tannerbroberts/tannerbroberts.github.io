@@ -1,4 +1,4 @@
-import { Delete, Schedule, Visibility, Timer, PlaylistAdd } from "@mui/icons-material";
+import { Delete, Schedule, Visibility, Timer, PlaylistAdd, Functions } from "@mui/icons-material";
 import { Box, ButtonGroup, Drawer, IconButton, List, ListItem, Toolbar, Typography } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
@@ -13,12 +13,14 @@ import RandomItemButton from "./RandomItemButton";
 import SchedulingDialog from "./SchedulingDialog";
 import DurationDialog from "./DurationDialog";
 import CheckListChildDialog from "./CheckListChildDialog";
+import VariableManagementDialog from "./dialogs/VariableManagementDialog";
 
 export default function SideBar() {
   const { sideDrawerOpen, focusedItemId, focusedListItemId, items } = useAppState()
   const appDispatch = useAppDispatch()
 
   const [filterString, setFilterString] = useState('')
+  const [variableDialogOpen, setVariableDialogOpen] = useState(false)
 
   const closeDrawer = useCallback(() => {
     appDispatch({ type: 'SET_SIDE_DRAWER_OPEN', payload: { sideDrawerOpen: false } })
@@ -44,6 +46,14 @@ export default function SideBar() {
   const openCheckListChildDialog = useCallback(() => {
     appDispatch({ type: 'SET_CHECKLIST_CHILD_DIALOG_OPEN', payload: { checkListChildDialogOpen: true } })
   }, [appDispatch])
+
+  const openVariableDialog = useCallback(() => {
+    setVariableDialogOpen(true)
+  }, [])
+
+  const closeVariableDialog = useCallback(() => {
+    setVariableDialogOpen(false)
+  }, [])
 
   // Can schedule if:
   const focusedItem = useMemo(() => {
@@ -115,6 +125,9 @@ export default function SideBar() {
                   <IconButton disabled={!canAddToChecklist} onClick={openCheckListChildDialog}>
                     <PlaylistAdd />
                   </IconButton>
+                  <IconButton disabled={!focusedItemId} onClick={openVariableDialog}>
+                    <Functions />
+                  </IconButton>
                 </>
               ) : (<IconButton disabled={!canSchedule} onClick={openSchedulingDialog}>
                 <Schedule />
@@ -154,6 +167,11 @@ export default function SideBar() {
         <DurationDialog />
         <CheckListChildDialog />
       </TimeInputProvider>
+      <VariableManagementDialog
+        open={variableDialogOpen}
+        onClose={closeVariableDialog}
+        itemId={focusedItemId}
+      />
     </>
   )
 }

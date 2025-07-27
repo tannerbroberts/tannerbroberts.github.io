@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
 import { Box, Typography, LinearProgress, Chip, Collapse, IconButton, List, ListItem, ListItemIcon, ListItemText, Divider } from "@mui/material";
-import { ExpandMore, ExpandLess, CheckCircle, RadioButtonUnchecked, PlaylistAddCheck } from "@mui/icons-material";
+import { ExpandMore, ExpandLess, CheckCircle, RadioButtonUnchecked, PlaylistAddCheck, Functions } from "@mui/icons-material";
 import { CheckListItem, Item } from "../../functions/utils/item/index";
 import { getTaskProgress, getItemById } from "../../functions/utils/item/utils";
 import { formatDuration } from "../../functions/utils/formatTime";
 import { useAppState } from "../../reducerContexts/App";
+import { useItemVariables } from "../../hooks/useItemVariables";
+import VariableSummaryDisplay from "../variables/VariableSummaryDisplay";
 
 interface PrimaryCheckListItemDisplayProps {
   readonly item: CheckListItem;
@@ -24,7 +26,14 @@ export default function PrimaryCheckListItemDisplay({
   children
 }: PrimaryCheckListItemDisplayProps) {
   const { items } = useAppState();
+  const { variableSummary } = useItemVariables(item.id);
   const [checklistExpanded, setChecklistExpanded] = useState(isDeepest);
+  const [showVariables, setShowVariables] = useState(false);
+
+  // Check if item has variables to show
+  const hasVariables = useMemo(() => {
+    return Object.keys(variableSummary).length > 0;
+  }, [variableSummary]);
 
   // Calculate progress using existing utility
   const progress = useMemo(() => {
@@ -106,6 +115,25 @@ export default function PrimaryCheckListItemDisplay({
             >
               {item.name}
             </Typography>
+
+            {/* Variables indicator */}
+            {hasVariables && (
+              <Box sx={{ display: 'flex', alignItems: 'center', ml: 1 }}>
+                <Functions
+                  sx={{
+                    color: 'text.secondary',
+                    fontSize: '1rem',
+                    transform: showVariables ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s ease',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setShowVariables(!showVariables)}
+                />
+                <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
+                  {Object.keys(variableSummary).length}
+                </Typography>
+              </Box>
+            )}
           </Box>
 
           {/* Checklist toggle and status */}
@@ -224,6 +252,18 @@ export default function PrimaryCheckListItemDisplay({
             </Typography>
           </Box>
         </Box>
+
+        {/* Variable Summary Display */}
+        {hasVariables && (
+          <Box sx={{ mt: 2 }}>
+            <VariableSummaryDisplay
+              summary={variableSummary}
+              title="Resource Summary"
+              defaultExpanded={showVariables}
+              compact
+            />
+          </Box>
+        )}
 
         {/* Status indicator for deepest item */}
         {isDeepest && (

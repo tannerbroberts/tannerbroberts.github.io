@@ -1,11 +1,13 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Box, Typography } from "@mui/material";
-import { Schedule } from "@mui/icons-material";
+import { Schedule, Functions } from "@mui/icons-material";
 import { SubCalendarItem } from "../../functions/utils/item/index";
 import { getTaskProgress } from "../../functions/utils/item/utils";
 import { formatDuration } from "../../functions/utils/formatTime";
 import { getActiveChildForExecution } from "./executionUtils";
 import { useAppState } from "../../reducerContexts/App";
+import { useItemVariables } from "../../hooks/useItemVariables";
+import VariableSummaryDisplay from "../variables/VariableSummaryDisplay";
 
 interface PrimarySubCalendarItemDisplayProps {
   readonly item: SubCalendarItem;
@@ -21,6 +23,13 @@ export default function PrimarySubCalendarItemDisplay({
   children
 }: PrimarySubCalendarItemDisplayProps) {
   const { items } = useAppState();
+  const { variableSummary } = useItemVariables(item.id);
+  const [showVariables, setShowVariables] = useState(false);
+
+  // Check if item has variables to show
+  const hasVariables = useMemo(() => {
+    return Object.keys(variableSummary).length > 0;
+  }, [variableSummary]);
 
   // Calculate progress using existing utility
   const progress = useMemo(() => {
@@ -92,8 +101,10 @@ export default function PrimarySubCalendarItemDisplay({
           backgroundColor: barColors.light,
           borderRadius: 1,
           overflow: 'hidden',
-          mb: children ? 0 : 2
+          mb: children ? 0 : 2,
+          cursor: hasVariables ? 'pointer' : 'default'
         }}
+        onClick={hasVariables ? () => setShowVariables(!showVariables) : undefined}
       >
         {/* Progress bar background (darker tone) */}
         <Box
@@ -118,7 +129,7 @@ export default function PrimarySubCalendarItemDisplay({
           width: '100%',
           px: 2
         }}>
-          {/* Left: Schedule icon and item name */}
+          {/* Left: Schedule icon, item name, and variables indicator */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0, flex: 1 }}>
             <Schedule sx={{ color: 'text.primary', fontSize: '1.5rem', flexShrink: 0 }} />
             <Typography
@@ -134,6 +145,23 @@ export default function PrimarySubCalendarItemDisplay({
             >
               {item.name}
             </Typography>
+
+            {/* Variables indicator */}
+            {hasVariables && (
+              <Box sx={{ display: 'flex', alignItems: 'center', ml: 1 }}>
+                <Functions
+                  sx={{
+                    color: 'text.secondary',
+                    fontSize: '1rem',
+                    transform: showVariables ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s ease'
+                  }}
+                />
+                <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
+                  {Object.keys(variableSummary).length}
+                </Typography>
+              </Box>
+            )}
           </Box>
 
           {/* Center: Progress percentage */}
@@ -161,6 +189,18 @@ export default function PrimarySubCalendarItemDisplay({
           </Typography>
         </Box>
       </Box>
+
+      {/* Variable Summary Display */}
+      {hasVariables && (
+        <Box sx={{ mb: 2 }}>
+          <VariableSummaryDisplay
+            summary={variableSummary}
+            title="Resource Summary"
+            defaultExpanded={showVariables}
+            compact
+          />
+        </Box>
+      )}
 
       {/* Show active child or up next section if no active child */}
       {!activeChild && nextChild && (

@@ -68,7 +68,7 @@ const ExecutionView = React.memo<ExecutionViewProps>(({
   // Auto-start instance tracking when execution begins
   useEffect(() => {
     const { currentInstance, baseStartTime } = executionContext;
-    
+
     if (currentInstance && !currentInstance.actualStartTime && currentTime >= baseStartTime) {
       // Mark instance as started
       dispatch({
@@ -116,7 +116,7 @@ const ExecutionView = React.memo<ExecutionViewProps>(({
             Current Task
           </Typography>
           {executionContext.currentInstance && (
-            <Chip 
+            <Chip
               label={executionContext.currentInstance.isComplete ? "Completed" : "In Progress"}
               color={executionContext.currentInstance.isComplete ? "success" : "primary"}
               variant="outlined"

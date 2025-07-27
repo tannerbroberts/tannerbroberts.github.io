@@ -15,12 +15,13 @@ import { useCallback, useState, useEffect } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
 import { TimeInputProvider, useTimeInputDispatch, useTimeInputState } from "../reducerContexts/TimeInput";
 import { NewItemProvider, useNewItemDispatch, useNewItemState } from "../reducerContexts/NewItem";
-import { BasicItem } from "../functions/utils/item/index";
+import { BasicItem, Variable } from "../functions/utils/item/index";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import { formatDuration } from "../functions/utils/formatTime";
+import VariableInput from "./variables/VariableInput";
 
 // Default time presets - now using milliseconds values, labels will be generated dynamically
 const DEFAULT_TIME_PRESETS = [
@@ -328,6 +329,9 @@ function CreateNewItemDialogContent() {
   const { name } = useNewItemState();
   const newItemDispatch = useNewItemDispatch();
 
+  // Add variables state
+  const [variables, setVariables] = useState<Variable[]>([]);
+
   const setName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     newItemDispatch({ type: "SET_NAME", payload: { name: event.target.value } });
   }, [newItemDispatch]);
@@ -337,6 +341,7 @@ function CreateNewItemDialogContent() {
     // Reset form on close
     newItemDispatch({ type: "SET_NAME", payload: { name: "" } });
     timeInputDispatch({ type: "RESET" });
+    setVariables([]);
   }, [dispatch, newItemDispatch, timeInputDispatch]);
 
   const createNewItem = useCallback(() => {
@@ -350,8 +355,17 @@ function CreateNewItemDialogContent() {
     }
     const newItem = new BasicItem({ name: name.trim(), duration: total });
     dispatch({ type: "CREATE_ITEM", payload: { newItem } });
+
+    // Save variables if any
+    if (variables.length > 0) {
+      dispatch({
+        type: 'SET_ITEM_VARIABLES',
+        payload: { itemId: newItem.id, variables }
+      });
+    }
+
     handleClose();
-  }, [dispatch, name, total, handleClose]);
+  }, [dispatch, name, total, variables, handleClose]);
 
   return (
     <Dialog
@@ -376,6 +390,13 @@ function CreateNewItemDialogContent() {
           />
 
           <ImprovedTimeInput />
+
+          <Box sx={{ mt: 3 }}>
+            <VariableInput
+              variables={variables}
+              onChange={setVariables}
+            />
+          </Box>
         </Box>
       </DialogContent>
       <DialogActions>

@@ -33,7 +33,7 @@ export function getExecutionContext(
 ): ExecutionContextWithInstances {
   // Get the current task chain using existing logic
   const taskChain = getCurrentTaskChain(items, currentTime, baseCalendar);
-  
+
   if (taskChain.length === 0) {
     return {
       currentItem: null,
@@ -46,7 +46,7 @@ export function getExecutionContext(
   // Find base calendar entry for root item
   const rootItem = taskChain[0];
   let baseCalendarEntry: BaseCalendarEntry | null = null;
-  
+
   for (const [, entry] of baseCalendar) {
     if (entry.itemId === rootItem.id) {
       baseCalendarEntry = entry;
@@ -66,7 +66,7 @@ export function getExecutionContext(
 
   // Get or create instance for base calendar entry
   const rootInstance = instances.get(baseCalendarEntry.instanceId || '');
-  
+
   if (!rootInstance && baseCalendarEntry.instanceId) {
     console.warn('Instance not found for calendar entry:', baseCalendarEntry.instanceId);
   }
@@ -81,10 +81,10 @@ export function getExecutionContext(
       const childInstances = Array.from(instances.values()).filter(
         inst => inst.itemId === item.id && inst.calendarEntryId === baseCalendarEntry.id
       );
-      
-      return { 
-        item, 
-        instance: childInstances.length > 0 ? childInstances[0] : null 
+
+      return {
+        item,
+        instance: childInstances.length > 0 ? childInstances[0] : null
       };
     }
   });
@@ -132,7 +132,7 @@ export function hasChecklistItemStarted(
   parentInstance: ItemInstance | null
 ): boolean {
   if (!parentInstance) return false;
-  
+
   return Boolean(parentInstance.executionDetails.checklistStartTimes?.[item.id]);
 }
 
@@ -145,7 +145,7 @@ export function getChecklistItemStartTime(
   fallbackTime: number
 ): number {
   if (!parentInstance) return fallbackTime;
-  
+
   return parentInstance.executionDetails.checklistStartTimes?.[item.id] || fallbackTime;
 }
 
