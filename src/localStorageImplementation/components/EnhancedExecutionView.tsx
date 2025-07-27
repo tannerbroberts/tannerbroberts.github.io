@@ -44,7 +44,7 @@ export function EnhancedExecutionView({
     items,
     baseCalendar,
     currentTime,
-    refreshInterval: autoRefreshInterval,
+    // refreshInterval: autoRefreshInterval, // Currently unused
     performanceMode
   });
 

@@ -6,7 +6,7 @@ interface UseActiveTaskOptions {
   items: Item[];
   baseCalendar: Map<string, BaseCalendarEntry>;
   currentTime: number;
-  refreshInterval?: number;
+  // refreshInterval?: number; // Currently unused
   performanceMode?: 'realtime' | 'optimized' | 'minimal';
   onTaskChange?: (newTask: Item | null, previousTask: Item | null) => void;
   onError?: (error: Error) => void;
@@ -29,7 +29,7 @@ export function useActiveTask({
   items,
   baseCalendar,
   currentTime,
-  refreshInterval = 1000,
+  // refreshInterval: _refreshInterval = 1000, // Currently unused
   performanceMode = 'optimized',
   onTaskChange,
   onError

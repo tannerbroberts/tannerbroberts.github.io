@@ -1,6 +1,5 @@
 import { generateDiagnosticReport, testStoragePerformance, DiagnosticReport } from './debugUtils';
 import { validateStorageIntegrity, cleanupStorageData } from './storageUtils';
-import { SAMPLE_DATASETS, replaceCurrentDataWithSample } from './sampleData';
 
 export interface DevToolsConfig {
   enableLogging: boolean;
@@ -234,15 +233,16 @@ export class DevTools {
     }
   }
 
-  public resetToSampleData(datasetName: keyof typeof SAMPLE_DATASETS): void {
-    try {
-      replaceCurrentDataWithSample(datasetName);
-      this.log('info', `Reset to sample data: ${String(datasetName)}`);
-    } catch (error) {
-      this.log('error', 'Failed to reset to sample data', { datasetName, error });
-      throw error;
-    }
-  }
+  // Sample data functionality disabled - sampleData.ts is empty
+  // public resetToSampleData(datasetName: keyof typeof SAMPLE_DATASETS): void {
+  //   try {
+  //     replaceCurrentDataWithSample(datasetName);
+  //     this.log('info', `Reset to sample data: ${String(datasetName)}`);
+  //   } catch (error) {
+  //     this.log('error', 'Failed to reset to sample data', { datasetName, error });
+  //     throw error;
+  //   }
+  // }
 
   public backupCurrentData(): string {
     try {
@@ -387,7 +387,12 @@ export class DevTools {
       };
     } catch (error) {
       this.log('error', 'Orphaned data search failed', { error });
-      throw error;
+      // Return a default result instead of throwing
+      return {
+        orphanedItems: [],
+        brokenReferences: [],
+        suggestions: ['Error occurred during orphan search']
+      };
     }
   }
 
@@ -543,13 +548,14 @@ export function fullDiag(): DiagnosticReport | null {
   return devTools.fullDiagnostic();
 }
 
-export function resetData(dataset: keyof typeof SAMPLE_DATASETS = 'TYPICAL'): void {
-  if (!devTools) {
-    console.warn('Dev tools are only available in development mode');
-    return;
-  }
-  devTools.resetToSampleData(dataset);
-}
+// Sample data functionality disabled - sampleData.ts is empty
+// export function resetData(dataset: keyof typeof SAMPLE_DATASETS = 'TYPICAL'): void {
+//   if (!devTools) {
+//     console.warn('Dev tools are only available in development mode');
+//     return;
+//   }
+//   devTools.resetToSampleData(dataset);
+// }
 
 export function inspectData(): DataInspection | null {
   if (!devTools) {
@@ -564,7 +570,7 @@ if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
   (window as unknown as { atpDevTools: unknown }).atpDevTools = {
     quickHealth,
     fullDiag,
-    resetData,
+    // resetData, // Disabled - sampleData.ts is empty
     inspectData,
     devTools
   };

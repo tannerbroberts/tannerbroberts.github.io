@@ -303,9 +303,10 @@ function StorageOverviewSection({
             <Button
               size="small"
               variant="outlined"
-              onClick={() => devTools?.resetToSampleData('TYPICAL')}
+              disabled
+              title="Sample data functionality disabled - sampleData.ts is empty"
             >
-              Load Sample Data
+              Load Sample Data (Disabled)
             </Button>
             <Button
               size="small"
@@ -322,8 +323,8 @@ function StorageOverviewSection({
 }
 
 function RawDataInspector({
-  storageData,
-  onRefresh
+  storageData
+  // onRefresh // Currently unused since sample data functionality is disabled
 }: Readonly<{
   storageData: DataInspection | null;
   onRefresh: () => void;
@@ -349,6 +350,8 @@ function RawDataInspector({
               value={selectedDataset}
               onChange={(e) => setSelectedDataset(e.target.value)}
               sx={{ minWidth: 150 }}
+              disabled
+              title="Sample data functionality disabled - sampleData.ts is empty"
             >
               {Object.entries(SAMPLE_DATASETS).map(([key, label]) => (
                 <MenuItem key={key} value={key}>
@@ -359,12 +362,10 @@ function RawDataInspector({
             <Button
               variant="contained"
               size="small"
-              onClick={() => {
-                devTools?.resetToSampleData(selectedDataset as keyof typeof SAMPLE_DATASETS);
-                onRefresh();
-              }}
+              disabled
+              title="Sample data functionality disabled - sampleData.ts is empty"
             >
-              Load Dataset
+              Load Dataset (Disabled)
             </Button>
           </Box>
         </CardContent>
