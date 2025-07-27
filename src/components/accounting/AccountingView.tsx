@@ -16,10 +16,12 @@ import {
 import { Search, CheckCircle, Schedule, Warning } from '@mui/icons-material';
 import { useItemInstances } from '../../hooks/useItemInstances';
 import { useAppState, useAppDispatch } from '../../reducerContexts/App';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { getItemById } from '../../functions/utils/item/utils';
 import { hasChildren, getChildren } from '../../functions/utils/item/itemUtils';
 import AccountingInstanceCard from './AccountingInstanceCard';
 import VariableAccountingSummary from './VariableAccountingSummary';
+import ErrorBoundary from '../common/ErrorBoundary';
 
 type TimeGroup = 'today' | 'yesterday' | 'thisWeek' | 'older';
 type SortOrder = 'newest' | 'oldest' | 'name' | 'duration';
@@ -33,8 +35,9 @@ export default function AccountingView({ className }: AccountingViewProps) {
   const { accountingInstances } = useItemInstances();
   const dispatch = useAppDispatch();
 
-  // Filter and search state
-  const [searchQuery, setSearchQuery] = useState('');
+  // Filter and search state with debouncing
+  const [searchQueryRaw, setSearchQueryRaw] = useState('');
+  const searchQuery = useDebouncedValue(searchQueryRaw, 300);
   const [selectedTimeGroup, setSelectedTimeGroup] = useState<TimeGroup | 'all'>('all');
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [showOnlyWithVariables] = useState(false);
@@ -219,174 +222,176 @@ export default function AccountingView({ className }: AccountingViewProps) {
   }, [accountingInstances, filteredInstances, items]);
 
   return (
-    <Box className={className} sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
-      {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Accounting View
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-          Review and complete past scheduled items that haven't been marked as finished.
-        </Typography>
+    <ErrorBoundary>
+      <Box className={className} sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
+        {/* Header */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            Accounting View
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+            Review and complete past scheduled items that haven't been marked as finished.
+          </Typography>
 
-        {/* Statistics */}
-        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-          <Chip
-            icon={<Schedule />}
-            label={`${stats.totalInstances} Total Incomplete`}
-            variant="outlined"
-            color="info"
-          />
-          <Chip
-            icon={<Warning />}
-            label={`${stats.totalOverdue} Overdue`}
-            variant="outlined"
-            color="warning"
-          />
-          {stats.filteredCount !== stats.totalInstances && (
+          {/* Statistics */}
+          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
             <Chip
-              label={`${stats.filteredCount} Filtered`}
+              icon={<Schedule />}
+              label={`${stats.totalInstances} Total Incomplete`}
               variant="outlined"
+              color="info"
             />
-          )}
-        </Box>
-      </Box>
-
-      {/* Variable Accounting Summary */}
-      <VariableAccountingSummary instances={accountingInstances} />
-
-      {/* Filters and Search */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-            {/* Search */}
-            <TextField
-              size="small"
-              placeholder="Search instances..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search />
-                    </InputAdornment>
-                  )
-                }
-              }}
-              sx={{ minWidth: 200 }}
+            <Chip
+              icon={<Warning />}
+              label={`${stats.totalOverdue} Overdue`}
+              variant="outlined"
+              color="warning"
             />
-
-            {/* Time Group Filter */}
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <InputLabel>Time Period</InputLabel>
-              <Select
-                value={selectedTimeGroup}
-                onChange={(e) => setSelectedTimeGroup(e.target.value as TimeGroup | 'all')}
-                label="Time Period"
-              >
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value="today">Today</MenuItem>
-                <MenuItem value="yesterday">Yesterday</MenuItem>
-                <MenuItem value="thisWeek">This Week</MenuItem>
-                <MenuItem value="older">Older</MenuItem>
-              </Select>
-            </FormControl>
-
-            {/* Sort Order */}
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <InputLabel>Sort By</InputLabel>
-              <Select
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value as SortOrder)}
-                label="Sort By"
-              >
-                <MenuItem value="newest">Newest</MenuItem>
-                <MenuItem value="oldest">Oldest</MenuItem>
-                <MenuItem value="name">Name</MenuItem>
-                <MenuItem value="duration">Duration</MenuItem>
-              </Select>
-            </FormControl>
-
-            {/* Bulk Actions */}
-            <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>
-              <Button
+            {stats.filteredCount !== stats.totalInstances && (
+              <Chip
+                label={`${stats.filteredCount} Filtered`}
                 variant="outlined"
-                onClick={handleCompleteAll}
-                disabled={filteredInstances.length === 0}
-                startIcon={<CheckCircle />}
-              >
-                Complete All Filtered
-              </Button>
-            </Box>
+              />
+            )}
           </Box>
-        </CardContent>
-      </Card>
+        </Box>
 
-      {/* Instances List */}
-      {filteredInstances.length === 0 ? (
-        <Card>
+        {/* Variable Accounting Summary */}
+        <VariableAccountingSummary instances={accountingInstances} />
+
+        {/* Filters and Search */}
+        <Card sx={{ mb: 3 }}>
           <CardContent>
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <CheckCircle sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
-              <Typography variant="h6" gutterBottom>
-                All Caught Up!
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {accountingInstances.length === 0
-                  ? "No incomplete instances found."
-                  : "No instances match your current filters."
-                }
-              </Typography>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+              {/* Search */}
+              <TextField
+                size="small"
+                placeholder="Search instances..."
+                value={searchQueryRaw}
+                onChange={(e) => setSearchQueryRaw(e.target.value)}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search />
+                      </InputAdornment>
+                    )
+                  }
+                }}
+                sx={{ minWidth: 200 }}
+              />
+
+              {/* Time Group Filter */}
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel>Time Period</InputLabel>
+                <Select
+                  value={selectedTimeGroup}
+                  onChange={(e) => setSelectedTimeGroup(e.target.value as TimeGroup | 'all')}
+                  label="Time Period"
+                >
+                  <MenuItem value="all">All</MenuItem>
+                  <MenuItem value="today">Today</MenuItem>
+                  <MenuItem value="yesterday">Yesterday</MenuItem>
+                  <MenuItem value="thisWeek">This Week</MenuItem>
+                  <MenuItem value="older">Older</MenuItem>
+                </Select>
+              </FormControl>
+
+              {/* Sort Order */}
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel>Sort By</InputLabel>
+                <Select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value as SortOrder)}
+                  label="Sort By"
+                >
+                  <MenuItem value="newest">Newest</MenuItem>
+                  <MenuItem value="oldest">Oldest</MenuItem>
+                  <MenuItem value="name">Name</MenuItem>
+                  <MenuItem value="duration">Duration</MenuItem>
+                </Select>
+              </FormControl>
+
+              {/* Bulk Actions */}
+              <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleCompleteAll}
+                  disabled={filteredInstances.length === 0}
+                  startIcon={<CheckCircle />}
+                >
+                  Complete All Filtered
+                </Button>
+              </Box>
             </Box>
           </CardContent>
         </Card>
-      ) : (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {selectedTimeGroup === 'all' ? (
-            // Group by time periods when showing all
-            Object.entries(groupedInstances).map(([timeGroup, instances]) => {
-              if (instances.length === 0) return null;
 
-              return (
-                <Box key={timeGroup}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6" sx={{ textTransform: 'capitalize' }}>
-                      {timeGroup === 'thisWeek' ? 'This Week' : timeGroup}
-                    </Typography>
-                    <Chip
-                      label={instances.length}
-                      size="small"
-                      sx={{ ml: 1 }}
-                    />
-                    <Button
-                      size="small"
-                      onClick={() => handleCompleteTimeGroup(timeGroup as TimeGroup)}
-                      sx={{ ml: 'auto' }}
-                    >
-                      Complete All
-                    </Button>
+        {/* Instances List */}
+        {filteredInstances.length === 0 ? (
+          <Card>
+            <CardContent>
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <CheckCircle sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
+                <Typography variant="h6" gutterBottom>
+                  All Caught Up!
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {accountingInstances.length === 0
+                    ? "No incomplete instances found."
+                    : "No instances match your current filters."
+                  }
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        ) : (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {selectedTimeGroup === 'all' ? (
+              // Group by time periods when showing all
+              Object.entries(groupedInstances).map(([timeGroup, instances]) => {
+                if (instances.length === 0) return null;
+
+                return (
+                  <Box key={timeGroup}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="h6" sx={{ textTransform: 'capitalize' }}>
+                        {timeGroup === 'thisWeek' ? 'This Week' : timeGroup}
+                      </Typography>
+                      <Chip
+                        label={instances.length}
+                        size="small"
+                        sx={{ ml: 1 }}
+                      />
+                      <Button
+                        size="small"
+                        onClick={() => handleCompleteTimeGroup(timeGroup as TimeGroup)}
+                        sx={{ ml: 'auto' }}
+                      >
+                        Complete All
+                      </Button>
+                    </Box>
+                    {instances.map(instance => (
+                      <AccountingInstanceCard
+                        key={instance.id}
+                        instance={instance}
+                      />
+                    ))}
                   </Box>
-                  {instances.map(instance => (
-                    <AccountingInstanceCard
-                      key={instance.id}
-                      instance={instance}
-                    />
-                  ))}
-                </Box>
-              );
-            })
-          ) : (
-            // Show filtered list without grouping
-            filteredInstances.map(instance => (
-              <AccountingInstanceCard
-                key={instance.id}
-                instance={instance}
-              />
-            ))
-          )}
-        </Box>
-      )}
-    </Box>
+                );
+              })
+            ) : (
+              // Show filtered list without grouping
+              filteredInstances.map(instance => (
+                <AccountingInstanceCard
+                  key={instance.id}
+                  instance={instance}
+                />
+              ))
+            )}
+          </Box>
+        )}
+      </Box>
+    </ErrorBoundary>
   );
 }

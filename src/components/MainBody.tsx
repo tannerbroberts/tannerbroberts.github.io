@@ -15,22 +15,21 @@ export default function MainBody() {
   const itemExceedsMaxHeight = focusedItem &&
     (focusedItem.duration * pixelsPerSegment / millisecondsPerSegment) > (viewportHeight * 2)
 
-  return (
-    <div style={{
-      flex: 1,
-      padding: '20px',
-      width: '100%',
-      position: 'relative',
-      // Add overflow scrolling when items exceed maximum height
-      ...(itemExceedsMaxHeight && {
-        maxHeight: `${viewportHeight * 2}px`,
-        overflowY: 'auto',
-        border: '2px solid rgba(255, 165, 0, 0.8)', // Orange border to indicate truncation
-        borderRadius: '4px',
-      })
-    }}>
-      {focusedItem ? (
-        <>
+  // Helper function to render main content based on current state
+  const renderMainContent = () => {
+    if (focusedItem) {
+      return (
+        <div style={{
+          flex: 1,
+          position: 'relative',
+          // Add overflow scrolling when items exceed maximum height
+          ...(itemExceedsMaxHeight && {
+            maxHeight: `${viewportHeight * 2}px`,
+            overflowY: 'auto',
+            border: '2px solid rgba(255, 165, 0, 0.8)', // Orange border to indicate truncation
+            borderRadius: '4px',
+          })
+        }}>
           <LedgerLines />
           {/* Render children of the focused item instead of the focused item itself */}
           {hasChildren(focusedItem) && getChildren(focusedItem).map((child: ChildReference) => {
@@ -60,14 +59,62 @@ export default function MainBody() {
               No scheduled items. Use the schedule dialog to add items to this timeline.
             </div>
           )}
-        </>
-      ) : (
-        /* Main View Area - Shows execution or accounting view */
+        </div>
+      );
+    }
+
+    if (currentView === 'execution') {
+      return (
+        /* Main Interface - Unified Accounting + Execution View */
         <>
-          {currentView === 'accounting' && <AccountingView />}
-          {currentView === 'execution' && <ExecutionView />}
+          {/* Accounting View - positioned above execution view for primary workflow */}
+          <div style={{
+            flex: '0 0 auto',
+            maxHeight: '40%',
+            minHeight: '200px',
+            borderBottom: '1px solid #e0e0e0',
+            overflow: 'auto',
+            padding: '20px'
+          }}>
+            <AccountingView />
+          </div>
+
+          {/* Execution View - main execution interface */}
+          <div style={{
+            flex: '1 1 auto',
+            minHeight: '300px',
+            overflow: 'auto',
+            padding: '20px'
+          }}>
+            <ExecutionView />
+          </div>
         </>
-      )}
+      );
+    }
+
+    return (
+      /* Standalone Accounting View */
+      <div style={{
+        flex: '1 1 auto',
+        overflow: 'auto',
+        padding: '20px'
+      }}>
+        <AccountingView />
+      </div>
+    );
+  };
+
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: viewportHeight,
+      width: '100%',
+      boxSizing: 'border-box',
+      overflow: 'hidden',
+      padding: focusedItem ? '20px' : '0'
+    }}>
+      {renderMainContent()}
     </div>
   )
 }

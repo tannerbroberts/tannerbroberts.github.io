@@ -2,6 +2,7 @@ import Box from '@mui/material/Box';
 import Header from './Header';
 import MainBody from './MainBody';
 import SideBar from './SideBar';
+import NotificationSystem from './notifications/NotificationSystem';
 import useItemListValidation from '../functions/utils/useItemListValidation';
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
         <SideBar />
         <MainBody />
       </Box>
+      <NotificationSystem />
     </Box>
   );
 }
