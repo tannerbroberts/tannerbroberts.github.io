@@ -13,7 +13,8 @@ import PrimaryCheckListItemDisplay from "./PrimaryCheckListItemDisplay";
 import {
   getActiveChildForExecution,
   calculateChildStartTime,
-  isRecursionDepthValid
+  isRecursionDepthValid,
+  ExecutionContextWithInstances
 } from "./executionUtils";
 
 interface PrimaryItemDisplayRouterProps {
@@ -23,6 +24,7 @@ interface PrimaryItemDisplayRouterProps {
   readonly startTime: number;
   readonly isDeepest?: boolean;
   readonly depth?: number; // For preventing infinite recursion
+  readonly executionContext?: ExecutionContextWithInstances; // New optional prop
 }
 
 export default function PrimaryItemDisplayRouter({
@@ -31,7 +33,8 @@ export default function PrimaryItemDisplayRouter({
   currentTime,
   startTime,
   isDeepest = false,
-  depth = 0
+  depth = 0,
+  executionContext
 }: PrimaryItemDisplayRouterProps) {
   const { items } = useAppState();
 
@@ -85,9 +88,10 @@ export default function PrimaryItemDisplayRouter({
         startTime={childStartTime}
         isDeepest={isDeepest}
         depth={depth + 1}
+        executionContext={executionContext}
       />
     );
-  }, [activeChild, taskChain, currentTime, childStartTime, isDeepest, depth, canRenderChildren]);
+  }, [activeChild, taskChain, currentTime, childStartTime, isDeepest, depth, canRenderChildren, executionContext]);
 
   // Route to appropriate primary display component
   const renderPrimaryDisplay = useCallback(() => {
@@ -95,7 +99,8 @@ export default function PrimaryItemDisplayRouter({
       taskChain,
       currentTime,
       startTime,
-      isDeepest
+      isDeepest,
+      executionContext
     };
 
     if (item instanceof BasicItem) {
@@ -137,7 +142,7 @@ export default function PrimaryItemDisplayRouter({
         Unknown item type: {item.constructor.name}
       </Box>
     );
-  }, [item, taskChain, currentTime, startTime, isDeepest, renderChildContent]);
+  }, [item, taskChain, currentTime, startTime, isDeepest, renderChildContent, executionContext]);
 
   // Handle depth limit reached
   if (!canRenderChildren && (item instanceof SubCalendarItem || item instanceof CheckListItem)) {

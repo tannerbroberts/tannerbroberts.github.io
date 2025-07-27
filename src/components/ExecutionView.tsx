@@ -1,10 +1,12 @@
-import React, { useMemo, useCallback } from "react";
-import { Box, Typography, Fade } from "@mui/material";
+import React, { useMemo, useEffect } from "react";
+import { Box, Typography, Fade, Chip } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { Schedule } from "@mui/icons-material";
 import { PrimaryItemDisplayRouter } from "./execution";
-import { useAppState } from "../reducerContexts/App";
+import { useAppState, useAppDispatch } from "../reducerContexts/App";
 import { useCurrentTime } from "../hooks/useCurrentTime";
-import { getCurrentTaskChain } from "../functions/utils/item/index";
+import { useItemInstances } from "../hooks/useItemInstances";
+import { getExecutionContext, ExecutionContextWithInstances } from "./execution/executionUtils";
 
 // Styled components for enhanced visuals
 const ExecutionContainer = styled(Box)(() => ({
@@ -37,183 +39,105 @@ interface ExecutionViewProps {
   readonly showHeader?: boolean;
 }
 
-/**
- * Calculate base start time for the root item in the task chain
- * Uses base calendar entries if available, otherwise falls back to current time
- * Memoized for performance optimization
- */
-const calculateBaseStartTime = (
-  taskChain: unknown[],
-  baseCalendar?: Map<string, { id: string; itemId: string; startTime: number }>
-): number => {
-  if (taskChain.length === 0) return Date.now();
-
-  const rootItem = taskChain[0] as { id: string };
-  if (baseCalendar) {
-    for (const [, entry] of baseCalendar) {
-      if (entry.itemId === rootItem.id) {
-        return entry.startTime;
-      }
-    }
-  }
-
-  // Fallback to current time if no calendar entry found
-  return Date.now();
-};
-
 // Memoized component for better performance
 const ExecutionView = React.memo<ExecutionViewProps>(({
   showHeader = true,
 }) => {
   const { items, baseCalendar } = useAppState();
+  const { allInstances } = useItemInstances();
+  const dispatch = useAppDispatch();
 
   // Optimized current time hook - reduce frequency for less critical updates
   const currentTime = useCurrentTime(500);
 
-  // Memoized task chain calculation with comprehensive error handling
+  // Enhanced execution context with instances
+  const executionContext = useMemo((): ExecutionContextWithInstances => {
+    try {
+      return getExecutionContext(items, allInstances, baseCalendar, currentTime);
+    } catch (error) {
+      console.error('Error getting execution context:', error);
+      return {
+        currentItem: null,
+        currentInstance: null,
+        taskChain: [],
+        baseStartTime: Date.now()
+      };
+    }
+  }, [items, allInstances, baseCalendar, currentTime]);
+
+  // Auto-start instance tracking when execution begins
+  useEffect(() => {
+    const { currentInstance, baseStartTime } = executionContext;
+    
+    if (currentInstance && !currentInstance.actualStartTime && currentTime >= baseStartTime) {
+      // Mark instance as started
+      dispatch({
+        type: 'MARK_INSTANCE_STARTED',
+        payload: { instanceId: currentInstance.id, startTime: currentTime }
+      });
+    }
+  }, [executionContext, currentTime, dispatch]);
+
+  // Calculate start time (use actual start time if available)
+  const startTime = useMemo(() => {
+    const { actualStartTime, baseStartTime } = executionContext;
+    return actualStartTime || baseStartTime;
+  }, [executionContext]);
+
+  // Extract task chain items for display components
   const taskChain = useMemo(() => {
-    try {
-      return getCurrentTaskChain(items, currentTime, baseCalendar);
-    } catch (error) {
-      console.error('Error getting current task chain:', error);
-      return [];
-    }
-  }, [items, currentTime, baseCalendar]);
+    return executionContext.taskChain.map(({ item }) => item);
+  }, [executionContext]);
 
-  // Memoized base start time calculation
-  const baseStartTime = useMemo(() => {
-    try {
-      return calculateBaseStartTime(taskChain, baseCalendar);
-    } catch (error) {
-      console.error('Error calculating base start time:', error);
-      return Date.now();
-    }
-  }, [taskChain, baseCalendar]);
-
-  // Memoized render functions for better performance
-  const renderIdleState = useCallback(() => (
-    <Fade in timeout={500}>
-      <IdleStateContainer>
-        <Typography
-          variant="h6"
-          color="text.secondary"
-          sx={{
-            fontWeight: 'bold',
-            mb: 1,
-            background: 'linear-gradient(45deg, #666, #999)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
-        >
-          🎯 No Active Task
-        </Typography>
-        <Typography
-          variant="body1"
-          color="text.secondary"
-          sx={{
-            opacity: 0.8,
-            fontStyle: 'italic',
-          }}
-        >
-          No tasks are currently scheduled for execution
-        </Typography>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{
-            mt: 2,
-            display: 'block',
-            opacity: 0.6,
-          }}
-        >
-          Ready to begin when a task becomes active
-        </Typography>
-      </IdleStateContainer>
-    </Fade>
-  ), []);
-
-  const renderHeader = useCallback(() => (
-    showHeader && (
-      <Fade in timeout={300}>
-        <HeaderContainer>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 'bold',
-              background: 'linear-gradient(45deg, #2196F3, #21CBF3)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-          >
-            ⚡ Current Execution
-          </Typography>
-          <Box
-            sx={{
-              width: 4,
-              height: 32,
-              background: 'linear-gradient(45deg, #2196F3, #21CBF3)',
-              borderRadius: 2,
-              animation: 'pulse 2s infinite',
-            }}
-          />
-        </HeaderContainer>
-      </Fade>
-    )
-  ), [showHeader]);
-
-  const renderActiveExecution = useCallback(() => (
-    <Fade in timeout={500}>
-      <Box>
-        <PrimaryItemDisplayRouter
-          item={taskChain[0]}
-          taskChain={taskChain}
-          currentTime={currentTime}
-          startTime={baseStartTime}
-          isDeepest={taskChain.length === 1}
-          depth={0}
-        />
-      </Box>
-    </Fade>
-  ), [taskChain, currentTime, baseStartTime]);
-
-  // Early return for idle state - no need to calculate anything else
-  if (taskChain.length === 0) {
+  // Render idle state if no current task
+  if (!executionContext.currentItem || taskChain.length === 0) {
     return (
-      <ExecutionContainer>
-        {renderHeader()}
-        {renderIdleState()}
-
-        {/* Add pulse animation for the header accent */}
-        <style>
-          {`
-            @keyframes pulse {
-              0% { opacity: 1; }
-              50% { opacity: 0.6; }
-              100% { opacity: 1; }
-            }
-          `}
-        </style>
-      </ExecutionContainer>
+      <Fade in timeout={500}>
+        <IdleStateContainer>
+          <Box textAlign="center" py={8}>
+            <Schedule sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+            <Typography variant="h4" color="text.secondary" gutterBottom>
+              No Active Tasks
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Schedule an item to begin execution
+            </Typography>
+          </Box>
+        </IdleStateContainer>
+      </Fade>
     );
   }
 
   return (
     <ExecutionContainer>
-      {renderHeader()}
-      {renderActiveExecution()}
+      {showHeader && (
+        <HeaderContainer>
+          <Typography variant="h4" component="h1">
+            Current Task
+          </Typography>
+          {executionContext.currentInstance && (
+            <Chip 
+              label={executionContext.currentInstance.isComplete ? "Completed" : "In Progress"}
+              color={executionContext.currentInstance.isComplete ? "success" : "primary"}
+              variant="outlined"
+            />
+          )}
+        </HeaderContainer>
+      )}
 
-      {/* Global animation styles */}
-      <style>
-        {`
-          @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-          }
-        `}
-      </style>
+      <Fade in timeout={300}>
+        <Box>
+          <PrimaryItemDisplayRouter
+            item={taskChain[0]}
+            taskChain={taskChain}
+            currentTime={currentTime}
+            startTime={startTime}
+            isDeepest={taskChain.length === 1}
+            depth={0}
+            executionContext={executionContext}
+          />
+        </Box>
+      </Fade>
     </ExecutionContainer>
   );
 });

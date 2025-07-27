@@ -3,9 +3,151 @@ import {
   SubCalendarItem,
   CheckListItem,
   Child,
-  CheckListChild
+  CheckListChild,
+  ItemInstance,
+  ItemInstanceImpl,
+  getCurrentTaskChain
 } from "../../functions/utils/item/index";
 import { getItemById } from "../../functions/utils/item/utils";
+import type { BaseCalendarEntry } from "../../functions/reducers/AppReducer";
+
+/**
+ * Enhanced execution context that includes instance information
+ */
+export interface ExecutionContextWithInstances {
+  currentItem: Item | null;
+  currentInstance: ItemInstance | null;
+  taskChain: Array<{ item: Item; instance: ItemInstance | null }>;
+  baseStartTime: number;
+  actualStartTime?: number;
+}
+
+/**
+ * Get execution context including instance information
+ */
+export function getExecutionContext(
+  items: Item[],
+  instances: Map<string, ItemInstance>,
+  baseCalendar: Map<string, BaseCalendarEntry>,
+  currentTime: number = Date.now()
+): ExecutionContextWithInstances {
+  // Get the current task chain using existing logic
+  const taskChain = getCurrentTaskChain(items, currentTime, baseCalendar);
+  
+  if (taskChain.length === 0) {
+    return {
+      currentItem: null,
+      currentInstance: null,
+      taskChain: [],
+      baseStartTime: currentTime
+    };
+  }
+
+  // Find base calendar entry for root item
+  const rootItem = taskChain[0];
+  let baseCalendarEntry: BaseCalendarEntry | null = null;
+  
+  for (const [, entry] of baseCalendar) {
+    if (entry.itemId === rootItem.id) {
+      baseCalendarEntry = entry;
+      break;
+    }
+  }
+
+  if (!baseCalendarEntry) {
+    console.warn('No base calendar entry found for root item:', rootItem.id);
+    return {
+      currentItem: taskChain[taskChain.length - 1],
+      currentInstance: null,
+      taskChain: taskChain.map((item: Item) => ({ item, instance: null })),
+      baseStartTime: currentTime
+    };
+  }
+
+  // Get or create instance for base calendar entry
+  const rootInstance = instances.get(baseCalendarEntry.instanceId || '');
+  
+  if (!rootInstance && baseCalendarEntry.instanceId) {
+    console.warn('Instance not found for calendar entry:', baseCalendarEntry.instanceId);
+  }
+
+  // Build task chain with instances
+  const taskChainWithInstances = taskChain.map((item: Item) => {
+    if (item.id === rootItem.id) {
+      return { item, instance: rootInstance || null };
+    } else {
+      // For child items, instances are created when they start executing
+      // Look for existing instance or create placeholder
+      const childInstances = Array.from(instances.values()).filter(
+        inst => inst.itemId === item.id && inst.calendarEntryId === baseCalendarEntry.id
+      );
+      
+      return { 
+        item, 
+        instance: childInstances.length > 0 ? childInstances[0] : null 
+      };
+    }
+  });
+
+  const currentItem = taskChain[taskChain.length - 1];
+  const currentInstance = taskChainWithInstances[taskChainWithInstances.length - 1]?.instance || null;
+
+  return {
+    currentItem,
+    currentInstance,
+    taskChain: taskChainWithInstances,
+    baseStartTime: baseCalendarEntry.startTime,
+    actualStartTime: rootInstance?.actualStartTime
+  };
+}
+
+/**
+ * Start tracking execution for a checklist item
+ */
+export function startChecklistItemExecution(
+  item: CheckListItem,
+  parentInstance: ItemInstance,
+  startTime: number = Date.now()
+): ItemInstance {
+  // Update parent instance with checklist start time
+  const updatedExecutionDetails = {
+    ...parentInstance.executionDetails,
+    checklistStartTimes: {
+      ...parentInstance.executionDetails.checklistStartTimes,
+      [item.id]: startTime
+    }
+  };
+
+  return new ItemInstanceImpl({
+    ...parentInstance,
+    executionDetails: updatedExecutionDetails
+  });
+}
+
+/**
+ * Check if a checklist item has started based on parent instance
+ */
+export function hasChecklistItemStarted(
+  item: CheckListItem,
+  parentInstance: ItemInstance | null
+): boolean {
+  if (!parentInstance) return false;
+  
+  return Boolean(parentInstance.executionDetails.checklistStartTimes?.[item.id]);
+}
+
+/**
+ * Get start time for a checklist item from parent instance
+ */
+export function getChecklistItemStartTime(
+  item: CheckListItem,
+  parentInstance: ItemInstance | null,
+  fallbackTime: number
+): number {
+  if (!parentInstance) return fallbackTime;
+  
+  return parentInstance.executionDetails.checklistStartTimes?.[item.id] || fallbackTime;
+}
 
 /**
  * Calculate start time for a child item based on parent context
