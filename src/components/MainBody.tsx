@@ -4,9 +4,10 @@ import { useViewportHeight } from "../hooks/useViewportHeight"
 import ItemSchedule from "./ItemSchedule"
 import LedgerLines from "./LedgerLines"
 import ExecutionView from "./ExecutionView"
+import AccountingView from "./accounting/AccountingView"
 
 export default function MainBody() {
-  const { focusedItemId, items, millisecondsPerSegment, pixelsPerSegment } = useAppState()
+  const { focusedItemId, currentView, items, millisecondsPerSegment, pixelsPerSegment } = useAppState()
   const viewportHeight = useViewportHeight()
   const focusedItem = getItemById(items, focusedItemId)
 
@@ -61,8 +62,11 @@ export default function MainBody() {
           )}
         </>
       ) : (
-        /* Execution View - Shows the base calendar and current task execution */
-        <ExecutionView />
+        /* Main View Area - Shows execution or accounting view */
+        <>
+          {currentView === 'accounting' && <AccountingView />}
+          {currentView === 'execution' && <ExecutionView />}
+        </>
       )}
     </div>
   )

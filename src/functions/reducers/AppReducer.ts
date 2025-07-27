@@ -54,6 +54,10 @@ export type AppAction =
     payload: { focusedListItemId: string | null };
   }
   | {
+    type: "SET_CURRENT_VIEW";
+    payload: { currentView: 'execution' | 'accounting' };
+  }
+  | {
     type: "SET_ITEM_SEARCH_WINDOW_RANGE";
     payload: { min: number; max: number };
   }
@@ -131,6 +135,7 @@ export const initialState = {
   expandSearchItems: false,
   focusedItemId: null as string | null,
   focusedListItemId: null as string | null,
+  currentView: 'execution' as 'execution' | 'accounting',
   items: new Array<Item>(),
   baseCalendar: new Map<string, BaseCalendarEntry>(),
   itemInstances: new Map<string, ItemInstanceImpl>(),
@@ -277,6 +282,14 @@ export default function reducer(
       //* focusedItemId
       //* ****************************************************
       return { ...previous, focusedListItemId: focusedListItemId };
+    }
+    case "SET_CURRENT_VIEW": {
+      const { currentView } = action.payload;
+      //* ****************************************************
+      //* appState
+      //* currentView
+      //* ****************************************************
+      return { ...previous, currentView };
     }
     case "SET_SCHEDULING_DIALOG_OPEN": {
       //* ****************************************************
