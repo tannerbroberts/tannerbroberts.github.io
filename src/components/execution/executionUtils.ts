@@ -12,6 +12,20 @@ import { getItemById } from "../../functions/utils/item/utils";
 import type { BaseCalendarEntry } from "../../functions/reducers/AppReducer";
 
 /**
+ * Enhanced child execution status with countdown information
+ */
+export interface ChildExecutionStatus {
+  activeChild: Item | null;
+  nextChild: {
+    item: Item;
+    timeUntilStart: number;
+    startTime: number;
+  } | null;
+  gapPeriod: boolean;
+  currentPhase: 'pre-start' | 'active' | 'gap' | 'complete';
+}
+
+/**
  * Enhanced execution context that includes instance information
  */
 export interface ExecutionContextWithInstances {
@@ -167,6 +181,257 @@ export function calculateChildStartTime(
 }
 
 /**
+ * Helper function to find item by id with linear search (for unsorted arrays)
+ */
+function findItemById(items: Item[], id: string): Item | null {
+  return items.find(item => item.id === id) || null;
+}
+
+/**
+ * Enhanced version of getActiveChildForExecution with countdown information
+ */
+export function getChildExecutionStatus(
+  parentItem: SubCalendarItem | CheckListItem,
+  items: Item[],
+  currentTime: number,
+  parentStartTime: number
+): ChildExecutionStatus {
+  if (parentItem instanceof SubCalendarItem) {
+    return getSubCalendarExecutionStatus(parentItem, items, currentTime, parentStartTime);
+  } else if (parentItem instanceof CheckListItem) {
+    return getCheckListExecutionStatus(parentItem, items);
+  }
+
+  return {
+    activeChild: null,
+    nextChild: null,
+    gapPeriod: false,
+    currentPhase: 'complete'
+  };
+}
+
+/**
+ * Get enhanced execution status for SubCalendarItem
+ */
+function getSubCalendarExecutionStatus(
+  parentItem: SubCalendarItem,
+  items: Item[],
+  currentTime: number,
+  parentStartTime: number
+): ChildExecutionStatus {
+  if (parentItem.children.length === 0) {
+    return {
+      activeChild: null,
+      nextChild: null,
+      gapPeriod: false,
+      currentPhase: 'complete'
+    };
+  }
+
+  const elapsedTime = currentTime - parentStartTime;
+  const sortedChildren = [...parentItem.children].sort((a, b) => a.start - b.start);
+
+  // If we haven't started yet, find the first child
+  if (elapsedTime < 0) {
+    const firstChild = sortedChildren[0];
+    const childItem = findItemById(items, firstChild.id);
+
+    if (childItem) {
+      return {
+        activeChild: null,
+        nextChild: {
+          item: childItem,
+          timeUntilStart: Math.abs(elapsedTime) + firstChild.start,
+          startTime: parentStartTime + firstChild.start
+        },
+        gapPeriod: false,
+        currentPhase: 'pre-start'
+      };
+    }
+  }
+
+  // Find currently active child or determine gap period
+  for (let i = 0; i < sortedChildren.length; i++) {
+    const child = sortedChildren[i];
+    // Use linear search instead of getItemById for reliability
+    const childItem = findItemById(items, child.id);
+
+    if (!childItem) continue;
+
+    const childStartTime = child.start;
+    const childEndTime = child.start + childItem.duration;
+
+    // Check if this child is currently active
+    if (elapsedTime >= childStartTime && elapsedTime < childEndTime) {
+      return {
+        activeChild: childItem,
+        nextChild: getNextChildInfo(sortedChildren, items, i + 1, parentStartTime),
+        gapPeriod: false,
+        currentPhase: 'active'
+      };
+    }
+
+    // Check if we're in a gap before this child
+    if (elapsedTime < childStartTime) {
+      return {
+        activeChild: null,
+        nextChild: {
+          item: childItem,
+          timeUntilStart: childStartTime - elapsedTime,
+          startTime: parentStartTime + childStartTime
+        },
+        gapPeriod: true,
+        currentPhase: 'gap'
+      };
+    }
+  }
+
+  // We're past all children
+  return {
+    activeChild: null,
+    nextChild: null,
+    gapPeriod: false,
+    currentPhase: 'complete'
+  };
+}
+
+/**
+ * Get enhanced execution status for CheckListItem
+ */
+function getCheckListExecutionStatus(
+  parentItem: CheckListItem,
+  items: Item[]
+): ChildExecutionStatus {
+  if (parentItem.children.length === 0) {
+    return {
+      activeChild: null,
+      nextChild: null,
+      gapPeriod: false,
+      currentPhase: 'complete'
+    };
+  }
+
+  // Find the first incomplete child
+  for (let i = 0; i < parentItem.children.length; i++) {
+    const child = parentItem.children[i];
+    if (!child.complete) {
+      const childItem = findItemById(items, child.itemId);
+      if (childItem) {
+        // Find next child for context
+        const nextChildInfo = getNextCheckListChildInfo(parentItem.children, items, i + 1);
+
+        return {
+          activeChild: childItem,
+          nextChild: nextChildInfo,
+          gapPeriod: false,
+          currentPhase: 'active'
+        };
+      }
+    }
+  }
+
+  // All children are complete
+  return {
+    activeChild: null,
+    nextChild: null,
+    gapPeriod: false,
+    currentPhase: 'complete'
+  };
+}
+
+/**
+ * Get next child information for SubCalendar
+ */
+function getNextChildInfo(
+  sortedChildren: Child[],
+  items: Item[],
+  startIndex: number,
+  parentStartTime: number
+): { item: Item; timeUntilStart: number; startTime: number } | null {
+  for (let i = startIndex; i < sortedChildren.length; i++) {
+    const child = sortedChildren[i];
+    const childItem = findItemById(items, child.id);
+
+    if (childItem) {
+      return {
+        item: childItem,
+        timeUntilStart: 0, // Will be calculated in real-time
+        startTime: parentStartTime + child.start
+      };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Get next child information for CheckList
+ */
+function getNextCheckListChildInfo(
+  children: CheckListChild[],
+  items: Item[],
+  startIndex: number
+): { item: Item; timeUntilStart: number; startTime: number } | null {
+  for (let i = startIndex; i < children.length; i++) {
+    const child = children[i];
+    if (!child.complete) {
+      const childItem = findItemById(items, child.itemId);
+      if (childItem) {
+        return {
+          item: childItem,
+          timeUntilStart: 0, // CheckList items don't have time-based transitions
+          startTime: 0
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Determine if we're in a gap period between children
+ */
+export function isInGapPeriod(
+  parentItem: SubCalendarItem,
+  items: Item[],
+  currentTime: number,
+  parentStartTime: number
+): boolean {
+  const status = getChildExecutionStatus(parentItem, items, currentTime, parentStartTime);
+  return status.gapPeriod;
+}
+
+/**
+ * Get context message for gap periods
+ */
+export function getGapPeriodContext(
+  nextChild: { item: Item; timeUntilStart: number; startTime: number } | null,
+  currentPhase: string
+): string {
+  if (!nextChild) {
+    return 'All tasks complete';
+  }
+
+  if (currentPhase === 'pre-start') {
+    return `Preparing to start: ${nextChild.item.name}`;
+  }
+
+  if (currentPhase === 'gap') {
+    const minutes = Math.floor(nextChild.timeUntilStart / (60 * 1000));
+    const seconds = Math.floor((nextChild.timeUntilStart % (60 * 1000)) / 1000);
+
+    if (minutes > 0) {
+      return `Next: ${nextChild.item.name} in ${minutes}m ${seconds}s`;
+    } else {
+      return `Next: ${nextChild.item.name} in ${seconds}s`;
+    }
+  }
+
+  return `Next: ${nextChild.item.name}`;
+}
+
+/**
  * Get the active child item for current time in execution context
  */
 export function getActiveChildForExecution(
@@ -202,29 +467,18 @@ function getActiveSubCalendarChild(
   if (elapsedTime < 0) return null;
 
   // Find the child that should be active at the current time
-  let activeChild: Child | null = null;
-
   for (const child of sortedChildren) {
-    if (elapsedTime >= child.start) {
-      const childItem = getItemById(items, child.id);
-      if (childItem) {
-        // Check if we're within this child's duration
-        if (elapsedTime < child.start + childItem.duration) {
-          activeChild = child;
-          break;
-        } else {
-          // This child has finished, but keep looking for the next one
-          // If no other child is found, we'll return this one as the "last active"
-          activeChild = child;
-        }
-      }
-    } else {
-      // We haven't reached this child yet, so the previous one should be active
-      break;
+    const childItem = getItemById(items, child.id);
+    if (!childItem) continue;
+
+    // Check if we're within this child's execution window
+    if (elapsedTime >= child.start && elapsedTime < child.start + childItem.duration) {
+      return childItem;
     }
   }
 
-  return activeChild ? getItemById(items, activeChild.id) : null;
+  // If no child is currently active, return null
+  return null;
 }
 
 /**

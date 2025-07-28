@@ -4,7 +4,7 @@ import { Schedule, Functions } from "@mui/icons-material";
 import { SubCalendarItem } from "../../functions/utils/item/index";
 import { getTaskProgress } from "../../functions/utils/item/utils";
 import { formatDuration } from "../../functions/utils/formatTime";
-import { getActiveChildForExecution } from "./executionUtils";
+import { getActiveChildForExecution, getChildExecutionStatus, getGapPeriodContext } from "./executionUtils";
 import { useAppState } from "../../reducerContexts/App";
 import { useItemVariables } from "../../hooks/useItemVariables";
 import VariableSummaryDisplay from "../variables/VariableSummaryDisplay";
@@ -55,30 +55,18 @@ export default function PrimarySubCalendarItemDisplay({
     return "primary";
   }, [progress]);
 
-  // Get the currently executing child if any
+  // Get enhanced child execution status
+  const childExecutionStatus = useMemo(() => {
+    return getChildExecutionStatus(item, items, currentTime, startTime);
+  }, [item, items, currentTime, startTime]);
+
+  // Get the currently executing child if any (for backward compatibility)
   const activeChild = useMemo(() => {
     return getActiveChildForExecution(item, items, currentTime, startTime);
   }, [item, items, currentTime, startTime]);
 
-  // Get next child to show "up next" section
-  const nextChild = useMemo(() => {
-    if (!item.children.length) return null;
-
-    const elapsedTime = currentTime - startTime;
-    const sortedChildren = [...item.children].sort((a, b) => a.start - b.start);
-
-    // Find the next child that hasn't started yet
-    for (const child of sortedChildren) {
-      if (elapsedTime < child.start) {
-        return {
-          child,
-          item: items.find(i => i.id === child.id),
-          timeUntilStart: (startTime + child.start) - currentTime
-        };
-      }
-    }
-    return null;
-  }, [item.children, items, currentTime, startTime]);
+  // Enhanced next child information with countdown
+  const { nextChild, gapPeriod, currentPhase } = childExecutionStatus;
 
   // Get progress bar colors (two tones of the same color)
   const getProgressBarColors = (color: string) => {
@@ -202,24 +190,45 @@ export default function PrimarySubCalendarItemDisplay({
         </Box>
       )}
 
-      {/* Show active child or up next section if no active child */}
+      {/* Show enhanced child status information */}
       {!activeChild && nextChild && (
         <Box sx={{
           p: 2,
-          backgroundColor: 'info.50',
+          backgroundColor: gapPeriod ? 'warning.50' : 'info.50',
           borderRadius: 1,
           border: '1px solid',
-          borderColor: 'info.200',
+          borderColor: gapPeriod ? 'warning.200' : 'info.200',
           mb: 2
         }}>
-          <Typography variant="subtitle2" color="info.main" sx={{ fontWeight: 'bold', mb: 1 }}>
-            Up Next
+          <Typography variant="subtitle2" color={gapPeriod ? 'warning.main' : 'info.main'} sx={{ fontWeight: 'bold', mb: 1 }}>
+            {gapPeriod ? 'Gap Period' : 'Up Next'}
           </Typography>
           <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
             {nextChild.item?.name || 'Unknown Task'}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Starts in {formatDuration(nextChild.timeUntilStart)}
+            {getGapPeriodContext(nextChild, currentPhase)}
+          </Typography>
+          {nextChild.timeUntilStart > 0 && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              Time remaining: {formatDuration(nextChild.timeUntilStart)}
+            </Typography>
+          )}
+        </Box>
+      )}
+
+      {/* Show gap period context when no next child but in gap */}
+      {!activeChild && !nextChild && gapPeriod && (
+        <Box sx={{
+          p: 2,
+          backgroundColor: 'grey.50',
+          borderRadius: 1,
+          border: '1px solid',
+          borderColor: 'grey.200',
+          mb: 2
+        }}>
+          <Typography variant="body2" color="text.secondary">
+            {getGapPeriodContext(null, currentPhase)}
           </Typography>
         </Box>
       )}
