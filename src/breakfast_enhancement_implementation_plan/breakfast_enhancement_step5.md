@@ -197,6 +197,18 @@ describe('Complete Breakfast Lesson Integration', () => {
 - **Performance Tests**: Browser performance profiling tools
 - **Visual Tests**: Screenshots for visual regression testing
 
+### Test Commands
+All tests should be run using:
+```bash
+npm run test:ai
+```
+
+### File Cleanup Commands
+All file removals should use the `-f` flag:
+```bash
+rm -f <file_name>
+```
+
 ## Acceptance Criteria
 
 ### Functional Integration

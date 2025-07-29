@@ -345,6 +345,18 @@ const getGapPeriodGuidance = (status: ChildExecutionStatus): string => {
 5. **Preparation Warnings**: Verify 30-second preparation warnings work
 6. **State Transitions**: Pay attention to smoothness of transitions
 
+### Test Commands
+All tests should be run using:
+```bash
+npm run test:ai
+```
+
+### File Cleanup Commands
+All file removals should use the `-f` flag:
+```bash
+rm -f <file_name>
+```
+
 ## Acceptance Criteria
 
 ### Visual Quality
