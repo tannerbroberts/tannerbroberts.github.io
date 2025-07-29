@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { Box, Typography, LinearProgress, Tooltip } from "@mui/material";
 import { Timer } from "@mui/icons-material";
 import { styled, keyframes } from "@mui/material/styles";
@@ -153,7 +153,7 @@ interface ChildStatus {
   endTime: number;
 }
 
-export default function SubCalendarStatusBar({
+function SubCalendarStatusBar({
   item,
   taskChain,
   currentTime,
@@ -558,3 +558,5 @@ export default function SubCalendarStatusBar({
     </StatusBarContainer>
   );
 }
+
+export default React.memo(SubCalendarStatusBar);
