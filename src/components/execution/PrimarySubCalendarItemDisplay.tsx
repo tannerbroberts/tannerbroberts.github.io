@@ -1,13 +1,12 @@
 import { useMemo, useState } from "react";
 import { Box, Typography } from "@mui/material";
-import { Schedule, Functions } from "@mui/icons-material";
 import { SubCalendarItem } from "../../functions/utils/item/index";
-import { getTaskProgress } from "../../functions/utils/item/utils";
 import { formatDuration } from "../../functions/utils/formatTime";
 import { getActiveChildForExecution, getChildExecutionStatus, getGapPeriodContext } from "./executionUtils";
 import { useAppState } from "../../reducerContexts/App";
 import { useItemVariables } from "../../hooks/useItemVariables";
 import VariableSummaryDisplay from "../variables/VariableSummaryDisplay";
+import SubCalendarStatusBar from "./SubCalendarStatusBar";
 
 interface PrimarySubCalendarItemDisplayProps {
   readonly item: SubCalendarItem;
@@ -31,30 +30,6 @@ export default function PrimarySubCalendarItemDisplay({
     return Object.keys(variableSummary).length > 0;
   }, [variableSummary]);
 
-  // Calculate progress using existing utility
-  const progress = useMemo(() => {
-    try {
-      return getTaskProgress(item, currentTime, startTime);
-    } catch (error) {
-      console.error('Error calculating progress for SubCalendarItem:', error);
-      return 0;
-    }
-  }, [item, currentTime, startTime]);
-
-  // Calculate remaining time
-  const remainingTime = useMemo(() => {
-    const elapsed = currentTime - startTime;
-    const remaining = Math.max(0, item.duration - elapsed);
-    return remaining;
-  }, [item.duration, currentTime, startTime]);
-
-  // Get progress bar color based on completion
-  const progressColor = useMemo(() => {
-    if (progress >= 100) return "success";
-    if (progress >= 75) return "warning";
-    return "primary";
-  }, [progress]);
-
   // Get enhanced child execution status
   const childExecutionStatus = useMemo(() => {
     return getChildExecutionStatus(item, items, currentTime, startTime);
@@ -68,114 +43,39 @@ export default function PrimarySubCalendarItemDisplay({
   // Enhanced next child information with countdown
   const { nextChild, gapPeriod, currentPhase } = childExecutionStatus;
 
-  // Get progress bar colors (two tones of the same color)
-  const getProgressBarColors = (color: string) => {
-    if (color === 'success') return { main: 'success.main', light: 'success.light' };
-    if (color === 'warning') return { main: 'warning.main', light: 'warning.light' };
-    return { main: 'primary.main', light: 'primary.light' };
-  };
-
-  const barColors = getProgressBarColors(progressColor);
-
   return (
     <Box sx={{ width: '100%' }}>
-      {/* Header Progress Bar */}
-      <Box
-        sx={{
-          position: 'relative',
-          height: 60,
-          display: 'flex',
-          alignItems: 'center',
-          backgroundColor: barColors.light,
-          borderRadius: 1,
-          overflow: 'hidden',
-          mb: children ? 0 : 2,
-          cursor: hasVariables ? 'pointer' : 'default'
-        }}
-        onClick={hasVariables ? () => setShowVariables(!showVariables) : undefined}
-      >
-        {/* Progress bar background (darker tone) */}
-        <Box
-          sx={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            height: '100%',
-            width: `${Math.min(progress, 100)}%`,
-            backgroundColor: barColors.main,
-            transition: 'width 0.3s ease'
-          }}
+      {/* Enhanced SubCalendar Status Bar with variable click handler */}
+      <Box sx={{ position: 'relative' }}>
+        <SubCalendarStatusBar
+          item={item}
+          taskChain={items}
+          currentTime={currentTime}
+          startTime={startTime}
+          itemName={item.name}
+          isExpandable={hasVariables}
+          isExpanded={showVariables}
+          childExecutionStatus={childExecutionStatus}
+          showCountdown={true}
+          showPreparationHints={true}
         />
 
-        {/* Content overlay */}
-        <Box sx={{
-          position: 'relative',
-          zIndex: 2,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          width: '100%',
-          px: 2
-        }}>
-          {/* Left: Schedule icon, item name, and variables indicator */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0, flex: 1 }}>
-            <Schedule sx={{ color: 'text.primary', fontSize: '1.5rem', flexShrink: 0 }} />
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 'bold',
-                color: 'text.primary',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                maxWidth: '250px'
-              }}
-            >
-              {item.name}
-            </Typography>
-
-            {/* Variables indicator */}
-            {hasVariables && (
-              <Box sx={{ display: 'flex', alignItems: 'center', ml: 1 }}>
-                <Functions
-                  sx={{
-                    color: 'text.secondary',
-                    fontSize: '1rem',
-                    transform: showVariables ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.2s ease'
-                  }}
-                />
-                <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
-                  {Object.keys(variableSummary).length}
-                </Typography>
-              </Box>
-            )}
-          </Box>
-
-          {/* Center: Progress percentage */}
-          <Typography
-            variant="h6"
+        {/* Variables click handler overlay */}
+        {hasVariables && (
+          <Box
             sx={{
-              fontWeight: 'bold',
-              color: 'text.primary',
-              mx: 2
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 60,
+              zIndex: 10,
+              cursor: 'pointer',
+              backgroundColor: 'transparent'
             }}
-          >
-            {progress.toFixed(1)}%
-          </Typography>
-
-          {/* Right: Time remaining */}
-          <Typography
-            variant="body1"
-            sx={{
-              fontWeight: 'medium',
-              minWidth: 'fit-content',
-              color: remainingTime <= 0 ? 'success.main' : 'text.primary'
-            }}
-          >
-            {remainingTime <= 0 ? 'Complete' : formatDuration(remainingTime)}
-          </Typography>
-        </Box>
+            onClick={() => setShowVariables(!showVariables)}
+          />
+        )}
       </Box>
 
       {/* Variable Summary Display */}

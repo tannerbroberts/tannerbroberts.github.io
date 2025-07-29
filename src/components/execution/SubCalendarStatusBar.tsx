@@ -1,9 +1,11 @@
 import { useMemo } from "react";
 import { Box, Typography, LinearProgress, Tooltip } from "@mui/material";
+import { Timer } from "@mui/icons-material";
 import { styled, keyframes } from "@mui/material/styles";
 import { SubCalendarItem, Item } from "../../functions/utils/item/index";
 import { getTaskProgress, getItemById } from "../../functions/utils/item/utils";
 import { Child } from "../../functions/utils/item/Child";
+import { ChildExecutionStatus } from "./executionUtils";
 
 // Define pulse animation
 const pulse = keyframes`
@@ -47,6 +49,88 @@ const PulsingIndicator = styled(Box)<{ color: string }>(({ color }) => ({
   flexShrink: 0,
 }));
 
+// Enhanced countdown formatting with multiple time units
+const formatCountdown = (milliseconds: number): string => {
+  if (milliseconds <= 0) return '0s';
+
+  const minutes = Math.floor(milliseconds / (60 * 1000));
+  const seconds = Math.floor((milliseconds % (60 * 1000)) / 1000);
+
+  if (minutes > 0) {
+    return `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
+  } else {
+    return `${seconds}s`;
+  }
+};
+
+// Context guidance for gap periods
+const getGapPeriodGuidance = (status: ChildExecutionStatus | undefined): string => {
+  if (!status?.nextChild) return 'Monitor current cooking tasks';
+
+  const { nextChild } = status;
+  const timeUntil = nextChild.timeUntilStart;
+
+  if (timeUntil < 30000) { // 30 seconds
+    return `Get ready for ${nextChild.item.name} - starting very soon!`;
+  } else if (timeUntil < 120000) { // 2 minutes
+    return `Prepare for ${nextChild.item.name} - gather needed items`;
+  } else {
+    return `Continue monitoring current tasks - ${nextChild.item.name} starts in ${formatCountdown(timeUntil)}`;
+  }
+};
+
+// Add countdown timer component
+const CountdownTimer = ({ timeMs, color }: { timeMs: number; color: string }) => {
+  return (
+    <Box sx={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 1,
+      px: 1,
+      py: 0.5,
+      borderRadius: 1,
+      backgroundColor: `${color}.50`,
+      border: `1px solid`,
+      borderColor: `${color}.200`
+    }}>
+      <Timer fontSize="small" sx={{ color: `${color}.main` }} />
+      <Typography
+        variant="body2"
+        sx={{
+          fontFamily: 'monospace',
+          fontWeight: 'bold',
+          color: `${color}.main`,
+          minWidth: '60px'
+        }}
+      >
+        {formatCountdown(timeMs)}
+      </Typography>
+    </Box>
+  );
+};
+
+// Add preparation indicator
+const PreparationIndicator = ({ visible }: { visible: boolean }) => (
+  <Box sx={{
+    opacity: visible ? 1 : 0,
+    transition: 'opacity 0.3s ease',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 0.5
+  }}>
+    <Box sx={{
+      width: 8,
+      height: 8,
+      borderRadius: '50%',
+      backgroundColor: 'warning.main',
+      animation: `${pulse} 2s infinite`
+    }} />
+    <Typography variant="caption" color="warning.main">
+      PREP
+    </Typography>
+  </Box>
+);
+
 interface SubCalendarStatusBarProps {
   readonly item: SubCalendarItem;
   readonly taskChain: Item[];
@@ -55,6 +139,9 @@ interface SubCalendarStatusBarProps {
   readonly itemName?: string; // Optional item name to display instead of current child
   readonly isExpandable?: boolean; // Whether this header can be expanded/collapsed
   readonly isExpanded?: boolean; // Current expanded state
+  readonly childExecutionStatus?: ChildExecutionStatus; // Enhanced child execution status
+  readonly showCountdown?: boolean; // Whether to show countdown timers
+  readonly showPreparationHints?: boolean; // Whether to show preparation hints
 }
 
 interface ChildStatus {
@@ -73,8 +160,82 @@ export default function SubCalendarStatusBar({
   startTime,
   itemName,
   isExpandable = false,
-  isExpanded = false
+  isExpanded = false,
+  childExecutionStatus,
+  showCountdown = true,
+  showPreparationHints = true
 }: SubCalendarStatusBarProps) {
+  // Add state type for status bar
+  type StatusBarState = 'active' | 'countdown' | 'gap' | 'preparation' | 'complete';
+
+  // Enhanced state calculation
+  const statusBarState = useMemo((): StatusBarState => {
+    if (!childExecutionStatus) return 'gap';
+
+    const { activeChild, nextChild, gapPeriod } = childExecutionStatus;
+
+    if (activeChild) return 'active';
+    if (nextChild && nextChild.timeUntilStart < 30000) return 'preparation'; // 30 seconds
+    if (nextChild) return 'countdown';
+    if (gapPeriod) return 'gap';
+    return 'complete';
+  }, [childExecutionStatus]);
+
+  // Enhanced display content calculation
+  const displayContent = useMemo(() => {
+    if (!childExecutionStatus) {
+      return {
+        primaryText: itemName || 'SubCalendar',
+        secondaryText: null,
+        countdownText: null,
+        color: 'primary'
+      };
+    }
+
+    const { activeChild, nextChild } = childExecutionStatus;
+
+    switch (statusBarState) {
+      case 'active':
+        return {
+          primaryText: `Executing: ${activeChild?.name}`,
+          secondaryText: 'Follow instructions carefully',
+          countdownText: null,
+          color: 'success'
+        };
+
+      case 'preparation':
+        return {
+          primaryText: `Prepare: ${nextChild?.item.name}`,
+          secondaryText: 'Get ready for next task',
+          countdownText: nextChild ? formatCountdown(nextChild.timeUntilStart) : null,
+          color: 'warning'
+        };
+
+      case 'countdown':
+        return {
+          primaryText: `Next: ${nextChild?.item.name}`,
+          secondaryText: 'Continue monitoring current tasks',
+          countdownText: nextChild ? formatCountdown(nextChild.timeUntilStart) : null,
+          color: 'info'
+        };
+
+      case 'gap':
+        return {
+          primaryText: 'Monitoring cooking',
+          secondaryText: 'Watch for cooking progress',
+          countdownText: nextChild ? formatCountdown(nextChild.timeUntilStart) : null,
+          color: 'primary'
+        };
+
+      default:
+        return {
+          primaryText: 'SubCalendar Complete',
+          secondaryText: 'All tasks finished',
+          countdownText: null,
+          color: 'success'
+        };
+    }
+  }, [statusBarState, childExecutionStatus, itemName]);
   // Calculate overall progress for the SubCalendar
   const overallProgress = useMemo(() => {
     try {
@@ -212,28 +373,47 @@ export default function SubCalendarStatusBar({
           px: 3,
         }}
       >
-        {/* Left side: Progress percentage and item name or current child */}
+        {/* Enhanced Left side: Progress percentage and dynamic status display */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
-          <Tooltip
-            title={`SubCalendar Progress: ${overallProgress.toFixed(1)}% complete`}
-            arrow
-            placement="top"
-          >
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 'bold',
-                color: 'text.primary',
-                fontSize: '1.1rem',
-                minWidth: '60px',
-              }}
-            >
-              {overallProgress.toFixed(1)}%
-            </Typography>
-          </Tooltip>
+          {/* Progress percentage */}
+          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+            {overallProgress.toFixed(1)}%
+          </Typography>
 
-          {/* Show item name if provided (for parent headers) */}
-          {itemName && (
+          {/* Primary status display - enhanced with childExecutionStatus */}
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="h6" sx={{
+              fontWeight: 'bold',
+              color: `${displayContent.color}.main`,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}>
+              {displayContent.primaryText}
+            </Typography>
+
+            {displayContent.secondaryText && (
+              <Typography variant="caption" color="text.secondary">
+                {displayContent.secondaryText}
+              </Typography>
+            )}
+          </Box>
+
+          {/* Countdown timer */}
+          {showCountdown && displayContent.countdownText && (
+            <CountdownTimer
+              timeMs={childExecutionStatus?.nextChild?.timeUntilStart || 0}
+              color={displayContent.color}
+            />
+          )}
+
+          {/* Preparation indicator */}
+          {showPreparationHints && (
+            <PreparationIndicator visible={statusBarState === 'preparation'} />
+          )}
+
+          {/* Fallback: Show item name if provided and no enhanced status */}
+          {itemName && !childExecutionStatus && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <Typography
                 variant="h6"
@@ -264,8 +444,8 @@ export default function SubCalendarStatusBar({
             </Box>
           )}
 
-          {/* Show current active child if no item name provided */}
-          {!itemName && childrenStatus.activeChild && (
+          {/* Fallback: Show current active child if no item name and no enhanced status */}
+          {!itemName && !childExecutionStatus && childrenStatus.activeChild && (
             <Tooltip
               title={`Currently executing: ${childrenStatus.activeChild.item?.name || 'Unknown Task'}`}
               arrow
@@ -336,6 +516,26 @@ export default function SubCalendarStatusBar({
           </Tooltip>
         </Box>
       </Box>
+
+      {/* Enhanced context display below status bar */}
+      {childExecutionStatus?.gapPeriod && showPreparationHints && (
+        <Box sx={{
+          position: 'absolute',
+          bottom: 3,
+          left: 3,
+          right: 3,
+          zIndex: 3,
+          p: 1,
+          backgroundColor: 'info.50',
+          borderRadius: 1,
+          border: '1px solid',
+          borderColor: 'info.200'
+        }}>
+          <Typography variant="body2" color="info.main" sx={{ fontWeight: 'medium', fontSize: '0.75rem' }}>
+            💡 {getGapPeriodGuidance(childExecutionStatus)}
+          </Typography>
+        </Box>
+      )}
 
       {/* Enhanced progress indicator at the bottom */}
       <LinearProgress
