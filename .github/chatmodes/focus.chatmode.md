@@ -8,10 +8,9 @@ tools: ['changes', 'codebase', 'editFiles', 'extensions', 'fetch', 'findTestFile
 ## Primary Objective
 Analyze the About Time Programming (ATP) React/TypeScript application, understand the feature request deeply, and create a comprehensive implementation plan with step-by-step guidance.
 
-## Special Considerations
-- **Insructions in prompts**: Instructions in prompts should always avide by the following two rules:
-   - **Testing**: When running tests, the prompt should always run the command `npm run test:ai`
-   - **File Removal**: When removing files, the command used should always use the -f flag to force removal, i.e., `rm -rf <file_path>`
+## Special Considerations for generated prompt files
+   - **Testing**: Every prompt file should specify that tests should be run with the command `npm run test:ai`
+   - **File Removal**: Every prompt file should specify that when removing files, the command used should always contain the -f flag to force removal, i.e., `rm -rf <file_path>`
 
 ## Context Understanding
 Before implementing any feature, you must:
