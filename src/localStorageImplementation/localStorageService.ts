@@ -1,8 +1,15 @@
 import { Item, ItemFactory, ItemInstanceImpl, VariableImpl } from '../functions/utils/item/index';
 import type { ItemJSON, ItemInstanceJSON, VariableJSON, VariableSummary } from '../functions/utils/item/index';
+import type { VariableDefinition, VariableDescription } from '../functions/utils/item/types/VariableTypes';
 import { BaseCalendarEntry } from '../functions/reducers/AppReducer';
 import { STORAGE_KEYS, CURRENT_SCHEMA_VERSION, MAX_STORAGE_SIZE } from './constants';
 import type { StorageResult, StorageMetadata, SerializedStorageData } from './types';
+import {
+  serializeVariableDefinitions,
+  deserializeVariableDefinitions,
+  serializeVariableDescriptions,
+  deserializeVariableDescriptions
+} from './variableStorageUtils';
 
 /**
  * Core storage operations for Items
@@ -727,4 +734,214 @@ export function serializeVariableSummaryCache(cache: Map<string, VariableSummary
  */
 export function deserializeVariableSummaryCache(serializedCache: Array<[string, VariableSummary]>): Map<string, VariableSummary> {
   return new Map(serializedCache);
+}
+
+/**
+ * Variable system storage functions (Step 3)
+ */
+
+/**
+ * Saves variable definitions Map to localStorage
+ */
+export function saveVariableDefinitionsToStorage(definitions: Map<string, VariableDefinition>): StorageResult<void> {
+  try {
+    if (!isStorageAvailable()) {
+      return {
+        success: false,
+        error: 'localStorage is not available in this environment'
+      };
+    }
+
+    const serializedDefinitions = serializeVariableDefinitions(definitions);
+    const dataToSave = {
+      variableDefinitions: serializedDefinitions,
+      version: CURRENT_SCHEMA_VERSION,
+      timestamp: Date.now()
+    };
+
+    const jsonString = JSON.stringify(dataToSave);
+
+    // Check storage size before saving
+    if (jsonString.length > MAX_STORAGE_SIZE) {
+      return {
+        success: false,
+        error: `Data size (${jsonString.length} bytes) exceeds maximum allowed size (${MAX_STORAGE_SIZE} bytes)`
+      };
+    }
+
+    localStorage.setItem(STORAGE_KEYS.VARIABLE_DEFINITIONS, jsonString);
+
+    return { success: true };
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.name === 'QuotaExceededError') {
+        return {
+          success: false,
+          error: 'Storage quota exceeded. Please clear some data and try again.'
+        };
+      }
+      return {
+        success: false,
+        error: `Failed to save variable definitions: ${error.message}`
+      };
+    }
+    return {
+      success: false,
+      error: 'Unknown error occurred while saving variable definitions'
+    };
+  }
+}
+
+/**
+ * Loads variable definitions Map from localStorage
+ */
+export function loadVariableDefinitionsFromStorage(): StorageResult<Map<string, VariableDefinition>> {
+  try {
+    if (!isStorageAvailable()) {
+      return {
+        success: false,
+        error: 'localStorage is not available in this environment'
+      };
+    }
+
+    const storedData = localStorage.getItem(STORAGE_KEYS.VARIABLE_DEFINITIONS);
+    if (!storedData) {
+      // No data stored yet - return empty Map
+      return {
+        success: true,
+        data: new Map<string, VariableDefinition>()
+      };
+    }
+
+    const parsedData = JSON.parse(storedData);
+
+    // Validate the data structure
+    if (!parsedData || !Array.isArray(parsedData.variableDefinitions)) {
+      return {
+        success: false,
+        error: 'Invalid or corrupted variable definitions data in storage'
+      };
+    }
+
+    const definitions = deserializeVariableDefinitions(parsedData.variableDefinitions);
+
+    return {
+      success: true,
+      data: definitions
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return {
+        success: false,
+        error: `Failed to load variable definitions: ${error.message}`
+      };
+    }
+    return {
+      success: false,
+      error: 'Unknown error occurred while loading variable definitions'
+    };
+  }
+}
+
+/**
+ * Saves variable descriptions Map to localStorage
+ */
+export function saveVariableDescriptionsToStorage(descriptions: Map<string, VariableDescription>): StorageResult<void> {
+  try {
+    if (!isStorageAvailable()) {
+      return {
+        success: false,
+        error: 'localStorage is not available in this environment'
+      };
+    }
+
+    const serializedDescriptions = serializeVariableDescriptions(descriptions);
+    const dataToSave = {
+      variableDescriptions: serializedDescriptions,
+      version: CURRENT_SCHEMA_VERSION,
+      timestamp: Date.now()
+    };
+
+    const jsonString = JSON.stringify(dataToSave);
+
+    // Check storage size before saving
+    if (jsonString.length > MAX_STORAGE_SIZE) {
+      return {
+        success: false,
+        error: `Data size (${jsonString.length} bytes) exceeds maximum allowed size (${MAX_STORAGE_SIZE} bytes)`
+      };
+    }
+
+    localStorage.setItem(STORAGE_KEYS.VARIABLE_DESCRIPTIONS, jsonString);
+
+    return { success: true };
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.name === 'QuotaExceededError') {
+        return {
+          success: false,
+          error: 'Storage quota exceeded. Please clear some data and try again.'
+        };
+      }
+      return {
+        success: false,
+        error: `Failed to save variable descriptions: ${error.message}`
+      };
+    }
+    return {
+      success: false,
+      error: 'Unknown error occurred while saving variable descriptions'
+    };
+  }
+}
+
+/**
+ * Loads variable descriptions Map from localStorage
+ */
+export function loadVariableDescriptionsFromStorage(): StorageResult<Map<string, VariableDescription>> {
+  try {
+    if (!isStorageAvailable()) {
+      return {
+        success: false,
+        error: 'localStorage is not available in this environment'
+      };
+    }
+
+    const storedData = localStorage.getItem(STORAGE_KEYS.VARIABLE_DESCRIPTIONS);
+    if (!storedData) {
+      // No data stored yet - return empty Map
+      return {
+        success: true,
+        data: new Map<string, VariableDescription>()
+      };
+    }
+
+    const parsedData = JSON.parse(storedData);
+
+    // Validate the data structure
+    if (!parsedData || !Array.isArray(parsedData.variableDescriptions)) {
+      return {
+        success: false,
+        error: 'Invalid or corrupted variable descriptions data in storage'
+      };
+    }
+
+    const descriptions = deserializeVariableDescriptions(parsedData.variableDescriptions);
+
+    return {
+      success: true,
+      data: descriptions
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return {
+        success: false,
+        error: `Failed to load variable descriptions: ${error.message}`
+      };
+    }
+    return {
+      success: false,
+      error: 'Unknown error occurred while loading variable descriptions'
+    };
+  }
 }

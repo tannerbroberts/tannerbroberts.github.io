@@ -10,4 +10,7 @@ export interface ItemJSON {
   priority?: number;
   children?: unknown[];
   sortType?: SortType;
+  // VariableItem specific properties
+  description?: string;
+  value?: number;
 }

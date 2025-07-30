@@ -2,6 +2,7 @@ import { Item } from "./Item";
 import { SubCalendarItem } from "./SubCalendarItem";
 import { CheckListItem } from "./CheckListItem";
 import { BasicItem } from "./BasicItem";
+import { VariableItem } from "./VariableItem";
 import { Child } from "./Child";
 import { CheckListChild } from "./CheckListChild";
 import { Parent } from "./Parent";
@@ -14,6 +15,13 @@ export function hasChildren(item: Item): item is SubCalendarItem | CheckListItem
 }
 
 /**
+ * Type guard to check if an item is a VariableItem
+ */
+export function isVariableItem(item: Item): item is VariableItem {
+  return item instanceof VariableItem;
+}
+
+/**
  * Safely get children from an item, returning empty array if no children
  */
 export function getChildren(item: Item): Child[] | CheckListChild[] | [] {
@@ -22,6 +30,7 @@ export function getChildren(item: Item): Child[] | CheckListChild[] | [] {
   } else if (item instanceof CheckListItem) {
     return item.children;
   }
+  // BasicItem and VariableItem don't have children
   return [];
 }
 
@@ -131,6 +140,15 @@ export function removeParentById(item: Item, parentId: string): Item {
       children: item.children,
       sortType: item.sortType,
     });
+  } else if (item instanceof VariableItem) {
+    return new VariableItem({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      value: item.value,
+      parents: newParents,
+      allOrNothing: item.allOrNothing,
+    });
   }
 
   throw new Error(`Unknown item type: ${item.constructor.name}`);
@@ -169,6 +187,15 @@ export function removeParentByRelationshipId(item: Item, relationshipId: string)
       allOrNothing: item.allOrNothing,
       children: item.children,
       sortType: item.sortType,
+    });
+  } else if (item instanceof VariableItem) {
+    return new VariableItem({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      value: item.value,
+      parents: newParents,
+      allOrNothing: item.allOrNothing,
     });
   }
 
@@ -247,6 +274,15 @@ export function addParentToItem(item: Item, parent: Parent): Item {
       children: item.children,
       sortType: item.sortType,
     });
+  } else if (item instanceof VariableItem) {
+    return new VariableItem({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      value: item.value,
+      parents: newParents,
+      allOrNothing: item.allOrNothing,
+    });
   }
 
   throw new Error(`Unknown item type: ${item.constructor.name}`);
@@ -280,7 +316,7 @@ export function addChildToItem(item: Item, child: Child | CheckListChild): Item 
       sortType: item.sortType,
     });
   }
-  
+
   // BasicItem doesn't have children, or incompatible child type
   throw new Error(`Cannot add child of type ${child.constructor.name} to item of type ${item.constructor.name}`);
 }

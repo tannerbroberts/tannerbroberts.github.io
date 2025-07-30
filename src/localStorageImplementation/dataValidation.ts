@@ -1,6 +1,10 @@
 import { Item, ItemFactory } from '../functions/utils/item/index';
 import { BaseCalendarEntry } from '../functions/reducers/AppReducer';
 
+// Add imports needed for variable validation functions
+import type { VariableDefinitionJSON, VariableDescriptionJSON } from '../functions/utils/item/types/VariableTypes';
+import type { VariableMigrationResult } from './variableMigration';
+
 export interface ValidationResult {
   isValid: boolean;
   errors: string[];
@@ -447,4 +451,150 @@ export function validateAllData(): ExtendedValidationResult {
       }
     };
   }
+}
+
+/**
+ * Variable system validation functions for Step 3
+ */
+
+/**
+ * Validates VariableDefinitionJSON object
+ */
+export function validateVariableDefinition(data: unknown): data is VariableDefinitionJSON {
+  if (!data || typeof data !== 'object') {
+    return false;
+  }
+
+  const obj = data as Record<string, unknown>;
+
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.name === 'string' &&
+    typeof obj.createdAt === 'number' &&
+    typeof obj.updatedAt === 'number' &&
+    (obj.unit === undefined || typeof obj.unit === 'string') &&
+    (obj.category === undefined || typeof obj.category === 'string') &&
+    (obj.description === undefined || typeof obj.description === 'string')
+  );
+}
+
+/**
+ * Validates VariableDescriptionJSON object
+ */
+export function validateVariableDescription(data: unknown): data is VariableDescriptionJSON {
+  if (!data || typeof data !== 'object') {
+    return false;
+  }
+
+  const obj = data as Record<string, unknown>;
+
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.variableDefinitionId === 'string' &&
+    typeof obj.content === 'string' &&
+    typeof obj.createdAt === 'number' &&
+    typeof obj.updatedAt === 'number'
+  );
+}
+
+/**
+ * Validates VariableItemJSON object (extends basic ItemJSON validation)
+ */
+export function validateVariableItem(data: unknown): data is Record<string, unknown> {
+  if (!data || typeof data !== 'object') {
+    return false;
+  }
+
+  const obj = data as Record<string, unknown>;
+
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.name === 'string' &&
+    obj.type === 'VariableItem' &&
+    typeof obj.duration === 'number' &&
+    obj.duration === 0 && // VariableItem duration is always 0
+    typeof obj.value === 'number' &&
+    Array.isArray(obj.parents) &&
+    typeof obj.allOrNothing === 'boolean'
+  );
+}
+
+/**
+ * Validates basic structure of migration result
+ */
+function validateMigrationStructure(data: VariableMigrationResult): string[] {
+  const errors: string[] = [];
+
+  if (!data || typeof data !== 'object') {
+    errors.push('Migration result is not a valid object');
+    return errors;
+  }
+
+  if (!(data.definitions instanceof Map)) {
+    errors.push('Migration result missing valid definitions Map');
+  }
+
+  if (!Array.isArray(data.variableItems)) {
+    errors.push('Migration result missing valid variableItems array');
+  }
+
+  if (!(data.descriptions instanceof Map)) {
+    errors.push('Migration result missing valid descriptions Map');
+  }
+
+  if (!Array.isArray(data.migrationLog)) {
+    errors.push('Migration result missing valid migrationLog array');
+  }
+
+  return errors;
+}
+
+/**
+ * Validates data consistency in migration result
+ */
+function validateMigrationConsistency(data: VariableMigrationResult): string[] {
+  const errors: string[] = [];
+
+  // Validate variable items have matching definitions
+  if (data.definitions && data.variableItems) {
+    for (const variableItem of data.variableItems) {
+      const hasMatchingDefinition = Array.from(data.definitions.values()).some(
+        (def: { name: string }) => def.name === variableItem.name
+      );
+
+      if (!hasMatchingDefinition) {
+        errors.push(`VariableItem "${variableItem.name}" has no matching definition`);
+      }
+    }
+  }
+
+  // Validate descriptions reference valid definitions
+  if (data.definitions && data.descriptions) {
+    for (const description of data.descriptions.values()) {
+      const hasValidDefinition = Array.from(data.definitions.values()).some(
+        (def: { id: string }) => def.id === description.variableDefinitionId
+      );
+
+      if (!hasValidDefinition) {
+        errors.push(`VariableDescription references non-existent definition ID: ${description.variableDefinitionId}`);
+      }
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validates migrated variable data integrity
+ */
+export function validateMigratedVariableData(data: VariableMigrationResult): { isValid: boolean; errors: string[] } {
+  const structureErrors = validateMigrationStructure(data);
+  const consistencyErrors = validateMigrationConsistency(data);
+
+  const allErrors = [...structureErrors, ...consistencyErrors];
+
+  return {
+    isValid: allErrors.length === 0,
+    errors: allErrors
+  };
 }

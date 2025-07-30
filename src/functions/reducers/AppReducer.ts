@@ -22,7 +22,10 @@ import {
   VariableSummary,
   createInstanceFromCalendarEntry,
   hasChildren,
-  getChildren
+  getChildren,
+  VariableItem,
+  VariableDefinition,
+  VariableDescription
 } from "../utils/item/index";
 import { v4 as uuid } from "uuid";
 
@@ -125,6 +128,16 @@ export type AppAction =
   // Caching Actions
   | { type: "INVALIDATE_VARIABLE_CACHE"; payload: { itemId?: string } }
   | { type: "UPDATE_VARIABLE_CACHE"; payload: { itemId: string; summary: VariableSummary } }
+  // New Variable System Actions
+  | { type: "CREATE_VARIABLE_DEFINITION"; payload: { definition: VariableDefinition } }
+  | { type: "UPDATE_VARIABLE_DEFINITION"; payload: { definitionId: string; updates: Partial<VariableDefinition> } }
+  | { type: "DELETE_VARIABLE_DEFINITION"; payload: { definitionId: string } }
+  | { type: "SET_VARIABLE_DESCRIPTION"; payload: { definitionId: string; description: VariableDescription } }
+  | { type: "UPDATE_VARIABLE_DESCRIPTION"; payload: { definitionId: string; description: VariableDescription } }
+  | { type: "CREATE_VARIABLE_ITEM"; payload: { variableItem: VariableItem; definitionId: string } }
+  | { type: "UPDATE_VARIABLE_ITEM_VALUE"; payload: { itemId: string; value: number } }
+  | { type: "BATCH_CREATE_VARIABLE_ITEMS"; payload: { items: Array<{ variableItem: VariableItem; definitionId: string }> } }
+  | { type: "MIGRATE_LEGACY_VARIABLES"; payload: { itemId: string } }
   // Enhanced calendar actions
   | { type: "ADD_BASE_CALENDAR_ENTRY_WITH_INSTANCE"; payload: { entry: BaseCalendarEntry; createInstance?: boolean } };
 
@@ -139,8 +152,12 @@ export const initialState = {
   items: new Array<Item>(),
   baseCalendar: new Map<string, BaseCalendarEntry>(),
   itemInstances: new Map<string, ItemInstanceImpl>(),
+  // Legacy variable system (maintained for backward compatibility during migration)
   itemVariables: new Map<string, Variable[]>(),
   variableSummaryCache: new Map<string, VariableSummary>(),
+  // New variable system
+  variableDefinitions: new Map<string, VariableDefinition>(),
+  variableDescriptions: new Map<string, VariableDescription>(),
   itemSearchWindowRange: { min: 0, max: DEFAULT_WINDOW_RANGE_SIZE },
   schedulingDialogOpen: false,
   durationDialogOpen: false,
@@ -741,6 +758,165 @@ export default function reducer(
         baseCalendar: newCalendar,
         itemInstances: newInstances
       };
+    }
+
+    // New Variable System Actions
+    case "CREATE_VARIABLE_DEFINITION": {
+      const { definition } = action.payload;
+      const newDefinitions = new Map(previous.variableDefinitions);
+      newDefinitions.set(definition.id, definition);
+
+      return {
+        ...previous,
+        variableDefinitions: newDefinitions
+      };
+    }
+
+    case "UPDATE_VARIABLE_DEFINITION": {
+      const { definitionId, updates } = action.payload;
+      const existingDefinition = previous.variableDefinitions.get(definitionId);
+
+      if (!existingDefinition) {
+        console.warn(`Variable definition ${definitionId} not found for update`);
+        return previous;
+      }
+
+      const updatedDefinition: VariableDefinition = {
+        ...existingDefinition,
+        ...updates,
+        updatedAt: Date.now()
+      };
+
+      const newDefinitions = new Map(previous.variableDefinitions);
+      newDefinitions.set(definitionId, updatedDefinition);
+
+      return {
+        ...previous,
+        variableDefinitions: newDefinitions
+      };
+    }
+
+    case "DELETE_VARIABLE_DEFINITION": {
+      const { definitionId } = action.payload;
+      const newDefinitions = new Map(previous.variableDefinitions);
+      newDefinitions.delete(definitionId);
+
+      // Also remove associated description
+      const newDescriptions = new Map(previous.variableDescriptions);
+      newDescriptions.delete(definitionId);
+
+      return {
+        ...previous,
+        variableDefinitions: newDefinitions,
+        variableDescriptions: newDescriptions
+      };
+    }
+
+    case "SET_VARIABLE_DESCRIPTION": {
+      const { definitionId, description } = action.payload;
+      const newDescriptions = new Map(previous.variableDescriptions);
+      newDescriptions.set(definitionId, description);
+
+      return {
+        ...previous,
+        variableDescriptions: newDescriptions
+      };
+    }
+
+    case "UPDATE_VARIABLE_DESCRIPTION": {
+      const { definitionId, description } = action.payload;
+
+      // Verify the definition exists
+      if (!previous.variableDefinitions.has(definitionId)) {
+        console.warn(`Variable definition ${definitionId} not found for description update`);
+        return previous;
+      }
+
+      const newDescriptions = new Map(previous.variableDescriptions);
+      newDescriptions.set(definitionId, {
+        ...description,
+        updatedAt: Date.now()
+      });
+
+      return {
+        ...previous,
+        variableDescriptions: newDescriptions
+      };
+    }
+
+    case "CREATE_VARIABLE_ITEM": {
+      const { variableItem, definitionId } = action.payload;
+
+      // Verify the definition exists
+      if (!previous.variableDefinitions.has(definitionId)) {
+        console.warn(`Variable definition ${definitionId} not found for new variable item`);
+        return previous;
+      }
+
+      // Add the variable item to the items array
+      const newItems = [...previous.items, variableItem];
+      newItems.sort((a, b) => a.id > b.id ? 1 : -1);
+
+      return {
+        ...previous,
+        items: newItems
+      };
+    }
+
+    case "UPDATE_VARIABLE_ITEM_VALUE": {
+      const { itemId, value } = action.payload;
+      const itemIndex = getIndexById(previous.items, itemId);
+
+      if (itemIndex === -1) {
+        console.warn(`Variable item ${itemId} not found for value update`);
+        return previous;
+      }
+
+      const item = previous.items[itemIndex];
+      if (!(item instanceof VariableItem)) {
+        console.warn(`Item ${itemId} is not a VariableItem`);
+        return previous;
+      }
+
+      const updatedItem = item.updateValue(value);
+      const newItems = [...previous.items];
+      newItems[itemIndex] = updatedItem;
+
+      return {
+        ...previous,
+        items: newItems
+      };
+    }
+
+    case "BATCH_CREATE_VARIABLE_ITEMS": {
+      const { items: variableItemsToCreate } = action.payload;
+
+      // Verify all definitions exist
+      for (const { definitionId } of variableItemsToCreate) {
+        if (!previous.variableDefinitions.has(definitionId)) {
+          console.warn(`Variable definition ${definitionId} not found for batch creation`);
+          return previous;
+        }
+      }
+
+      // Add all variable items to the items array
+      const newVariableItems = variableItemsToCreate.map(({ variableItem }) => variableItem);
+      const newItems = [...previous.items, ...newVariableItems];
+      newItems.sort((a, b) => a.id > b.id ? 1 : -1);
+
+      return {
+        ...previous,
+        items: newItems
+      };
+    }
+
+    case "MIGRATE_LEGACY_VARIABLES": {
+      const { itemId } = action.payload;
+
+      // This action will be implemented in Step 3 as part of the storage layer migration
+      // For now, just return the current state
+      console.log(`Legacy variable migration requested for item ${itemId} - to be implemented in Step 3`);
+      return previous;
     }
 
     default:

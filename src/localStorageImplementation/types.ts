@@ -1,4 +1,5 @@
 import type { Item, ItemInstanceJSON, VariableJSON, VariableSummary } from '../functions/utils/item/index';
+import type { VariableDefinitionJSON, VariableDescriptionJSON } from '../functions/utils/item/types/VariableTypes';
 import type { BadgeSettings } from '../components/accounting/types/badgeSettings';
 
 // Note: BaseCalendarEntry is imported from AppReducer since it's defined there
@@ -15,6 +16,9 @@ export interface StorageData {
   itemVariables?: Map<string, VariableJSON[]>;
   variableSummaryCache?: Map<string, VariableSummary>;
   badgeSettings?: BadgeSettings;
+  // New variable system fields
+  variableDefinitions?: Map<string, VariableDefinitionJSON>;
+  variableDescriptions?: Map<string, VariableDescriptionJSON>;
   version: string;
   timestamp: number;
 }
@@ -26,6 +30,9 @@ export interface SerializedStorageData {
   itemVariables?: Array<[string, VariableJSON[]]>;
   variableSummaryCache?: Array<[string, VariableSummary]>;
   badgeSettings?: BadgeSettings;
+  // New variable system fields
+  variableDefinitions?: Array<[string, VariableDefinitionJSON]>;
+  variableDescriptions?: Array<[string, VariableDescriptionJSON]>;
   version: string;
   timestamp: number;
 }

@@ -3,6 +3,7 @@ import { Item } from "./Item";
 import { BasicItem } from "./BasicItem";
 import { SubCalendarItem } from "./SubCalendarItem";
 import { CheckListItem } from "./CheckListItem";
+import { VariableItem } from "./VariableItem";
 
 export class ItemFactory {
   static fromJSON(json: ItemJSON): Item {
@@ -13,6 +14,8 @@ export class ItemFactory {
         return SubCalendarItem.fromJSON(json);
       case 'CheckListItem':
         return CheckListItem.fromJSON(json);
+      case 'VariableItem':
+        return VariableItem.fromJSON(json);
       default:
         // Default to BasicItem for backwards compatibility
         return BasicItem.fromJSON(json);

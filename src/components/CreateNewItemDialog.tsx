@@ -21,7 +21,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import { formatDuration } from "../functions/utils/formatTime";
-import VariableInput from "./variables/VariableInput";
+import EnhancedVariableInput from "./variables/EnhancedVariableInput";
 
 // Default time presets - now using milliseconds values, labels will be generated dynamically
 const DEFAULT_TIME_PRESETS = [
@@ -392,7 +392,7 @@ function CreateNewItemDialogContent() {
           <ImprovedTimeInput />
 
           <Box sx={{ mt: 3 }}>
-            <VariableInput
+            <EnhancedVariableInput
               variables={variables}
               onChange={setVariables}
             />
