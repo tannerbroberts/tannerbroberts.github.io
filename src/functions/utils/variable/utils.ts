@@ -1,6 +1,42 @@
 import { Variable, VariableImpl, VariableSummary } from './types';
 import { Item, hasChildren, getChildren } from '../item/index';
 import { getChildId } from '../item/itemUtils';
+import { RelationshipTracker } from './relationshipTracker';
+import { VariableSummaryCalculator } from './variableSummaryCalculator';
+
+// Global instances for relationship-based calculations
+let globalRelationshipTracker: RelationshipTracker | null = null;
+let globalCalculator: VariableSummaryCalculator | null = null;
+
+/**
+ * Initialize relationship-based calculation system
+ */
+export function initializeRelationshipCalculation(): void {
+  if (!globalRelationshipTracker) {
+    globalRelationshipTracker = new RelationshipTracker();
+    globalCalculator = new VariableSummaryCalculator(globalRelationshipTracker);
+  }
+}
+
+/**
+ * Get the global relationship tracker (creates if not exists)
+ */
+export function getRelationshipTracker(): RelationshipTracker {
+  if (!globalRelationshipTracker) {
+    initializeRelationshipCalculation();
+  }
+  return globalRelationshipTracker!;
+}
+
+/**
+ * Get the global variable summary calculator (creates if not exists)
+ */
+export function getVariableSummaryCalculator(): VariableSummaryCalculator {
+  if (!globalCalculator) {
+    initializeRelationshipCalculation();
+  }
+  return globalCalculator!;
+}
 
 /**
  * Add parent item's direct variables to summary
@@ -62,8 +98,49 @@ function addChildVariables(
 
 /**
  * Calculate variable summary for an item including BOTH parent variables AND recursively summed child variables
+ * Now supports both legacy parent-child relationships and new relationshipId-based tracking
  */
 export function calculateVariableSummary(
+  item: Item,
+  allItems: Item[],
+  variableMap: Map<string, Variable[]>,
+  visited: Set<string> = new Set(),
+  useRelationshipTracking: boolean = true
+): VariableSummary {
+  // Try relationship-based calculation first if enabled
+  if (useRelationshipTracking && globalCalculator) {
+    try {
+      // Convert Variable[] to VariableMapEntry[] format
+      const convertedVariableMap = new Map<string, Array<{
+        name: string;
+        quantity: number;
+        unit?: string;
+        category?: string;
+      }>>();
+
+      for (const [itemId, variables] of variableMap) {
+        convertedVariableMap.set(itemId, variables.map(v => ({
+          name: v.name,
+          quantity: v.quantity,
+          unit: v.unit,
+          category: v.category
+        })));
+      }
+
+      return globalCalculator.calculateSummary(item, allItems, convertedVariableMap);
+    } catch (error) {
+      console.warn('Relationship-based calculation failed, falling back to legacy method:', error);
+    }
+  }
+
+  // Fallback to legacy calculation method
+  return calculateVariableSummaryLegacy(item, allItems, variableMap, visited);
+}
+
+/**
+ * Legacy variable summary calculation using parent-child relationships
+ */
+function calculateVariableSummaryLegacy(
   item: Item,
   allItems: Item[],
   variableMap: Map<string, Variable[]>,
@@ -141,6 +218,46 @@ export function formatVariableForDisplay(variable: Variable): string {
   return `${sign}${variable.quantity}${unit} ${variable.name}`;
 }
 
+/**
+ * Synchronize relationship tracker with current item hierarchy
+ * This should be called when items are loaded or when parent-child relationships change
+ */
+export function synchronizeRelationships(items: Item[]): number {
+  const tracker = getRelationshipTracker();
+  let relationshipsCreated = 0;
+
+  // Clear existing relationships
+  tracker.clear();
+
+  // Create relationships from item parent references
+  for (const item of items) {
+    for (const parent of item.parents) {
+      try {
+        tracker.createRelationship(
+          parent.relationshipId,
+          parent.id,
+          item.id,
+          1 // Default multiplier, could be extended later
+        );
+        relationshipsCreated++;
+      } catch (error) {
+        console.warn(`Failed to create relationship ${parent.relationshipId} for item ${item.id}:`, error);
+      }
+    }
+  }
+
+  console.log(`Synchronized ${relationshipsCreated} relationships from ${items.length} items`);
+  return relationshipsCreated;
+}
+
+/**
+ * Update variable summary calculation to use relationship tracking
+ * This function invalidates caches and triggers recalculation for affected items
+ */
+export function invalidateVariableSummaries(itemId: string): void {
+  const calculator = getVariableSummaryCalculator();
+  calculator.invalidateCache(itemId);
+}
 /**
  * Group variables by category
  */

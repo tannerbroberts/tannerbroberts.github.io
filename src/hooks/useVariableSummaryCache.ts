@@ -1,5 +1,12 @@
 import { useRef, useCallback } from 'react';
-import { Variable, VariableSummary, calculateVariableSummary, Item, SubCalendarItem, CheckListItem } from '../functions/utils/item/index';
+import {
+  Variable,
+  VariableSummary,
+  calculateVariableSummary,
+  Item,
+  getRelationshipTracker,
+  synchronizeRelationships
+} from '../functions/utils/item/index';
 
 interface CacheEntry {
   summary: VariableSummary;
@@ -11,6 +18,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export function useVariableSummaryCache() {
   const cacheRef = useRef<Map<string, CacheEntry>>(new Map());
+  const relationshipsSyncedRef = useRef(false);
 
   const getCachedSummary = useCallback((
     itemId: string,
@@ -18,6 +26,12 @@ export function useVariableSummaryCache() {
     allItems: Item[],
     variableMap: Map<string, Variable[]>
   ): VariableSummary => {
+    // Ensure relationships are synchronized on first use
+    if (!relationshipsSyncedRef.current) {
+      synchronizeRelationships(allItems);
+      relationshipsSyncedRef.current = true;
+    }
+
     const cache = cacheRef.current;
     const cached = cache.get(itemId);
     const now = Date.now();
@@ -34,27 +48,28 @@ export function useVariableSummaryCache() {
       }
     }
 
-    // Calculate fresh summary
+    // Calculate fresh summary using relationship-based calculation
     const summary = calculateVariableSummary(item, allItems, variableMap);
 
-    // Determine dependencies (items in hierarchy)
+    // Determine dependencies using relationship tracker
     const dependencies = [itemId];
-    const addChildDependencies = (parentItem: Item) => {
-      if (parentItem instanceof SubCalendarItem || parentItem instanceof CheckListItem) {
-        const children = parentItem.children;
-        for (const child of children) {
-          const childId = 'id' in child ? child.id : child.itemId;
-          if (!dependencies.includes(childId)) {
-            dependencies.push(childId);
-            const childItem = allItems.find(i => i.id === childId);
-            if (childItem) {
-              addChildDependencies(childItem);
-            }
-          }
-        }
+    const tracker = getRelationshipTracker();
+
+    // Add child dependencies from relationships
+    const childRelationships = tracker.getChildRelationships(itemId);
+    for (const relationship of childRelationships) {
+      if (!dependencies.includes(relationship.childItemId)) {
+        dependencies.push(relationship.childItemId);
       }
-    };
-    addChildDependencies(item);
+    }
+
+    // Add parent dependencies from relationships  
+    const parentRelationships = tracker.getParentRelationships(itemId);
+    for (const relationship of parentRelationships) {
+      if (!dependencies.includes(relationship.parentItemId)) {
+        dependencies.push(relationship.parentItemId);
+      }
+    }
 
     // Cache the result
     cache.set(itemId, {
@@ -70,11 +85,26 @@ export function useVariableSummaryCache() {
     const cache = cacheRef.current;
 
     if (itemId) {
-      // Invalidate specific item and anything that depends on it
+      // Invalidate specific item and anything that depends on it using relationship tracking
+      const tracker = getRelationshipTracker();
       const toInvalidate = new Set<string>();
 
+      // Add the item itself
+      toInvalidate.add(itemId);
+
+      // Add all items that have this item as a relationship dependency
+      const affectedRelationships = tracker.getAffectedRelationships(itemId);
+      for (const relationshipId of affectedRelationships) {
+        const relationship = tracker.getRelationship(relationshipId);
+        if (relationship) {
+          toInvalidate.add(relationship.parentItemId);
+          toInvalidate.add(relationship.childItemId);
+        }
+      }
+
+      // Also check cache dependencies (legacy support)
       for (const [cachedItemId, entry] of cache) {
-        if (cachedItemId === itemId || entry.dependencies.includes(itemId)) {
+        if (entry.dependencies.includes(itemId)) {
           toInvalidate.add(cachedItemId);
         }
       }
@@ -85,6 +115,7 @@ export function useVariableSummaryCache() {
     } else {
       // Clear entire cache
       cache.clear();
+      relationshipsSyncedRef.current = false; // Force re-sync on next use
     }
   }, []);
 
@@ -105,13 +136,24 @@ export function useVariableSummaryCache() {
     return {
       totalEntries: cache.size,
       validEntries,
-      expiredEntries
+      expiredEntries,
+      relationshipsSynced: relationshipsSyncedRef.current
     };
+  }, []);
+
+  // Force synchronization of relationships
+  const syncRelationships = useCallback((allItems: Item[]) => {
+    const count = synchronizeRelationships(allItems);
+    relationshipsSyncedRef.current = true;
+    // Clear cache to force recalculation with new relationships
+    cacheRef.current.clear();
+    return count;
   }, []);
 
   return {
     getCachedSummary,
     invalidateCache,
-    getCacheStats
+    getCacheStats,
+    syncRelationships
   };
 }

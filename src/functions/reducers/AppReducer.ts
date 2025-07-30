@@ -128,6 +128,12 @@ export type AppAction =
   // Caching Actions
   | { type: "INVALIDATE_VARIABLE_CACHE"; payload: { itemId?: string } }
   | { type: "UPDATE_VARIABLE_CACHE"; payload: { itemId: string; summary: VariableSummary } }
+  // Relationship-based Summary Actions
+  | { type: "UPDATE_RELATIONSHIP_SUMMARY"; payload: { relationshipId: string; summary: VariableSummary } }
+  | { type: "CASCADE_VARIABLE_UPDATE"; payload: { itemId: string; updatedVariables: Variable[] } }
+  | { type: "REBUILD_RELATIONSHIP_SUMMARIES"; payload: { itemIds: string[] } }
+  | { type: "INVALIDATE_RELATIONSHIP_CACHE"; payload: { relationshipIds: string[] } }
+  | { type: "SYNC_RELATIONSHIPS_FROM_ITEMS"; payload: Record<string, never> }
   // New Variable System Actions
   | { type: "CREATE_VARIABLE_DEFINITION"; payload: { definition: VariableDefinition } }
   | { type: "UPDATE_VARIABLE_DEFINITION"; payload: { definitionId: string; updates: Partial<VariableDefinition> } }
@@ -917,6 +923,71 @@ export default function reducer(
       // For now, just return the current state
       console.log(`Legacy variable migration requested for item ${itemId} - to be implemented in Step 3`);
       return previous;
+    }
+
+    // Relationship-based Summary Actions
+    case "UPDATE_RELATIONSHIP_SUMMARY": {
+      // In a more complete implementation, this would update a relationship summary cache
+      // For now, we'll just invalidate the variable cache to trigger recalculation
+      return {
+        ...previous,
+        variableSummaryCache: new Map(previous.variableSummaryCache)
+      };
+    }
+
+    case "CASCADE_VARIABLE_UPDATE": {
+      const { itemId } = action.payload;
+      // Invalidate cache for this item and all dependent items
+      const newCache = new Map(previous.variableSummaryCache);
+
+      // Remove cache entries for affected items
+      for (const [cachedItemId] of newCache) {
+        if (cachedItemId === itemId || itemHasDescendant(previous.items, cachedItemId, itemId)) {
+          newCache.delete(cachedItemId);
+        }
+      }
+
+      return {
+        ...previous,
+        variableSummaryCache: newCache
+      };
+    }
+
+    case "REBUILD_RELATIONSHIP_SUMMARIES": {
+      const { itemIds } = action.payload;
+      const newCache = new Map(previous.variableSummaryCache);
+
+      // Remove cache entries for specified items
+      for (const itemId of itemIds) {
+        newCache.delete(itemId);
+      }
+
+      return {
+        ...previous,
+        variableSummaryCache: newCache
+      };
+    }
+
+    case "INVALIDATE_RELATIONSHIP_CACHE": {
+      const { relationshipIds } = action.payload;
+      // In a complete implementation, this would map relationshipIds to affected items
+      // For now, we'll clear the entire cache to be safe
+      console.log('Invalidating relationship cache for relationships:', relationshipIds);
+
+      return {
+        ...previous,
+        variableSummaryCache: new Map()
+      };
+    }
+
+    case "SYNC_RELATIONSHIPS_FROM_ITEMS": {
+      // This action triggers synchronization of the relationship tracker with current items
+      // The actual work is done by the relationship system, not the reducer
+      // We just clear the cache to force recalculation with updated relationships
+      return {
+        ...previous,
+        variableSummaryCache: new Map()
+      };
     }
 
     default:
