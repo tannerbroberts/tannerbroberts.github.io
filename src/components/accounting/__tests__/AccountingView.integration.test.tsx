@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor, act, fireEvent } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import AccountingView from '../AccountingView';
 import { StorageAwareAppProvider } from '../../../localStorageImplementation/StorageAwareAppProvider';
@@ -434,6 +434,145 @@ describe('AccountingView Integration Tests', () => {
           // This is a basic test - in a real implementation, we'd check for specific
           // UI elements that indicate the correct number of completed items
         });
+      });
+    });
+  });
+
+  describe('Collapsible Header Tests', () => {
+    it('starts in collapsed state by default', async () => {
+      setupMockedHooks([]);
+
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <AccountingView />
+          </TestWrapper>
+        );
+      });
+
+      // Should show collapsed header
+      const expandButton = screen.getByRole('button', { name: /expand accounting view/i });
+      expect(expandButton).toBeInTheDocument();
+      expect(expandButton).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('expands when header is clicked', async () => {
+      setupMockedHooks([]);
+
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <AccountingView />
+          </TestWrapper>
+        );
+      });
+
+      const expandButton = screen.getByRole('button', { name: /expand accounting view/i });
+
+      // Click to expand
+      fireEvent.click(expandButton);
+
+      await waitFor(() => {
+        const collapseButton = screen.getByRole('button', { name: /collapse accounting view/i });
+        expect(collapseButton).toBeInTheDocument();
+        expect(collapseButton).toHaveAttribute('aria-expanded', 'true');
+      });
+    });
+
+    it('shows accounting content when expanded', async () => {
+      setupMockedHooks([]);
+
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <AccountingView />
+          </TestWrapper>
+        );
+      });
+
+      // Initially collapsed - content should be hidden but might still be in DOM
+      const searchField = screen.getByPlaceholderText('Search instances...');
+      expect(searchField.closest('.MuiCollapse-root')).toHaveClass('MuiCollapse-hidden');
+
+      // Expand
+      const expandButton = screen.getByRole('button', { name: /expand accounting view/i });
+      fireEvent.click(expandButton);
+
+      await waitFor(() => {
+        // Should now show the search field in an expanded state
+        const searchFieldExpanded = screen.getByPlaceholderText('Search instances...');
+        expect(searchFieldExpanded.closest('.MuiCollapse-root')).toHaveClass('MuiCollapse-entered');
+      });
+    });
+
+    it('hides accounting content when collapsed', async () => {
+      setupMockedHooks([]);
+
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <AccountingView />
+          </TestWrapper>
+        );
+      });
+
+      // Expand first
+      const expandButton = screen.getByRole('button', { name: /expand accounting view/i });
+      fireEvent.click(expandButton);
+
+      await waitFor(() => {
+        const searchField = screen.getByPlaceholderText('Search instances...');
+        expect(searchField.closest('.MuiCollapse-root')).toHaveClass('MuiCollapse-entered');
+      });
+
+      // Now collapse
+      const collapseButton = screen.getByRole('button', { name: /collapse accounting view/i });
+      fireEvent.click(collapseButton);
+
+      await waitFor(() => {
+        // Content should be hidden (but may still be in DOM)
+        const searchField = screen.getByPlaceholderText('Search instances...');
+        expect(searchField.closest('.MuiCollapse-root')).toHaveClass('MuiCollapse-hidden');
+      });
+    });
+
+    it('maintains functionality when expanded', async () => {
+      const completedInstance = new ItemInstanceImpl({
+        id: 'instance-1',
+        itemId: TEST_ITEM_IDS.CHILD_1,
+        calendarEntryId: 'entry-1',
+        scheduledStartTime: 0,
+        actualStartTime: 0,
+        completedAt: 1000,
+        isComplete: true,
+        executionDetails: {}
+      });
+
+      setupMockedHooks([completedInstance]);
+
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <AccountingView />
+          </TestWrapper>
+        );
+      });
+
+      // Expand
+      const expandButton = screen.getByRole('button', { name: /expand accounting view/i });
+      fireEvent.click(expandButton);
+
+      await waitFor(() => {
+        // Should show search functionality and other features
+        expect(screen.getByPlaceholderText('Search instances...')).toBeInTheDocument();
+
+        // Should show filtering controls using a more specific approach
+        const timePeriodElements = screen.getAllByText('Time Period');
+        const sortByElements = screen.getAllByText('Sort By');
+
+        // At least one of each should be visible (one from label, one from select)
+        expect(timePeriodElements.length).toBeGreaterThan(0);
+        expect(sortByElements.length).toBeGreaterThan(0);
       });
     });
   });
