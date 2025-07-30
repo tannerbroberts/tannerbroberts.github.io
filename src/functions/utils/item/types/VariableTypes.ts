@@ -47,8 +47,25 @@ export interface VariableDescription {
   readonly id: string;
   readonly variableDefinitionId: string;
   readonly content: string; // Rich text content with potential square bracket references
+  readonly linkedVariables: string[]; // Referenced variable definition IDs
+  readonly referencedBy: string[]; // Variable definition IDs that reference this one
   readonly createdAt: number;
   readonly updatedAt: number;
+  readonly linkValidation?: LinkValidationResult;
+}
+
+// Link validation result for cross-references
+export interface LinkValidationResult {
+  readonly validLinks: string[];
+  readonly brokenLinks: BrokenLink[];
+  readonly lastValidated: number;
+}
+
+// Information about broken variable links
+export interface BrokenLink {
+  readonly text: string;
+  readonly suggestions: string[];
+  readonly position: { start: number; end: number };
 }
 
 // JSON representation of VariableDescription
@@ -56,6 +73,17 @@ export interface VariableDescriptionJSON {
   id: string;
   variableDefinitionId: string;
   content: string;
+  linkedVariables: string[];
+  referencedBy: string[];
   createdAt: number;
   updatedAt: number;
+  linkValidation?: {
+    validLinks: string[];
+    brokenLinks: Array<{
+      text: string;
+      suggestions: string[];
+      position: { start: number; end: number };
+    }>;
+    lastValidated: number;
+  };
 }

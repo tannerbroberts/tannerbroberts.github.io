@@ -1,47 +1,63 @@
 import { VariableDefinition } from '../item/types/VariableTypes';
+import { extractVariableReferences as extractRefsFromParser, validateVariableLinks } from './linkParser';
 
 /**
  * Extract variable references from description text
  * Looks for patterns like [variable_name] and returns array of variable names
+ * Updated to use the enhanced link parser for better validation
  */
 export function extractVariableReferences(
   text: string,
   variableDefinitions: Map<string, VariableDefinition>
 ): string[] {
-  const matches = text.match(/\[([^\]]+)\]/g);
-  if (!matches) return [];
-
-  const referencedVariables: string[] = [];
-  const allVariableNames = new Set(
-    Array.from(variableDefinitions.values()).map(def => def.name)
-  );
-
-  for (const match of matches) {
-    const variableName = match.slice(1, -1); // Remove brackets
-    if (allVariableNames.has(variableName)) {
-      referencedVariables.push(variableName);
-    }
-  }
-
-  // Return unique variable names
-  return [...new Set(referencedVariables)];
+  // Use the enhanced parser which provides better validation
+  return extractRefsFromParser(text, variableDefinitions);
 }
 
 /**
  * Validate description content for quality and standards
+ * Enhanced with link validation
  */
-export function validateDescription(text: string): {
+export function validateDescription(text: string, variableDefinitions?: Map<string, VariableDefinition>): {
   isValid: boolean;
   errors: string[];
   warnings: string[];
+  linkValidation?: ReturnType<typeof validateVariableLinks>;
 } {
   const errors: string[] = [];
   const warnings: string[] = [];
 
   // Basic validation
+  const basicValidation = validateBasicRequirements(text);
+  errors.push(...basicValidation.errors);
+  if (!basicValidation.isValid) {
+    return { isValid: false, errors, warnings };
+  }
+
+  // Link validation if variable definitions are provided
+  const linkValidation = variableDefinitions ? validateVariableLinks(text, variableDefinitions) : undefined;
+  if (linkValidation?.brokenLinks.length) {
+    errors.push(`${linkValidation.brokenLinks.length} broken variable link${linkValidation.brokenLinks.length === 1 ? '' : 's'}`);
+  }
+
+  // Quality checks
+  const qualityWarnings = validateQuality(text);
+  warnings.push(...qualityWarnings);
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings,
+    linkValidation
+  };
+}
+
+function validateBasicRequirements(text: string): { isValid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
   if (!text.trim()) {
     errors.push('Description cannot be empty');
-    return { isValid: false, errors, warnings };
+    return { isValid: false, errors };
   }
 
   if (text.trim().length < 10) {
@@ -52,7 +68,12 @@ export function validateDescription(text: string): {
     errors.push('Description cannot exceed 2000 characters');
   }
 
-  // Quality checks
+  return { isValid: errors.length === 0, errors };
+}
+
+function validateQuality(text: string): string[] {
+  const warnings: string[] = [];
+
   if (text.trim().length < 50) {
     warnings.push('Consider adding more detail to make this description more helpful');
   }
@@ -77,11 +98,7 @@ export function validateDescription(text: string): {
     }
   }
 
-  return {
-    isValid: errors.length === 0,
-    errors,
-    warnings
-  };
+  return warnings;
 }
 
 /**

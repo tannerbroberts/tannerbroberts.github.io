@@ -2,6 +2,16 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import DescriptionEditor from '../DescriptionEditor';
 
+// Mock the useAppState hook
+vi.mock('../../../reducerContexts/App', () => ({
+  useAppState: vi.fn(() => ({
+    variableDefinitions: new Map([
+      ['1', { id: '1', name: 'eggs', description: 'Number of eggs', unit: 'count', createdAt: Date.now(), updatedAt: Date.now() }],
+      ['2', { id: '2', name: 'flour', description: 'Amount of flour', unit: 'cups', createdAt: Date.now(), updatedAt: Date.now() }]
+    ])
+  }))
+}));
+
 describe('DescriptionEditor', () => {
   const mockOnChange = vi.fn();
 
@@ -117,5 +127,30 @@ describe('DescriptionEditor', () => {
     );
 
     expect(screen.getByText(/contains formatting/i)).toBeInTheDocument();
+  });
+
+  it('shows link validation status chips', () => {
+    render(
+      <DescriptionEditor
+        value="Description with [eggs] and [invalid]"
+        onChange={mockOnChange}
+      />
+    );
+
+    // Should show valid and broken link chips
+    expect(screen.getByText('1 valid link')).toBeInTheDocument();
+    expect(screen.getByText('1 broken link')).toBeInTheDocument();
+  });
+
+  it('has variable link insert button in toolbar', () => {
+    render(
+      <DescriptionEditor
+        value=""
+        onChange={mockOnChange}
+        showFormatting={true}
+      />
+    );
+
+    expect(screen.getByLabelText('Insert Variable Link ([variable_name])')).toBeInTheDocument();
   });
 });

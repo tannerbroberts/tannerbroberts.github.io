@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   Box,
   TextField,
@@ -14,8 +14,12 @@ import {
   FormatListBulleted,
   Preview,
   Edit,
-  Info
+  Info,
+  Link as LinkIcon
 } from '@mui/icons-material';
+import { useAppState } from '../../reducerContexts/App';
+import { validateVariableLinks } from '../../functions/utils/variable/linkParser';
+import LinkedDescription from './LinkedDescription';
 
 interface DescriptionEditorProps {
   value: string;
@@ -48,10 +52,17 @@ export default function DescriptionEditor({
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [localValue, setLocalValue] = useState(value);
 
+  const { variableDefinitions } = useAppState();
+
   // Sync with external value changes
   useEffect(() => {
     setLocalValue(value);
   }, [value]);
+
+  // Real-time link validation
+  const linkValidation = useMemo(() => {
+    return validateVariableLinks(localValue, variableDefinitions);
+  }, [localValue, variableDefinitions]);
 
   const handleChange = useCallback((newValue: string) => {
     setLocalValue(newValue);
@@ -93,46 +104,26 @@ export default function DescriptionEditor({
     insertFormatting('\n- ', '');
   }, [insertFormatting]);
 
-  // Render preview with basic markdown-like formatting
+  const handleInsertVariableLink = useCallback(() => {
+    insertFormatting('[', ']');
+  }, [insertFormatting]);
+
+  // Render preview using LinkedDescription component
   const renderPreview = useCallback((text: string) => {
     if (!text.trim()) {
       return <Typography color="text.secondary" sx={{ fontStyle: 'italic' }}>No description provided</Typography>;
     }
 
-    // Simple markdown parsing
-    const processed = text
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/_(.*?)_/g, '<em>$1</em>')
-      .replace(/\[([^\]]+)\]/g, '<span style="background-color: #e3f2fd; padding: 2px 4px; border-radius: 4px; font-family: monospace;">$1</span>');
-
-    // Convert newlines to br tags and handle bullet points
-    const lines = processed.split('\n');
-    const processedLines = lines.map(line => {
-      if (line.trim().startsWith('- ')) {
-        return `<li>${line.substring(2)}</li>`;
-      }
-      return line;
-    });
-
-    // Wrap consecutive li elements in ul
-    const finalText = processedLines.join('<br>').replace(/(<li>.*?<\/li>(<br>)?)+/g, (match) => {
-      const listItems = match.replace(/<br>/g, '');
-      return `<ul>${listItems}</ul>`;
-    });
-
     return (
-      <Typography
-        component="div"
-        dangerouslySetInnerHTML={{ __html: finalText }}
-        sx={{
-          '& ul': { margin: '8px 0', paddingLeft: '20px' },
-          '& li': { margin: '4px 0' },
-          '& strong': { fontWeight: 'bold' },
-          '& em': { fontStyle: 'italic' }
-        }}
+      <LinkedDescription
+        description={text}
+        variableDefinitions={variableDefinitions}
+        showValidation={true}
+        showExpandToggle={false}
+        compact={false}
       />
     );
-  }, []);
+  }, [variableDefinitions]);
 
   const characterCount = localValue.length;
   const isOverLimit = characterCount > maxLength;
@@ -169,6 +160,11 @@ export default function DescriptionEditor({
           <Tooltip title="Bullet List">
             <IconButton size="small" onClick={handleBulletList} disabled={disabled}>
               <FormatListBulleted />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Insert Variable Link ([variable_name])">
+            <IconButton size="small" onClick={handleInsertVariableLink} disabled={disabled}>
+              <LinkIcon />
             </IconButton>
           </Tooltip>
           {showPreview && (
@@ -259,6 +255,22 @@ export default function DescriptionEditor({
               size="small"
               label="Contains formatting"
               color="secondary"
+              variant="outlined"
+            />
+          )}
+          {linkValidation.validLinks.length > 0 && (
+            <Chip
+              size="small"
+              label={`${linkValidation.validLinks.length} valid link${linkValidation.validLinks.length === 1 ? '' : 's'}`}
+              color="success"
+              variant="outlined"
+            />
+          )}
+          {linkValidation.brokenLinks.length > 0 && (
+            <Chip
+              size="small"
+              label={`${linkValidation.brokenLinks.length} broken link${linkValidation.brokenLinks.length === 1 ? '' : 's'}`}
+              color="error"
               variant="outlined"
             />
           )}
