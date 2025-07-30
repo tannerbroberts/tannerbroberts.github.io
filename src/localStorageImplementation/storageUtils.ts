@@ -7,11 +7,14 @@ import {
 } from './localStorageService';
 import { validateAllData } from './dataValidation';
 import { STORAGE_KEYS, CURRENT_SCHEMA_VERSION } from './constants';
+import { loadBadgeSettings } from '../components/accounting/storage/badgeSettingsStorage';
+import type { BadgeSettings } from '../components/accounting/types/badgeSettings';
 
 // Export/Import functionality
 export interface ExportData {
   items: Item[];
   baseCalendar: Map<string, BaseCalendarEntry>;
+  badgeSettings?: BadgeSettings;
   metadata: {
     exportDate: number;
     version: string;
@@ -111,11 +114,13 @@ export interface RestoreResult {
 export function createDataSnapshot(): ExportData {
   try {
     const result = loadAllDataFromStorage();
+    const badgeSettingsResult = loadBadgeSettings();
 
     if (!result.success || !result.data) {
       return {
         items: [],
         baseCalendar: new Map(),
+        badgeSettings: badgeSettingsResult.success ? badgeSettingsResult.data : undefined,
         metadata: {
           exportDate: Date.now(),
           version: CURRENT_SCHEMA_VERSION,
@@ -129,6 +134,7 @@ export function createDataSnapshot(): ExportData {
     return {
       items: result.data.items,
       baseCalendar: result.data.baseCalendar,
+      badgeSettings: badgeSettingsResult.success ? badgeSettingsResult.data : undefined,
       metadata: {
         exportDate: Date.now(),
         version: CURRENT_SCHEMA_VERSION,
@@ -138,10 +144,12 @@ export function createDataSnapshot(): ExportData {
       }
     };
   } catch (error) {
+    const badgeSettingsResult = loadBadgeSettings();
     console.error('Error creating data snapshot:', error);
     return {
       items: [],
       baseCalendar: new Map(),
+      badgeSettings: badgeSettingsResult.success ? badgeSettingsResult.data : undefined,
       metadata: {
         exportDate: Date.now(),
         version: CURRENT_SCHEMA_VERSION,
@@ -163,7 +171,8 @@ export function exportDataToJSON(): string {
     // Convert Map to Array for JSON serialization
     const serializable = {
       ...snapshot,
-      baseCalendar: Array.from(snapshot.baseCalendar.entries())
+      baseCalendar: Array.from(snapshot.baseCalendar.entries()),
+      badgeSettings: snapshot.badgeSettings
     };
 
     return JSON.stringify(serializable, null, 2);
@@ -477,7 +486,8 @@ export function createAutoBackup(): BackupResult {
     const backupId = `backup-${Date.now()}`;
     const backupData = JSON.stringify({
       ...snapshot,
-      baseCalendar: Array.from(snapshot.baseCalendar.entries())
+      baseCalendar: Array.from(snapshot.baseCalendar.entries()),
+      badgeSettings: snapshot.badgeSettings
     });
 
     // Store backup in localStorage with special key
