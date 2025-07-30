@@ -1,6 +1,6 @@
 ---
 description: 'Focus on creating comprehensive documentation and implementation plans only. Perform architectural audit, generate feature descriptions, and create detailed implementation plans without executing any code changes or tests.'
-tools: ['codebase', 'search', 'searchResults', 'new']
+tools: ['changes', 'codebase', 'editFiles', 'extensions', 'fetch', 'findTestFiles', 'githubRepo', 'new', 'openSimpleBrowser', 'problems', 'runCommands', 'runNotebooks', 'runTasks', 'runTests', 'search', 'searchResults', 'terminalLastCommand', 'terminalSelection', 'testFailure', 'usages', 'vscodeAPI']
 ---
 
 # Feature Planning Agent
