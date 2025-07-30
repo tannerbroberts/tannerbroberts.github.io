@@ -23,6 +23,7 @@ import { hasChildren, getChildren } from '../../functions/utils/item/itemUtils';
 import AccountingInstanceCard from './AccountingInstanceCard';
 import VariableAccountingSummary from './VariableAccountingSummary';
 import AccountingViewHeader from './AccountingViewHeader';
+import BadgeSettingsDialog from './settings/BadgeSettingsDialog';
 import ErrorBoundary from '../common/ErrorBoundary';
 
 type TimeGroup = 'today' | 'yesterday' | 'thisWeek' | 'older';
@@ -39,6 +40,9 @@ export default function AccountingView({ className }: AccountingViewProps) {
 
   // Expand/collapse state (starts collapsed by default)
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Settings dialog state
+  const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
 
   // Filter and search state with debouncing
   const [searchQueryRaw, setSearchQueryRaw] = useState('');
@@ -178,10 +182,19 @@ export default function AccountingView({ className }: AccountingViewProps) {
     return instances;
   }, [hierarchicallyFilteredInstances, groupedInstances, selectedTimeGroup, searchQuery, showOnlyWithVariables, sortOrder, items]);
 
-  // Badge click handler for detailed breakdowns
+  // Badge click handler for debugging/info
   const handleBadgeClick = useCallback((badgeType: 'time' | 'variables') => {
-    console.log(`${badgeType} badge clicked - detailed breakdown could be shown here`);
-    // Future enhancement: Open modal or drawer with detailed breakdown
+    console.log(`Badge clicked: ${badgeType}`);
+    // Future: Could open detailed breakdown or filtering based on badge type
+  }, []);
+
+  // Settings dialog handlers
+  const handleSettingsClick = useCallback(() => {
+    setSettingsDialogOpen(true);
+  }, []);
+
+  const handleSettingsClose = useCallback(() => {
+    setSettingsDialogOpen(false);
   }, []);
 
   // Bulk completion handlers
@@ -246,6 +259,7 @@ export default function AccountingView({ className }: AccountingViewProps) {
           items={items}
           itemVariables={itemVariables}
           onBadgeClick={handleBadgeClick}
+          onSettingsClick={handleSettingsClick}
         />
 
         {/* Collapsible Content */}
@@ -394,6 +408,12 @@ export default function AccountingView({ className }: AccountingViewProps) {
           </Box>
         </Collapse>
       </Box>
+
+      {/* Settings Dialog */}
+      <BadgeSettingsDialog
+        open={settingsDialogOpen}
+        onClose={handleSettingsClose}
+      />
     </ErrorBoundary>
   );
 }

@@ -5,6 +5,7 @@ import ItemSchedule from "./ItemSchedule"
 import LedgerLines from "./LedgerLines"
 import ExecutionView from "./ExecutionView"
 import AccountingView from "./accounting/AccountingView"
+import { BadgeSettingsProvider } from "./accounting/contexts/BadgeSettingsContext"
 
 export default function MainBody() {
   const { focusedItemId, currentView, items, millisecondsPerSegment, pixelsPerSegment } = useAppState()
@@ -76,7 +77,9 @@ export default function MainBody() {
             overflow: 'auto',
             padding: '20px'
           }}>
-            <AccountingView />
+            <BadgeSettingsProvider>
+              <AccountingView />
+            </BadgeSettingsProvider>
           </div>
 
           {/* Execution View - main execution interface */}
@@ -99,7 +102,9 @@ export default function MainBody() {
         overflow: 'auto',
         padding: '20px'
       }}>
-        <AccountingView />
+        <BadgeSettingsProvider>
+          <AccountingView />
+        </BadgeSettingsProvider>
       </div>
     );
   };

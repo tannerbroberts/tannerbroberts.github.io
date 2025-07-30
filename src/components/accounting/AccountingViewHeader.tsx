@@ -4,13 +4,16 @@ import {
   Chip,
   Card,
   CardContent,
-  Button
+  Button,
+  IconButton,
+  Tooltip
 } from '@mui/material';
 import {
   ExpandMore,
   ExpandLess,
   Schedule,
-  Warning
+  Warning,
+  Settings
 } from '@mui/icons-material';
 import ClockBadge from './badges/ClockBadge';
 import StarBadge from './badges/StarBadge';
@@ -28,6 +31,7 @@ interface AccountingViewHeaderProps {
   readonly items: Item[];
   readonly itemVariables: Map<string, Variable[]>;
   readonly onBadgeClick?: (badgeType: 'time' | 'variables') => void;
+  readonly onSettingsClick?: () => void;
 }
 
 export default function AccountingViewHeader({
@@ -39,7 +43,8 @@ export default function AccountingViewHeader({
   instances,
   items,
   itemVariables,
-  onBadgeClick
+  onBadgeClick,
+  onSettingsClick
 }: AccountingViewHeaderProps) {
   const showFilteredCount = filteredCount !== undefined && filteredCount !== totalIncompleteCount;
 
@@ -95,7 +100,7 @@ export default function AccountingViewHeader({
               />
             )}
             {/* Enhanced badges showing time and variable calculations */}
-            <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
               <ClockBadge
                 instances={instances}
                 items={items}
@@ -107,6 +112,20 @@ export default function AccountingViewHeader({
                 itemVariables={itemVariables}
                 onClick={() => onBadgeClick?.('variables')}
               />
+              {onSettingsClick && (
+                <Tooltip title="Badge Settings">
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSettingsClick();
+                    }}
+                    sx={{ ml: 0.5 }}
+                  >
+                    <Settings fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              )}
             </Box>
           </Box>
         </Button>
