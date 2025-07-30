@@ -1,19 +1,40 @@
-import { useCallback, useMemo, useEffect } from "react"
+import { useCallback, useMemo, useEffect, useState } from "react"
 import { useAppDispatch, useAppState } from "../reducerContexts/App"
 import AboutTimeListItem from "./AboutTimeListItem"
 import { Pagination } from "@mui/material"
 import { DEFAULT_WINDOW_RANGE_SIZE } from "../functions/reducers/AppReducer"
 
-export default function PaginatedItemList({ filterString }: Readonly<{ filterString: string }>) {
-  const { items, itemSearchWindowRange: { min, max } } = useAppState()
+interface PaginatedItemListProps {
+  readonly filterString: string;
+  readonly filteredItemIds?: string[]; // Item IDs from variable filtering
+}
 
+export default function PaginatedItemList({ filterString, filteredItemIds }: PaginatedItemListProps) {
+  const { items, itemSearchWindowRange: { min, max } } = useAppState()
   const appDispatch = useAppDispatch()
+
+  // Track which filtering mode is active
+  const [usingVariableFilter, setUsingVariableFilter] = useState(false);
+
+  // Update filtering mode when filteredItemIds changes
+  useEffect(() => {
+    setUsingVariableFilter(!!filteredItemIds);
+  }, [filteredItemIds]);
+
   // Virtualize the list
   const sortedByDurationItems = useMemo(() => [...items].sort((a, b) => a.duration - b.duration), [items])
+
   const filteredItems = useMemo(() => {
+    // If we have variable filter results, use those
+    if (usingVariableFilter && filteredItemIds) {
+      const filteredItemsMap = new Set(filteredItemIds);
+      return sortedByDurationItems.filter(item => filteredItemsMap.has(item.id));
+    }
+
+    // Otherwise use name filtering
     if (!filterString) return sortedByDurationItems
     return sortedByDurationItems.filter(item => item.name.toLowerCase().includes(filterString.toLowerCase()))
-  }, [filterString, sortedByDurationItems])
+  }, [filterString, sortedByDurationItems, filteredItemIds, usingVariableFilter])
 
   // Reset pagination to first page when filter changes
   useEffect(() => {

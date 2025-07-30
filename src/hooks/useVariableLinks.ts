@@ -62,7 +62,7 @@ export function useVariableLinks(): UseVariableLinksReturn {
   // Build or update cache if needed
   const ensureCache = useCallback(() => {
     const now = Date.now();
-    
+
     if (linkCache && (now - linkCache.lastUpdated) < CACHE_DURATION) {
       return linkCache;
     }
@@ -107,7 +107,7 @@ export function useVariableLinks(): UseVariableLinksReturn {
       if (description) {
         const referencesCount = referencesMap.get(def.id)?.length || 0;
         const referencedByCount = referencedByMap.get(def.id)?.length || 0;
-        const hasCircularReferences = circularReferences.some(cycle => 
+        const hasCircularReferences = circularReferences.some(cycle =>
           cycle.path.includes(def.id)
         );
 
@@ -141,7 +141,7 @@ export function useVariableLinks(): UseVariableLinksReturn {
   const getVariablesReferencingVariable = useCallback((definitionId: string): VariableLinkMetadata[] => {
     const cache = ensureCache();
     const referencingIds = cache.referencedByMap.get(definitionId) || [];
-    
+
     return referencingIds
       .map(id => cache.metadata.get(id))
       .filter((metadata): metadata is VariableLinkMetadata => metadata !== undefined);
@@ -150,7 +150,7 @@ export function useVariableLinks(): UseVariableLinksReturn {
   const getVariablesReferencedByVariable = useCallback((definitionId: string): VariableLinkMetadata[] => {
     const cache = ensureCache();
     const referencedIds = cache.referencesMap.get(definitionId) || [];
-    
+
     return referencedIds
       .map(id => cache.metadata.get(id))
       .filter((metadata): metadata is VariableLinkMetadata => metadata !== undefined);
@@ -190,24 +190,24 @@ export function useVariableLinks(): UseVariableLinksReturn {
 
   const getNavigationPath = useCallback((fromId: string, toId: string): string[] | null => {
     const cache = ensureCache();
-    
+
     // Simple BFS to find shortest path
     const queue: Array<{ id: string; path: string[] }> = [{ id: fromId, path: [fromId] }];
     const visited = new Set<string>();
-    
+
     while (queue.length > 0) {
       const current = queue.shift()!;
-      
+
       if (current.id === toId) {
         return current.path;
       }
-      
+
       if (visited.has(current.id)) {
         continue;
       }
-      
+
       visited.add(current.id);
-      
+
       // Add all variables referenced by current variable
       const referencedIds = cache.referencesMap.get(current.id) || [];
       referencedIds.forEach(refId => {
@@ -216,7 +216,7 @@ export function useVariableLinks(): UseVariableLinksReturn {
         }
       });
     }
-    
+
     return null; // No path found
   }, [ensureCache]);
 

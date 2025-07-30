@@ -20,6 +20,7 @@ export default function SideBar() {
   const appDispatch = useAppDispatch()
 
   const [filterString, setFilterString] = useState('')
+  const [filteredItemIds, setFilteredItemIds] = useState<string[]>([])
   const [variableDialogOpen, setVariableDialogOpen] = useState(false)
 
   const closeDrawer = useCallback(() => {
@@ -134,8 +135,15 @@ export default function SideBar() {
               </IconButton>)}
             </ButtonGroup>
             <hr />
-            <ItemListFilter value={filterString} setValue={setFilterString} />
-            <PaginatedItemList filterString={filterString} />
+            <ItemListFilter
+              value={filterString}
+              setValue={setFilterString}
+              onFilteredItemsChange={setFilteredItemIds}
+            />
+            <PaginatedItemList
+              filterString={filterString}
+              filteredItemIds={filteredItemIds}
+            />
           </List>
           <hr />
           <List>

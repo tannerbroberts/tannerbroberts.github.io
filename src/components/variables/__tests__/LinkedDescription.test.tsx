@@ -6,7 +6,7 @@ import { VariableDefinition } from '../../../functions/utils/item/types/Variable
 // Mock variable definitions for testing
 const createMockVariableDefinitions = (): Map<string, VariableDefinition> => {
   const definitions = new Map<string, VariableDefinition>();
-  
+
   definitions.set('1', {
     id: '1',
     name: 'eggs',
@@ -15,7 +15,7 @@ const createMockVariableDefinitions = (): Map<string, VariableDefinition> => {
     createdAt: Date.now(),
     updatedAt: Date.now()
   });
-  
+
   definitions.set('2', {
     id: '2',
     name: 'flour',
@@ -24,7 +24,7 @@ const createMockVariableDefinitions = (): Map<string, VariableDefinition> => {
     createdAt: Date.now(),
     updatedAt: Date.now()
   });
-  
+
   return definitions;
 };
 
@@ -39,7 +39,7 @@ describe('LinkedDescription', () => {
 
   it('should render description with variable links', () => {
     const description = 'This recipe uses [eggs] and [flour].';
-    
+
     render(
       <LinkedDescription
         description={description}
@@ -55,7 +55,7 @@ describe('LinkedDescription', () => {
 
   it('should handle variable link clicks', () => {
     const description = 'This recipe uses [eggs].';
-    
+
     render(
       <LinkedDescription
         description={description}
@@ -66,13 +66,13 @@ describe('LinkedDescription', () => {
 
     const eggLink = screen.getByText('eggs');
     fireEvent.click(eggLink);
-    
+
     expect(mockOnVariableClick).toHaveBeenCalledWith('1');
   });
 
   it('should show validation status for broken links', () => {
     const description = 'This recipe uses [eggs] and [invalid].';
-    
+
     render(
       <LinkedDescription
         description={description}
@@ -88,7 +88,7 @@ describe('LinkedDescription', () => {
 
   it('should expand and collapse long descriptions', () => {
     const longDescription = 'This is a very long description that should be truncated initially. '.repeat(10) + '[eggs]';
-    
+
     render(
       <LinkedDescription
         description={longDescription}
@@ -109,7 +109,7 @@ describe('LinkedDescription', () => {
 
   it('should highlight search terms', () => {
     const description = 'This recipe uses [eggs] and flour.';
-    
+
     render(
       <LinkedDescription
         description={description}
@@ -135,7 +135,7 @@ describe('LinkedDescription', () => {
 
   it('should handle compact mode', () => {
     const description = 'This recipe uses [eggs] and [flour].';
-    
+
     render(
       <LinkedDescription
         description={description}
@@ -151,7 +151,7 @@ describe('LinkedDescription', () => {
 
   it('should render markdown formatting', () => {
     const description = 'This is **bold** and _italic_ text with [eggs].';
-    
+
     render(
       <LinkedDescription
         description={description}
@@ -167,7 +167,7 @@ describe('LinkedDescription', () => {
 
   it('should handle bullet lists', () => {
     const description = 'Ingredients:\n- [eggs]\n- [flour]\n- Salt';
-    
+
     render(
       <LinkedDescription
         description={description}
@@ -183,7 +183,7 @@ describe('LinkedDescription', () => {
 
   it('should show broken link details when clicked', () => {
     const description = 'This recipe uses [eggs] and [invalid].';
-    
+
     render(
       <LinkedDescription
         description={description}
@@ -195,7 +195,7 @@ describe('LinkedDescription', () => {
     // Click the broken links chip to expand details
     const brokenChip = screen.getByText('1 broken');
     fireEvent.click(brokenChip);
-    
+
     expect(screen.getByText('Broken Variable Links:')).toBeInTheDocument();
     // Use getByText with a function to handle split text content
     expect(screen.getByText((_content, element) => {

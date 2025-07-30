@@ -190,7 +190,7 @@ export default function LinkedDescription({
               />
             </Tooltip>
           )}
-          
+
           {hasBrokenLinks && (
             <Tooltip title={`${linkValidation.brokenLinks.length} broken link${linkValidation.brokenLinks.length === 1 ? '' : 's'}`}>
               <Chip
@@ -211,12 +211,12 @@ export default function LinkedDescription({
       {/* Broken links details */}
       {hasBrokenLinks && showValidation && (
         <Collapse in={showValidationDetails}>
-          <Paper 
-            elevation={0} 
-            sx={{ 
-              p: 2, 
-              mb: 1, 
-              backgroundColor: 'error.light', 
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              mb: 1,
+              backgroundColor: 'error.light',
               border: '1px solid',
               borderColor: 'error.main'
             }}

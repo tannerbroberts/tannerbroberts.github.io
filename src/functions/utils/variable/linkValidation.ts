@@ -34,7 +34,7 @@ export function validateVariableDescription(
     } else {
       // Generate suggestions for broken links
       const suggestions = generateVariableNameSuggestions(link.text, allVariableNames);
-      
+
       brokenLinks.push({
         text: link.text,
         suggestions,
@@ -46,7 +46,7 @@ export function validateVariableDescription(
   // Check for circular references if all descriptions are provided
   let hasCircularReferences = false;
   let circularPaths: Array<{ path: string[]; variableNames: string[] }> = [];
-  
+
   if (allDescriptions) {
     circularPaths = detectCircularReferences(allDescriptions, variableDefinitions);
     hasCircularReferences = circularPaths.length > 0;
@@ -184,7 +184,7 @@ export function getValidationSummary(
   topIssues: Array<{ issue: string; count: number }>;
 } {
   const results = Array.from(validationResults.values());
-  
+
   if (results.length === 0) {
     return {
       totalDescriptions: 0,
@@ -197,7 +197,7 @@ export function getValidationSummary(
   }
 
   const totalBrokenLinks = results.reduce((sum, result) => sum + result.brokenLinks.length, 0);
-  const totalCircularReferences = results.reduce((sum, result) => 
+  const totalCircularReferences = results.reduce((sum, result) =>
     sum + (result.hasCircularReferences ? 1 : 0), 0
   );
   const averageQualityScore = results.reduce((sum, result) => sum + result.qualityScore, 0) / results.length;
@@ -235,13 +235,13 @@ export function generateValidationReport(
 ): string {
   const summary = getValidationSummary(validationResults);
   const definitionIdToName = new Map<string, string>();
-  
+
   variableDefinitions.forEach(def => {
     definitionIdToName.set(def.id, def.name);
   });
 
   let report = '# Variable Description Validation Report\n\n';
-  
+
   // Summary section
   report += '## Summary\n';
   report += `- Total Descriptions: ${summary.totalDescriptions}\n`;
@@ -267,7 +267,7 @@ export function generateValidationReport(
   sortedResults.forEach(([definitionId, result]) => {
     const variableName = definitionIdToName.get(definitionId) || definitionId;
     report += `### ${variableName} (Score: ${result.qualityScore}/100)\n`;
-    
+
     if (result.qualityIssues.length > 0) {
       report += '**Issues:**\n';
       result.qualityIssues.forEach(issue => {

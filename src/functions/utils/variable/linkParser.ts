@@ -85,7 +85,7 @@ export function validateVariableLinks(
     } else {
       // Generate suggestions for broken links
       const suggestions = generateVariableNameSuggestions(link.text, allVariableNames);
-      
+
       brokenLinks.push({
         text: link.text,
         suggestions,
@@ -117,7 +117,7 @@ export function generateVariableNameSuggestions(
   availableNames.forEach(name => {
     const distance = calculateLevenshteinDistance(inputLower, name.toLowerCase());
     const maxDistance = Math.max(2, Math.floor(input.length * 0.3)); // Allow up to 30% difference
-    
+
     if (distance <= maxDistance) {
       suggestions.push({ name, distance });
     }
@@ -182,7 +182,7 @@ export function formatVariableLinksAsHtml(
     const end = position.end;
 
     let replacement: string;
-    
+
     if (isValid && definitionId) {
       // Valid link - make it clickable if callback provided
       const clickHandler = onVariableClick ? `data-variable-id="${definitionId}"` : '';
@@ -208,7 +208,7 @@ export function detectCircularReferences(
 ): Array<{ path: string[]; variableNames: string[] }> {
   const circularPaths: Array<{ path: string[]; variableNames: string[] }> = [];
   const definitionIdToName = new Map<string, string>();
-  
+
   // Build lookup map
   variableDefinitions.forEach(def => {
     definitionIdToName.set(def.id, def.name);
@@ -242,7 +242,7 @@ export function detectCircularReferences(
         const cycleStart = currentPath.indexOf(neighborId);
         const cyclePath = currentPath.slice(cycleStart);
         cyclePath.push(neighborId); // Complete the cycle
-        
+
         const variableNames = cyclePath.map(id => definitionIdToName.get(id) || id);
         circularPaths.push({
           path: [...cyclePath],
