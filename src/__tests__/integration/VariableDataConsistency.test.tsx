@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { AppReducer, initialState, AppAction } from '../../functions/reducers/AppReducer';
+import AppReducer, { initialState, AppAction } from '../../functions/reducers/AppReducer';
 import { VariableItem } from '../../functions/utils/item/VariableItem';
 import { BasicItem } from '../../functions/utils/item/BasicItem';
 import { calculateVariableSummary } from '../../hooks/useRelationshipBasedSummary';

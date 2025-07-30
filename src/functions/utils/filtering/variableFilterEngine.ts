@@ -6,6 +6,8 @@ import {
   FilterResult,
   FilterPerformanceMetrics
 } from './filterTypes';
+import { getOptimizedVariableFilter } from './optimizedVariableFilter';
+import { measurePerformance } from '../performance/variablePerformanceMonitor';
 
 /**
  * Cache for filter results to improve performance
@@ -129,9 +131,36 @@ export function executeVariableFilter(
 }
 
 /**
- * Execute multiple variable filters against an item
+ * Execute multiple variable filters against an item with optimization
  */
 export function executeVariableFilters(
+  items: Item[],
+  itemVariableSummaries: Map<string, VariableSummary>,
+  filterCriteria: FilterCriteria,
+  useOptimizedFiltering: boolean = true
+): { results: FilterResult[]; performance: FilterPerformanceMetrics } {
+  // Try optimized filtering first if enabled
+  if (useOptimizedFiltering) {
+    try {
+      const optimizedFilter = getOptimizedVariableFilter();
+      return measurePerformance('optimized-variable-filter', () =>
+        optimizedFilter.executeFilters(items, itemVariableSummaries, filterCriteria)
+      );
+    } catch (error) {
+      console.warn('Optimized filtering failed, falling back to standard filtering:', error);
+    }
+  }
+
+  // Fall back to standard filtering
+  return measurePerformance('standard-variable-filter', () =>
+    executeStandardVariableFilters(items, itemVariableSummaries, filterCriteria)
+  );
+}
+
+/**
+ * Standard variable filter execution (original implementation)
+ */
+function executeStandardVariableFilters(
   items: Item[],
   itemVariableSummaries: Map<string, VariableSummary>,
   filterCriteria: FilterCriteria

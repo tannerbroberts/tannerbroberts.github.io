@@ -6,6 +6,38 @@ export interface ValidationResult {
   warnings: string[];
 }
 
+// Add validation function for variable consistency
+export function validateVariableConsistency(state: unknown): boolean {
+  try {
+    // Basic validation - check if required fields exist
+    if (!state || typeof state !== 'object' || !('items' in state)) {
+      return false;
+    }
+
+    const stateObj = state as { items?: unknown };
+    if (!Array.isArray(stateObj.items)) {
+      return false;
+    }
+
+    // Check that variable definitions have required fields
+    const variableItems = stateObj.items.filter((item: unknown) => {
+      return item && typeof item === 'object' && 'type' in item && (item as { type: string }).type === 'variable';
+    });
+
+    for (const variable of variableItems) {
+      const varObj = variable as { id?: string; name?: string; value?: number };
+      if (!varObj.id || !varObj.name || varObj.value === undefined) {
+        return false;
+      }
+    }
+
+    // Additional consistency checks can be added here
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function validateItemInstance(instance: ItemInstance): ValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];

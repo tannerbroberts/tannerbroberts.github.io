@@ -3,18 +3,27 @@ import { Item, hasChildren, getChildren } from '../item/index';
 import { getChildId } from '../item/itemUtils';
 import { RelationshipTracker } from './relationshipTracker';
 import { VariableSummaryCalculator } from './variableSummaryCalculator';
+import { OptimizedSummaryCalculator } from './optimizedSummaryCalculator';
+import { measurePerformance } from '../performance/variablePerformanceMonitor';
 
 // Global instances for relationship-based calculations
 let globalRelationshipTracker: RelationshipTracker | null = null;
 let globalCalculator: VariableSummaryCalculator | null = null;
+let globalOptimizedCalculator: OptimizedSummaryCalculator | null = null;
 
 /**
- * Initialize relationship-based calculation system
+ * Initialize relationship-based calculation system with optimization
  */
 export function initializeRelationshipCalculation(): void {
   if (!globalRelationshipTracker) {
     globalRelationshipTracker = new RelationshipTracker();
     globalCalculator = new VariableSummaryCalculator(globalRelationshipTracker);
+    globalOptimizedCalculator = new OptimizedSummaryCalculator(globalRelationshipTracker, {
+      enableMemoization: true,
+      enableIncrementalUpdates: true,
+      maxCacheSize: 1000,
+      cacheTTL: 5 * 60 * 1000 // 5 minutes
+    });
   }
 }
 
@@ -98,16 +107,45 @@ function addChildVariables(
 
 /**
  * Calculate variable summary for an item including BOTH parent variables AND recursively summed child variables
- * Now supports both legacy parent-child relationships and new relationshipId-based tracking
+ * Now supports both legacy parent-child relationships and new relationshipId-based tracking with optimizations
  */
 export function calculateVariableSummary(
   item: Item,
   allItems: Item[],
   variableMap: Map<string, Variable[]>,
   visited: Set<string> = new Set(),
-  useRelationshipTracking: boolean = true
+  useRelationshipTracking: boolean = true,
+  useOptimizedCalculation: boolean = true
 ): VariableSummary {
-  // Try relationship-based calculation first if enabled
+  // Try optimized calculation first if enabled
+  if (useOptimizedCalculation && globalOptimizedCalculator) {
+    try {
+      // Convert Variable[] to VariableMapEntry[] format
+      const convertedVariableMap = new Map<string, Array<{
+        name: string;
+        quantity: number;
+        unit?: string;
+        category?: string;
+      }>>();
+
+      for (const [itemId, variables] of variableMap) {
+        convertedVariableMap.set(itemId, variables.map(v => ({
+          name: v.name,
+          quantity: v.quantity,
+          unit: v.unit,
+          category: v.category
+        })));
+      }
+
+      return measurePerformance('optimized-variable-summary', () =>
+        globalOptimizedCalculator!.calculateSummary(item, allItems, convertedVariableMap)
+      );
+    } catch (error) {
+      console.warn('Optimized calculation failed, falling back to regular method:', error);
+    }
+  }
+
+  // Try relationship-based calculation if enabled
   if (useRelationshipTracking && globalCalculator) {
     try {
       // Convert Variable[] to VariableMapEntry[] format
@@ -251,12 +289,24 @@ export function synchronizeRelationships(items: Item[]): number {
 }
 
 /**
+ * Get the optimized variable summary calculator
+ */
+export function getOptimizedVariableSummaryCalculator(): OptimizedSummaryCalculator | null {
+  return globalOptimizedCalculator;
+}
+
+/**
  * Update variable summary calculation to use relationship tracking
  * This function invalidates caches and triggers recalculation for affected items
  */
 export function invalidateVariableSummaries(itemId: string): void {
   const calculator = getVariableSummaryCalculator();
   calculator.invalidateCache(itemId);
+
+  // Also invalidate optimized calculator if available
+  if (globalOptimizedCalculator) {
+    globalOptimizedCalculator.invalidateCache(itemId);
+  }
 }
 /**
  * Group variables by category
