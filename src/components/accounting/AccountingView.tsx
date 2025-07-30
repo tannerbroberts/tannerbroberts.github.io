@@ -33,7 +33,7 @@ interface AccountingViewProps {
 }
 
 export default function AccountingView({ className }: AccountingViewProps) {
-  const { items } = useAppState();
+  const { items, itemVariables } = useAppState();
   const { accountingInstances } = useItemInstances();
   const dispatch = useAppDispatch();
 
@@ -178,6 +178,12 @@ export default function AccountingView({ className }: AccountingViewProps) {
     return instances;
   }, [hierarchicallyFilteredInstances, groupedInstances, selectedTimeGroup, searchQuery, showOnlyWithVariables, sortOrder, items]);
 
+  // Badge click handler for detailed breakdowns
+  const handleBadgeClick = useCallback((badgeType: 'time' | 'variables') => {
+    console.log(`${badgeType} badge clicked - detailed breakdown could be shown here`);
+    // Future enhancement: Open modal or drawer with detailed breakdown
+  }, []);
+
   // Bulk completion handlers
   const handleCompleteAll = useCallback(async () => {
     if (!confirm(`Mark all ${filteredInstances.length} instances as complete?`)) {
@@ -236,6 +242,10 @@ export default function AccountingView({ className }: AccountingViewProps) {
           totalIncompleteCount={stats.totalInstances}
           overdueCount={stats.totalOverdue}
           filteredCount={stats.filteredCount}
+          instances={accountingInstances}
+          items={items}
+          itemVariables={itemVariables}
+          onBadgeClick={handleBadgeClick}
         />
 
         {/* Collapsible Content */}
