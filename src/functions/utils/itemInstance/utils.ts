@@ -72,6 +72,25 @@ export function getPastIncompleteInstances(
 }
 
 /**
+ * Get completed instances for accounting view
+ * Returns instances that have been marked as complete
+ */
+export function getCompletedInstances(
+  instances: Map<string, ItemInstance>,
+  currentTime: number = Date.now()
+): ItemInstance[] {
+  return Array.from(instances.values()).filter(instance => {
+    // Must be complete
+    if (!instance.isComplete) return false;
+
+    // Must have completed before current time (if completedAt is available)
+    if (instance.completedAt && instance.completedAt > currentTime) return false;
+
+    return true;
+  });
+}
+
+/**
  * Check if an instance is currently executing
  */
 export function isInstanceCurrentlyExecuting(

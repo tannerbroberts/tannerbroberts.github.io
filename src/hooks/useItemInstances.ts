@@ -4,7 +4,8 @@ import {
   ItemInstance,
   getInstancesByItemId,
   getInstancesByCalendarEntryId,
-  getPastIncompleteInstances
+  getPastIncompleteInstances,
+  getCompletedInstances
 } from '../functions/utils/item/index';
 
 /**
@@ -17,9 +18,8 @@ export function useItemInstances() {
     // Get past incomplete instances
     const pastIncompleteInstances = getPastIncompleteInstances(itemInstances);
 
-    // For now, accounting instances are the same as past incomplete instances
-    // In a more sophisticated implementation, we would filter out currently executing instances
-    const accountingInstances = pastIncompleteInstances;
+    // Get completed instances for accounting view
+    const accountingInstances = getCompletedInstances(itemInstances);
 
     return {
       // Get all instances
@@ -28,7 +28,7 @@ export function useItemInstances() {
       // Get past incomplete instances (includes currently executing)
       pastIncompleteInstances,
 
-      // Get accounting instances (past incomplete but NOT currently executing)
+      // Get accounting instances (completed instances only)
       accountingInstances,
 
       // Get instances by item ID
