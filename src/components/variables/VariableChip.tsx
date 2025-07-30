@@ -4,14 +4,12 @@ import {
   Tooltip,
   Box,
   Typography,
-  IconButton,
-  Popover,
-  Paper
+  IconButton
 } from '@mui/material';
 import { Edit, Info } from '@mui/icons-material';
 import { useVariableDescriptions } from '../../hooks/useVariableDescriptions';
 import { useAppState } from '../../reducerContexts/App';
-import DescriptionDisplay from './DescriptionDisplay';
+import VariableDescriptionPopup from './VariableDescriptionPopup';
 
 interface VariableChipProps {
   variableName: string;
@@ -40,7 +38,8 @@ export default function VariableChip({
 }: Readonly<VariableChipProps>) {
   const { variableDefinitions } = useAppState();
   const { getDescription } = useVariableDescriptions();
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | undefined>();
 
   // Find the variable definition
   const variableDefinition = React.useMemo(() => {
@@ -59,13 +58,16 @@ export default function VariableChip({
 
     if (clickable && onVariableClick) {
       onVariableClick(variableName);
-    } else if (description && showDescription) {
-      setAnchorEl(event.currentTarget);
+    } else if (description && showDescription && variableDefinition) {
+      // Capture mouse position for popup positioning
+      setMousePosition({ x: event.clientX, y: event.clientY });
+      setPopupOpen(true);
     }
-  }, [clickable, onVariableClick, variableName, description, showDescription, disabled]);
+  }, [clickable, onVariableClick, variableName, description, showDescription, disabled, variableDefinition]);
 
-  const handlePopoverClose = useCallback(() => {
-    setAnchorEl(null);
+  const handlePopupClose = useCallback(() => {
+    setPopupOpen(false);
+    setMousePosition(undefined);
   }, []);
 
   const handleEditClick = useCallback((event: React.MouseEvent) => {
@@ -113,7 +115,6 @@ export default function VariableChip({
 
   const chipLabel = formatLabel();
   const chipColor = getChipColor();
-  const popoverOpen = Boolean(anchorEl);
 
   // Simple tooltip for when there's no description
   if (!description || !showDescription) {
@@ -169,7 +170,7 @@ export default function VariableChip({
     );
   }
 
-  // Full description popover for variables with descriptions
+  // Chip with description popup
   return (
     <>
       <Chip
@@ -207,41 +208,18 @@ export default function VariableChip({
         }}
       />
 
-      <Popover
-        open={popoverOpen}
-        anchorEl={anchorEl}
-        onClose={handlePopoverClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
-        }}
-        sx={{ mt: 1 }}
-      >
-        <Paper sx={{ p: 2, maxWidth: 400 }}>
-          <Typography variant="h6" gutterBottom>
-            {variableName}
-          </Typography>
-
-          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-            {category && (
-              <Chip size="small" label={category} variant="outlined" />
-            )}
-            {unit && (
-              <Chip size="small" label={`Unit: ${unit}`} variant="outlined" />
-            )}
-          </Box>
-
-          <DescriptionDisplay
-            description={description.content}
-            showExpandToggle={true}
-            onVariableClick={onVariableClick}
-          />
-        </Paper>
-      </Popover>
+      {/* New Variable Description Popup */}
+      {variableDefinition && (
+        <VariableDescriptionPopup
+          open={popupOpen}
+          variableDefinitionId={variableDefinition.definitionId}
+          variableName={variableName}
+          mousePosition={mousePosition}
+          onClose={handlePopupClose}
+          onEdit={onEdit ? () => onEdit(variableName) : undefined}
+          compact={false}
+        />
+      )}
     </>
   );
 }
