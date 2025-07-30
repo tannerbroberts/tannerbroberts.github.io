@@ -9,16 +9,10 @@ import { SubCalendarItem, Child, VariableImpl } from "../functions/utils/item/in
  */
 function createScalingSubCalendarItems(): SubCalendarItem[] {
   const items: SubCalendarItem[] = [];
+  const itemsByDuration = new Map<number, SubCalendarItem>();
 
-  // Create the 1-second base item
-  const oneSecItem = new SubCalendarItem({
-    name: "1 Second Item",
-    duration: 1000, // 1 second
-  });
-  items.push(oneSecItem);
-
-  // Create items following the pattern: 2s, 4s, 8s, 16s, 32s, 64s, 128s, 256s, 512s
-  const durations = [2, 4, 8, 16, 32, 64, 128, 256, 512];
+  // Create all items in order from smallest to largest: 1s, 2s, 4s, 8s, 16s, 32s, 64s, 128s, 256s, 512s
+  const durations = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512];
 
   durations.forEach((duration) => {
     const item = new SubCalendarItem({
@@ -26,35 +20,20 @@ function createScalingSubCalendarItems(): SubCalendarItem[] {
       duration: duration * 1000, // Convert to milliseconds
     });
 
-    // Calculate child duration (half of current duration)
-    const childDuration = duration / 2;
+    // For items longer than 1 second, schedule the child of half duration inside
+    if (duration > 1) {
+      const childDuration = duration / 2;
+      const childItem = itemsByDuration.get(childDuration);
 
-    // Find existing items of the child duration
-    const childItems = items.filter(existingItem =>
-      existingItem.duration === childDuration * 1000
-    );
-
-    // Schedule 2 child items inside this item
-    if (childItems.length >= 2) {
-      item.children = [
-        new Child({ id: childItems[0].id, start: 0 }),
-        new Child({ id: childItems[1].id, start: childDuration * 1000 }),
-      ];
-    } else if (childItems.length === 1) {
-      // If we only have one item of the required duration, duplicate it
-      const duplicateChild = new SubCalendarItem({
-        name: `${childDuration} Second Item`,
-        duration: childDuration * 1000,
-      });
-      items.push(duplicateChild);
-
-      item.children = [
-        new Child({ id: childItems[0].id, start: 0 }),
-        new Child({ id: duplicateChild.id, start: childDuration * 1000 }),
-      ];
+      if (childItem) {
+        item.children = [
+          new Child({ id: childItem.id, start: 0 })
+        ];
+      }
     }
 
     items.push(item);
+    itemsByDuration.set(duration, item);
   });
 
   return items;
