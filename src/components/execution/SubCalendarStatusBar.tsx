@@ -139,6 +139,7 @@ interface SubCalendarStatusBarProps {
   readonly itemName?: string; // Optional item name to display instead of current child
   readonly isExpandable?: boolean; // Whether this header can be expanded/collapsed
   readonly isExpanded?: boolean; // Current expanded state
+  readonly onClick?: () => void; // Click handler for expansion/collapse
   readonly childExecutionStatus?: ChildExecutionStatus; // Enhanced child execution status
   readonly showCountdown?: boolean; // Whether to show countdown timers
   readonly showPreparationHints?: boolean; // Whether to show preparation hints
@@ -161,6 +162,7 @@ function SubCalendarStatusBar({
   itemName,
   isExpandable = false,
   isExpanded = false,
+  onClick,
   childExecutionStatus,
   showCountdown = true,
   showPreparationHints = true
@@ -342,9 +344,16 @@ function SubCalendarStatusBar({
 
   return (
     <StatusBarContainer
+      onClick={isExpandable ? onClick : undefined}
       sx={{
         backgroundColor: statusBarBgColor,
         borderColor: borderColor,
+        cursor: isExpandable ? 'pointer' : 'default',
+        '&:hover': isExpandable ? {
+          boxShadow: '0 6px 12px rgba(0, 0, 0, 0.2)',
+          transform: 'translateY(-1px)',
+        } : {},
+        transition: 'all 0.3s ease-in-out',
       }}
     >
       {/* Progress bar background with animation */}
