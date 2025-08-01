@@ -33,7 +33,7 @@ export function testFullExecutionChain() {
     children: [child1, child2, child3]
   });
 
-  const items = [subCalendarItem, childItem1, childItem2, childItem3];
+  const items = [subCalendarItem, childItem1, childItem2, childItem3].sort((a, b) => a.id.localeCompare(b.id));
 
   // Create base calendar entry (this is how items get scheduled)
   const parentStartTime = Date.now();

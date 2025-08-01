@@ -70,8 +70,11 @@ export function getCurrentTaskChain(
     const topMostItem = findTopMostActiveItem(items, currentTime, baseCalendar);
     if (!topMostItem) return chain;
 
+    // Get the start time for the top-most item from the base calendar
+    const topMostStartTime = getBaseStartTime(topMostItem, baseCalendar);
+
     // Build chain recursively from top-most parent to deepest child
-    buildChainRecursively(items, topMostItem, currentTime, chain, 0);
+    buildChainRecursively(items, topMostItem, currentTime, chain, 0, topMostStartTime);
 
     const duration = performance.now() - startTime;
     if (duration > 10) { // Log if it takes more than 10ms
@@ -111,7 +114,7 @@ function findTopMostActiveItem(items: Item[], currentTime: number, baseCalendar?
 /**
  * Build the task chain recursively from parent to child
  */
-function buildChainRecursively(items: Item[], currentItem: Item, currentTime: number, chain: Item[], depth: number = 0): void {
+function buildChainRecursively(items: Item[], currentItem: Item, currentTime: number, chain: Item[], depth: number = 0, parentStartTime: number = 0): void {
   // Prevent infinite recursion by limiting depth
   const MAX_DEPTH = 50;
   if (depth > MAX_DEPTH) {
@@ -128,18 +131,26 @@ function buildChainRecursively(items: Item[], currentItem: Item, currentTime: nu
   chain.push(currentItem);
 
   // Find child items that are active at current time
-  const activeChild = findActiveChildAtTime(items, currentItem, currentTime);
+  const activeChild = findActiveChildAtTime(items, currentItem, currentTime, parentStartTime);
   if (activeChild) {
-    buildChainRecursively(items, activeChild, currentTime, chain, depth + 1);
+    // Calculate the child's absolute start time for the next level
+    let childStartTime = parentStartTime;
+    if (currentItem instanceof SubCalendarItem) {
+      const childRef = currentItem.children.find(ref => ref?.id === activeChild.id);
+      if (childRef) {
+        childStartTime = parentStartTime + (childRef.start ?? 0);
+      }
+    }
+    buildChainRecursively(items, activeChild, currentTime, chain, depth + 1, childStartTime);
   }
 }
 
 /**
  * Find a child item that is active at the given time
  */
-function findActiveChildAtTime(items: Item[], parentItem: Item, currentTime: number): Item | null {
+function findActiveChildAtTime(items: Item[], parentItem: Item, currentTime: number, parentStartTime: number = 0): Item | null {
   if (parentItem instanceof SubCalendarItem) {
-    return findActiveSubCalendarChild(items, parentItem, currentTime);
+    return findActiveSubCalendarChild(items, parentItem, currentTime, parentStartTime);
   } else if (parentItem instanceof CheckListItem) {
     return findActiveCheckListChild(items, parentItem);
   }
@@ -149,7 +160,7 @@ function findActiveChildAtTime(items: Item[], parentItem: Item, currentTime: num
 /**
  * Find active child in SubCalendarItem
  */
-function findActiveSubCalendarChild(items: Item[], parentItem: SubCalendarItem, currentTime: number): Item | null {
+function findActiveSubCalendarChild(items: Item[], parentItem: SubCalendarItem, currentTime: number, parentStartTime: number = 0): Item | null {
   for (const childRef of parentItem.children) {
     if (!childRef?.id) {
       console.warn(`Invalid child reference found in SubCalendarItem ${parentItem.id}:`, childRef);
@@ -157,8 +168,12 @@ function findActiveSubCalendarChild(items: Item[], parentItem: SubCalendarItem, 
     }
 
     const childItem = getItemById(items, childRef.id);
-    if (childItem && isItemActiveAtTime(childItem, currentTime, childRef.start ?? 0)) {
-      return childItem;
+    if (childItem) {
+      // Calculate absolute start time for the child
+      const childAbsoluteStartTime = parentStartTime + (childRef.start ?? 0);
+      if (isItemActiveAtTime(childItem, currentTime, childAbsoluteStartTime)) {
+        return childItem;
+      }
     }
   }
   return null;
