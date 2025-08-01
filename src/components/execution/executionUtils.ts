@@ -211,7 +211,7 @@ export function getChildExecutionStatus(
 }
 
 /**
- * Get enhanced execution status for SubCalendarItem
+ * Get enhanced execution status for SubCalendarItem with improved timing accuracy
  */
 function getSubCalendarExecutionStatus(
   parentItem: SubCalendarItem,
@@ -231,18 +231,31 @@ function getSubCalendarExecutionStatus(
   const elapsedTime = currentTime - parentStartTime;
   const sortedChildren = [...parentItem.children].sort((a, b) => a.start - b.start);
 
+  // Check if parent execution has ended
+  if (elapsedTime >= parentItem.duration) {
+    return {
+      activeChild: null,
+      nextChild: null,
+      gapPeriod: false,
+      currentPhase: 'complete'
+    };
+  }
+
   // If we haven't started yet, find the first child
   if (elapsedTime < 0) {
     const firstChild = sortedChildren[0];
     const childItem = findItemById(items, firstChild.id);
 
     if (childItem) {
+      const firstChildAbsoluteStartTime = parentStartTime + firstChild.start;
+      const timeUntilFirstChild = firstChildAbsoluteStartTime - currentTime;
+
       return {
         activeChild: null,
         nextChild: {
           item: childItem,
-          timeUntilStart: Math.abs(elapsedTime) + firstChild.start,
-          startTime: parentStartTime + firstChild.start
+          timeUntilStart: Math.max(0, timeUntilFirstChild),
+          startTime: firstChildAbsoluteStartTime
         },
         gapPeriod: false,
         currentPhase: 'pre-start'
@@ -265,7 +278,7 @@ function getSubCalendarExecutionStatus(
     if (elapsedTime >= childStartTime && elapsedTime < childEndTime) {
       return {
         activeChild: childItem,
-        nextChild: getNextChildInfo(sortedChildren, items, i + 1, parentStartTime),
+        nextChild: getNextChildInfo(sortedChildren, items, i + 1, parentStartTime, currentTime),
         gapPeriod: false,
         currentPhase: 'active'
       };
@@ -273,12 +286,15 @@ function getSubCalendarExecutionStatus(
 
     // Check if we're in a gap before this child
     if (elapsedTime < childStartTime) {
+      const childAbsoluteStartTime = parentStartTime + childStartTime;
+      const timeUntilChild = childAbsoluteStartTime - currentTime;
+
       return {
         activeChild: null,
         nextChild: {
           item: childItem,
-          timeUntilStart: childStartTime - elapsedTime,
-          startTime: parentStartTime + childStartTime
+          timeUntilStart: Math.max(0, timeUntilChild),
+          startTime: childAbsoluteStartTime
         },
         gapPeriod: true,
         currentPhase: 'gap'
@@ -286,7 +302,7 @@ function getSubCalendarExecutionStatus(
     }
   }
 
-  // We're past all children
+  // We're past all children but parent hasn't ended - this should be complete, not gap
   return {
     activeChild: null,
     nextChild: null,
@@ -340,23 +356,27 @@ function getCheckListExecutionStatus(
 }
 
 /**
- * Get next child information for SubCalendar
+ * Get next child information for SubCalendar with accurate timing
  */
 function getNextChildInfo(
   sortedChildren: Child[],
   items: Item[],
   startIndex: number,
-  parentStartTime: number
+  parentStartTime: number,
+  currentTime: number = Date.now()
 ): { item: Item; timeUntilStart: number; startTime: number } | null {
   for (let i = startIndex; i < sortedChildren.length; i++) {
     const child = sortedChildren[i];
     const childItem = findItemById(items, child.id);
 
     if (childItem) {
+      const childAbsoluteStartTime = parentStartTime + child.start;
+      const timeUntilStart = Math.max(0, childAbsoluteStartTime - currentTime);
+
       return {
         item: childItem,
-        timeUntilStart: 0, // Will be calculated in real-time
-        startTime: parentStartTime + child.start
+        timeUntilStart,
+        startTime: childAbsoluteStartTime
       };
     }
   }
@@ -450,7 +470,7 @@ export function getActiveChildForExecution(
 }
 
 /**
- * Get active child for SubCalendarItem based on current time
+ * Get active child for SubCalendarItem based on current time - synchronized with execution status logic
  */
 function getActiveSubCalendarChild(
   parentItem: SubCalendarItem,
@@ -463,8 +483,8 @@ function getActiveSubCalendarChild(
   const elapsedTime = currentTime - parentStartTime;
   const sortedChildren = [...parentItem.children].sort((a, b) => a.start - b.start);
 
-  // If we haven't started yet, return null
-  if (elapsedTime < 0) return null;
+  // If we haven't started yet or parent execution has ended, return null
+  if (elapsedTime < 0 || elapsedTime >= parentItem.duration) return null;
 
   // Find the child that should be active at the current time
   for (const child of sortedChildren) {
@@ -472,13 +492,16 @@ function getActiveSubCalendarChild(
     const childItem = findItemById(items, child.id);
     if (!childItem) continue;
 
+    const childStartTime = child.start;
+    const childEndTime = child.start + childItem.duration;
+
     // Check if we're within this child's execution window
-    if (elapsedTime >= child.start && elapsedTime < child.start + childItem.duration) {
+    if (elapsedTime >= childStartTime && elapsedTime < childEndTime) {
       return childItem;
     }
   }
 
-  // If no child is currently active, return null
+  // If no child is currently active (gap period), return null
   return null;
 }
 
