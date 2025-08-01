@@ -468,7 +468,8 @@ function getActiveSubCalendarChild(
 
   // Find the child that should be active at the current time
   for (const child of sortedChildren) {
-    const childItem = getItemById(items, child.id);
+    // Use linear search instead of getItemById for reliability
+    const childItem = findItemById(items, child.id);
     if (!childItem) continue;
 
     // Check if we're within this child's execution window
