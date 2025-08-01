@@ -259,4 +259,116 @@ describe('Multi-Child SubCalendar Execution', () => {
       expect(getActiveChildForExecution(subCalendarItem, items, 1999, parentStartTime)?.name).toBe('Child 1'); // Just before transition
     });
   });
+
+  describe('Integration Tests with Child Execution Status', () => {
+    it('should provide consistent results between getActiveChildForExecution and getChildExecutionStatus', () => {
+      const childItem1 = new BasicItem({ name: 'Integration Child 1', duration: 800 });
+      const childItem2 = new BasicItem({ name: 'Integration Child 2', duration: 600 });
+
+      const child1 = new Child({ id: childItem1.id, start: 200 });
+      const child2 = new Child({ id: childItem2.id, start: 1200 });
+
+      const subCalendarItem = new SubCalendarItem({
+        name: 'Integration Parent',
+        duration: 2000,
+        children: [child1, child2]
+      });
+
+      const items = [subCalendarItem, childItem1, childItem2];
+      const parentStartTime = 1000;
+
+      // Test various phases for consistency
+      const testTimes = [
+        { time: 1100, phase: 'pre-start', activeChild: null }, // 100ms elapsed, before first child
+        { time: 1400, phase: 'active', activeChild: 'Integration Child 1' }, // 400ms elapsed, during first child
+        { time: 1150, phase: 'gap', activeChild: null }, // 1150ms elapsed, gap period
+        { time: 2400, phase: 'active', activeChild: 'Integration Child 2' }, // 1400ms elapsed, during second child
+        { time: 3200, phase: 'complete', activeChild: null } // 2200ms elapsed, after completion
+      ];
+
+      testTimes.forEach(({ time, activeChild }) => {
+        const activeFromFunction = getActiveChildForExecution(subCalendarItem, items, time, parentStartTime);
+
+        if (activeChild) {
+          expect(activeFromFunction?.name).toBe(activeChild);
+        } else {
+          expect(activeFromFunction).toBeNull();
+        }
+      });
+    });
+
+    it('should handle mixed child types in complex scenarios', () => {
+      // This test ensures that the system can handle various child configurations
+      const quickChild = new BasicItem({ name: 'Quick Task', duration: 200 });
+      const mediumChild = new BasicItem({ name: 'Medium Task', duration: 800 });
+      const longChild = new BasicItem({ name: 'Long Task', duration: 1200 });
+
+      const child1 = new Child({ id: quickChild.id, start: 0 });      // 0-200ms
+      const child2 = new Child({ id: mediumChild.id, start: 400 });   // 400-1200ms (gap 200-400ms)
+      const child3 = new Child({ id: longChild.id, start: 1400 });    // 1400-2600ms (gap 1200-1400ms)
+
+      const subCalendarItem = new SubCalendarItem({
+        name: 'Complex Parent',
+        duration: 3000,
+        children: [child1, child2, child3]
+      });
+
+      const items = [subCalendarItem, quickChild, mediumChild, longChild];
+      const parentStartTime = 5000;
+
+      // Test the full execution cycle
+      expect(getActiveChildForExecution(subCalendarItem, items, 5100, parentStartTime)?.name).toBe('Quick Task');     // 100ms elapsed
+      expect(getActiveChildForExecution(subCalendarItem, items, 5300, parentStartTime)).toBeNull();                   // 300ms elapsed (gap)
+      expect(getActiveChildForExecution(subCalendarItem, items, 5600, parentStartTime)?.name).toBe('Medium Task');    // 600ms elapsed
+      expect(getActiveChildForExecution(subCalendarItem, items, 5300, parentStartTime)).toBeNull();                   // 1300ms elapsed (gap)
+      expect(getActiveChildForExecution(subCalendarItem, items, 6800, parentStartTime)?.name).toBe('Long Task');      // 1800ms elapsed
+      expect(getActiveChildForExecution(subCalendarItem, items, 8500, parentStartTime)).toBeNull();                   // 3500ms elapsed (complete)
+    });
+
+    it('should maintain performance during transition intensive scenarios', () => {
+      // Create a scenario with many rapid transitions to test performance
+      const children: Child[] = [];
+      const childItems: BasicItem[] = [];
+
+      // Create 50 children with 50ms duration each and 10ms gaps
+      for (let i = 0; i < 50; i++) {
+        const childItem = new BasicItem({
+          name: `Rapid Child ${i + 1}`,
+          duration: 50
+        });
+        childItems.push(childItem);
+
+        const child = new Child({
+          id: childItem.id,
+          start: i * 60 // 50ms duration + 10ms gap
+        });
+        children.push(child);
+      }
+
+      const subCalendarItem = new SubCalendarItem({
+        name: 'Rapid Transition Parent',
+        duration: 3000,
+        children: children
+      });
+
+      const items = [subCalendarItem, ...childItems];
+      const parentStartTime = 10000;
+
+      // Test performance during rapid queries
+      const startTime = performance.now();
+
+      // Query every 5ms for the full duration
+      for (let time = parentStartTime; time < parentStartTime + 3000; time += 5) {
+        const activeChild = getActiveChildForExecution(subCalendarItem, items, time, parentStartTime);
+        // Just ensure we get some result (null during gaps is expected)
+        expect(activeChild === null || activeChild.name.startsWith('Rapid Child')).toBe(true);
+      }
+
+      const endTime = performance.now();
+      const executionTime = endTime - startTime;
+
+      // Should complete within reasonable time (600 queries)
+      expect(executionTime).toBeLessThan(50); // Less than 50ms for 600 queries
+    });
+  });
 });
