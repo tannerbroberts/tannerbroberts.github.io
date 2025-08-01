@@ -38,12 +38,14 @@ export default function PrimaryItemDisplayRouter({
 }: PrimaryItemDisplayRouterProps) {
   const { items } = useAppState();
 
-  // Prevent infinite recursion
+  // Prevent infinite recursion - important for deeply nested SubCalendar structures
   const canRenderChildren = useMemo(() => {
     return isRecursionDepthValid(depth);
   }, [depth]);
 
-  // Get active child for container items
+  // Get active child for container items (SubCalendar and CheckList)
+  // This uses the fixed getActiveChildForExecution function from Steps 2-3
+  // which properly handles time-based child transitions for SubCalendar items
   const activeChild = useMemo(() => {
     if (!canRenderChildren) return null;
 
@@ -53,7 +55,9 @@ export default function PrimaryItemDisplayRouter({
     return null;
   }, [item, items, currentTime, startTime, canRenderChildren]);
 
-  // Calculate child start time
+  // Calculate the correct start time for the active child
+  // For SubCalendar: parent start time + child offset
+  // For CheckList: same as parent start time (children execute sequentially)
   const childStartTime = useMemo(() => {
     if (!activeChild || !(item instanceof SubCalendarItem || item instanceof CheckListItem)) {
       return startTime;
@@ -77,6 +81,9 @@ export default function PrimaryItemDisplayRouter({
   }, [activeChild, item, startTime]);
 
   // Render child content recursively
+  // This enables proper nesting: SubCalendar -> SubCalendar -> BasicItem
+  // The depth parameter prevents infinite recursion
+  // Child transitions are handled automatically by the activeChild memoization
   const renderChildContent = useCallback(() => {
     if (!activeChild || !canRenderChildren) return null;
 
