@@ -46,10 +46,6 @@ export type AppAction =
     payload: { focusedItemId: string | null };
   }
   | {
-    type: "SET_FOCUSED_LIST_ITEM_BY_ID";
-    payload: { focusedListItemId: string | null };
-  }
-  | {
     type: "SET_CURRENT_VIEW";
     payload: { currentView: 'execution' | 'accounting' };
   }
@@ -122,7 +118,6 @@ export const initialState = {
   pixelsPerSegment: 30,
   expandSearchItems: false,
   focusedItemId: null as string | null,
-  focusedListItemId: null as string | null,
   currentView: 'execution' as 'execution' | 'accounting',
   items: new Array<Item>(),
   baseCalendar: new Map<string, BaseCalendarEntry>(),
@@ -184,9 +179,8 @@ export default function reducer(
         item.id !== id
       );
 
-      const { focusedListItemId, focusedItemId } = previous;
+      const { focusedItemId } = previous;
       const shouldNullifyFocusedItemId = focusedItemId === id;
-      const shouldNullifyFocusedListItemId = focusedListItemId === id;
 
       //* ****************************************************
       //* appState
@@ -195,9 +189,6 @@ export default function reducer(
         ...removedInstanceState,
         items: newItems,
         focusedItemId: shouldNullifyFocusedItemId ? null : focusedItemId,
-        focusedListItemId: shouldNullifyFocusedListItemId
-          ? null
-          : focusedListItemId,
       };
     }
     case "REMOVE_INSTANCES_BY_ID": {
@@ -251,23 +242,13 @@ export default function reducer(
       //* appState
       //* focusedItemId
       //* ****************************************************
-      if (!focusedItemId) return { ...previous, focusedItemId: null, focusedListItemId: null };
+      if (!focusedItemId) return { ...previous, focusedItemId: null };
 
       //* ****************************************************
       //* appState
       //* focusedItemId
       //* ****************************************************
-      return { ...previous, focusedItemId, focusedListItemId: null };
-    }
-    case "SET_FOCUSED_LIST_ITEM_BY_ID": {
-      const { focusedListItemId } = action.payload;
-      if (!focusedListItemId) return previous;
-
-      //* ****************************************************
-      //* appState
-      //* focusedItemId
-      //* ****************************************************
-      return { ...previous, focusedListItemId: focusedListItemId };
+      return { ...previous, focusedItemId };
     }
     case "SET_CURRENT_VIEW": {
       const { currentView } = action.payload;

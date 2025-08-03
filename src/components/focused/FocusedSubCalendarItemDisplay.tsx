@@ -3,9 +3,9 @@ import { Edit, Schedule, Delete, Add } from '@mui/icons-material';
 import { SubCalendarItem, hasChildren, getChildren, getChildId, type ChildReference } from '../../functions/utils/item/index';
 import { formatDuration } from '../../functions/utils/formatTime';
 import { getItemById } from '../../functions/utils/item/utils';
-import { useAppState } from '../../reducerContexts/App';
+import { useAppState, useAppDispatch } from '../../reducerContexts/App';
 import { useViewportHeight } from '../../hooks/useViewportHeight';
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import ItemSchedule from '../ItemSchedule';
 import LedgerLines from '../LedgerLines';
 
@@ -14,8 +14,31 @@ interface FocusedSubCalendarItemDisplayProps {
 }
 
 export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalendarItemDisplayProps) {
-  const { items, millisecondsPerSegment, pixelsPerSegment } = useAppState();
+  const { items, pixelsPerSegment, millisecondsPerSegment } = useAppState();
+  const appDispatch = useAppDispatch();
   const viewportHeight = useViewportHeight();
+
+  const handleEditTemplate = useCallback(() => {
+    // TODO: Implement template editing
+    alert('Edit Template functionality not yet implemented');
+  }, []);
+
+  const handleAddChildTemplate = useCallback(() => {
+    // Open the duration dialog to add a child template with scheduling
+    appDispatch({ type: 'SET_DURATION_DIALOG_OPEN', payload: { durationDialogOpen: true } });
+  }, [appDispatch]);
+
+  const handleCreateInstance = useCallback(() => {
+    // Open the scheduling dialog to create an instance of this template
+    appDispatch({ type: 'SET_SCHEDULING_DIALOG_OPEN', payload: { schedulingDialogOpen: true } });
+  }, [appDispatch]);
+
+  const handleDeleteTemplate = useCallback(() => {
+    // Confirm deletion and delete the template
+    if (window.confirm(`Are you sure you want to delete the SubCalendar template "${item.name}"? This action cannot be undone.`)) {
+      appDispatch({ type: 'DELETE_ITEM_BY_ID', payload: { id: item.id } });
+    }
+  }, [appDispatch, item.id, item.name]);
 
   // Calculate if the template timeline would exceed maximum height
   const itemExceedsMaxHeight = useMemo(() => {
@@ -114,6 +137,7 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
             startIcon={<Edit />}
             color="primary"
             size="small"
+            onClick={handleEditTemplate}
           >
             Edit Template
           </Button>
@@ -122,6 +146,7 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
             startIcon={<Add />}
             color="secondary"
             size="small"
+            onClick={handleAddChildTemplate}
           >
             Add Child Template
           </Button>
@@ -130,6 +155,7 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
             startIcon={<Schedule />}
             color="secondary"
             size="small"
+            onClick={handleCreateInstance}
           >
             Create Instance
           </Button>
@@ -138,6 +164,7 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
             startIcon={<Delete />}
             color="error"
             size="small"
+            onClick={handleDeleteTemplate}
           >
             Delete Template
           </Button>

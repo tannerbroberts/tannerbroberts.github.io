@@ -3,8 +3,8 @@ import { Edit, Schedule, Delete, Add, Remove, DragIndicator } from '@mui/icons-m
 import { CheckListItem } from '../../functions/utils/item/index';
 import { formatDuration } from '../../functions/utils/formatTime';
 import { getItemById } from '../../functions/utils/item/utils';
-import { useAppState } from '../../reducerContexts/App';
-import { useMemo } from 'react';
+import { useAppState, useAppDispatch } from '../../reducerContexts/App';
+import { useMemo, useCallback } from 'react';
 
 interface FocusedCheckListItemDisplayProps {
   readonly item: CheckListItem;
@@ -12,6 +12,38 @@ interface FocusedCheckListItemDisplayProps {
 
 export default function FocusedCheckListItemDisplay({ item }: FocusedCheckListItemDisplayProps) {
   const { items } = useAppState();
+  const appDispatch = useAppDispatch();
+
+  const handleEditTemplate = useCallback(() => {
+    // TODO: Implement template editing
+    alert('Edit Template functionality not yet implemented');
+  }, []);
+
+  const handleAddChildTemplate = useCallback(() => {
+    // TODO: Implement child template addition - could open a picker dialog
+    alert('Add Child Template functionality not yet implemented - use the main list to drag items here');
+  }, []);
+
+  const handleCreateInstance = useCallback(() => {
+    // Open the scheduling dialog to create an instance of this template
+    appDispatch({ type: 'SET_SCHEDULING_DIALOG_OPEN', payload: { schedulingDialogOpen: true } });
+  }, [appDispatch]);
+
+  const handleDeleteTemplate = useCallback(() => {
+    // Confirm deletion and delete the template
+    if (window.confirm(`Are you sure you want to delete the checklist template "${item.name}"? This action cannot be undone.`)) {
+      appDispatch({ type: 'DELETE_ITEM_BY_ID', payload: { id: item.id } });
+    }
+  }, [appDispatch, item.id, item.name]);
+
+  const handleRemoveChild = useCallback((relationshipId: string) => {
+    if (window.confirm('Are you sure you want to remove this child template from the checklist?')) {
+      appDispatch({
+        type: 'REMOVE_INSTANCE_BY_RELATIONSHIP_ID',
+        payload: { relationshipId }
+      });
+    }
+  }, [appDispatch]);
 
   // Calculate template statistics (not completion)
   const templateStats = useMemo(() => {
@@ -107,6 +139,7 @@ export default function FocusedCheckListItemDisplay({ item }: FocusedCheckListIt
             variant="outlined"
             startIcon={<Edit />}
             color="primary"
+            onClick={handleEditTemplate}
           >
             Edit Template
           </Button>
@@ -114,6 +147,7 @@ export default function FocusedCheckListItemDisplay({ item }: FocusedCheckListIt
             variant="outlined"
             startIcon={<Add />}
             color="secondary"
+            onClick={handleAddChildTemplate}
           >
             Add Child Template
           </Button>
@@ -121,6 +155,7 @@ export default function FocusedCheckListItemDisplay({ item }: FocusedCheckListIt
             variant="contained"
             startIcon={<Schedule />}
             color="secondary"
+            onClick={handleCreateInstance}
           >
             Create Instance
           </Button>
@@ -128,6 +163,7 @@ export default function FocusedCheckListItemDisplay({ item }: FocusedCheckListIt
             variant="outlined"
             startIcon={<Delete />}
             color="error"
+            onClick={handleDeleteTemplate}
           >
             Delete Template
           </Button>
@@ -159,6 +195,7 @@ export default function FocusedCheckListItemDisplay({ item }: FocusedCheckListIt
                 startIcon={<Add />}
                 color="primary"
                 size="small"
+                onClick={handleAddChildTemplate}
               >
                 Add First Child Template
               </Button>
@@ -199,7 +236,11 @@ export default function FocusedCheckListItemDisplay({ item }: FocusedCheckListIt
                       <IconButton size="small" color="primary">
                         <Edit />
                       </IconButton>
-                      <IconButton size="small" color="error">
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleRemoveChild(child.relationshipId)}
+                      >
                         <Remove />
                       </IconButton>
                     </Box>

@@ -7,7 +7,7 @@ import { createBaseCalendarEntry } from "../functions/reducers/AppReducer";
 import { useTimeInputState, useTimeInputDispatch } from "../reducerContexts/TimeInput";
 
 export default function SchedulingDialog() {
-  const { schedulingDialogOpen, items, focusedItemId, focusedListItemId } = useAppState()
+  const { schedulingDialogOpen, items, focusedItemId } = useAppState()
   const { total } = useTimeInputState()
   const dispatch = useAppDispatch()
   const timeInputDispatch = useTimeInputDispatch()
@@ -23,25 +23,25 @@ export default function SchedulingDialog() {
     dispatch({ type: 'SET_SCHEDULING_DIALOG_OPEN', payload: { schedulingDialogOpen: false } })
   }, [dispatch])
 
-  const scheduleSelectedListItem = useCallback(() => {
-    const focusedListItem = getItemById(items, focusedListItemId)
-    if (focusedListItem === null) throw new Error(`Item with id ${focusedListItemId} not found`)
+  const scheduleSelectedItem = useCallback(() => {
+    const focusedItem = getItemById(items, focusedItemId)
+    if (focusedItem === null) throw new Error(`Item with id ${focusedItemId} not found`)
 
     // Use the absolute timestamp from the time input
     const scheduledTime = total;
 
     // Schedule directly onto the base calendar (absolute time scheduling)
-    const baseCalendarEntry = createBaseCalendarEntry(focusedListItem.id, scheduledTime)
+    const baseCalendarEntry = createBaseCalendarEntry(focusedItem.id, scheduledTime)
     dispatch({
       type: "ADD_BASE_CALENDAR_ENTRY",
       payload: { entry: baseCalendarEntry }
     })
 
     handleClose()
-  }, [dispatch, focusedListItemId, items, total, handleClose])
+  }, [dispatch, focusedItemId, items, total, handleClose])
 
-  // Can schedule if we have a focused list item
-  const canSchedule = focusedListItemId !== null
+  // Can schedule if we have a focused item
+  const canSchedule = focusedItemId !== null
 
   return (
     <Dialog open={schedulingDialogOpen} onClose={handleClose}>
@@ -54,7 +54,7 @@ export default function SchedulingDialog() {
       <DialogActions sx={{ padding: 2 }}>
         <Button onClick={handleClose} color="inherit">Cancel</Button>
         <Button
-          onClick={scheduleSelectedListItem}
+          onClick={scheduleSelectedItem}
           variant="contained"
           color="primary"
           disabled={!canSchedule}

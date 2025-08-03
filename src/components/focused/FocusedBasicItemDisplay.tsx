@@ -2,12 +2,32 @@ import { Box, Typography, Paper, Divider, Chip, Button } from '@mui/material';
 import { Edit, Schedule, Delete } from '@mui/icons-material';
 import { BasicItem } from '../../functions/utils/item/index';
 import { formatDuration } from '../../functions/utils/formatTime';
+import { useCallback } from 'react';
+import { useAppDispatch } from '../../reducerContexts/App';
 
 interface FocusedBasicItemDisplayProps {
   readonly item: BasicItem;
 }
 
 export default function FocusedBasicItemDisplay({ item }: FocusedBasicItemDisplayProps) {
+  const appDispatch = useAppDispatch();
+
+  const handleEditTemplate = useCallback(() => {
+    // TODO: Implement template editing - could open a dialog or navigate to edit view
+    alert('Edit Template functionality not yet implemented');
+  }, []);
+
+  const handleCreateInstance = useCallback(() => {
+    // Open the scheduling dialog to create an instance of this template
+    appDispatch({ type: 'SET_SCHEDULING_DIALOG_OPEN', payload: { schedulingDialogOpen: true } });
+  }, [appDispatch]);
+
+  const handleDeleteTemplate = useCallback(() => {
+    // Confirm deletion and delete the template
+    if (window.confirm(`Are you sure you want to delete the template "${item.name}"? This action cannot be undone.`)) {
+      appDispatch({ type: 'DELETE_ITEM_BY_ID', payload: { id: item.id } });
+    }
+  }, [appDispatch, item.id, item.name]);
   return (
     <Box sx={{ p: 3, height: '100%', overflow: 'auto' }}>
       <Paper sx={{ p: 3, maxWidth: 600, margin: '0 auto' }}>
@@ -94,6 +114,7 @@ export default function FocusedBasicItemDisplay({ item }: FocusedBasicItemDispla
             variant="outlined"
             startIcon={<Edit />}
             color="primary"
+            onClick={handleEditTemplate}
           >
             Edit Template
           </Button>
@@ -101,6 +122,7 @@ export default function FocusedBasicItemDisplay({ item }: FocusedBasicItemDispla
             variant="contained"
             startIcon={<Schedule />}
             color="secondary"
+            onClick={handleCreateInstance}
           >
             Create Instance
           </Button>
@@ -108,6 +130,7 @@ export default function FocusedBasicItemDisplay({ item }: FocusedBasicItemDispla
             variant="outlined"
             startIcon={<Delete />}
             color="error"
+            onClick={handleDeleteTemplate}
           >
             Delete Template
           </Button>

@@ -14,8 +14,8 @@ export default function RandomItemButton() {
     const randomItem = items[randomIndex];
 
     appDispatch({
-      type: 'SET_FOCUSED_LIST_ITEM_BY_ID',
-      payload: { focusedListItemId: randomItem.id }
+      type: 'SET_FOCUSED_ITEM_BY_ID',
+      payload: { focusedItemId: randomItem.id }
     });
   }, [items, appDispatch]);
 

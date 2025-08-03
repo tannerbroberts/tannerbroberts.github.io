@@ -73,7 +73,7 @@ function TimeUnitControl({ label, value, onChange }: Readonly<TimeUnitControlPro
 }
 
 export default function DurationDialog() {
-  const { durationDialogOpen, items, focusedListItemId, focusedItemId } = useAppState();
+  const { durationDialogOpen, items, focusedItemId } = useAppState();
   const { weeks, days, hours, minutes, seconds, millis, total } = useTimeInputState();
   const dispatch = useAppDispatch();
   const timeInputDispatch = useTimeInputDispatch();
@@ -89,11 +89,8 @@ export default function DurationDialog() {
     dispatch({ type: 'SET_DURATION_DIALOG_OPEN', payload: { durationDialogOpen: false } });
   }, [dispatch]);
 
-  const scheduleSelectedListItem = useCallback(() => {
-    const focusedListItem = getItemById(items, focusedListItemId);
-    if (!focusedListItem) throw new Error(`Item with id ${focusedListItemId} not found`);
-
-    if (!focusedItemId) throw new Error('DurationDialog requires a focused item to schedule as a child');
+  const scheduleSelectedItem = useCallback(() => {
+    if (!focusedItemId) throw new Error('DurationDialog requires a focused item');
 
     const focusedItem = getItemById(items, focusedItemId);
     if (!focusedItem) throw new Error(`Item with id ${focusedItemId} not found`);
@@ -105,7 +102,7 @@ export default function DurationDialog() {
 
     // Create child relationship with relative start time
     const childRelationship = new Child({
-      id: focusedListItem.id,
+      id: focusedItem.id, // Note: This logic might need updating based on your actual requirements
       start: Date.now() + total
     });
 
@@ -123,14 +120,14 @@ export default function DurationDialog() {
       relationshipId: childRelationship.relationshipId
     });
 
-    const updatedChild = addParentToItem(focusedListItem, newParent);
+    const updatedChild = addParentToItem(focusedItem, newParent);
 
     dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [focusedItem, updatedChild] } });
     handleClose();
-  }, [dispatch, focusedItemId, focusedListItemId, items, total, handleClose]);
+  }, [dispatch, focusedItemId, items, total, handleClose]);
 
-  // Can schedule if we have both a focused list item and a focused item that is already a SubCalendarItem
-  const canSchedule = focusedListItemId !== null && focusedItemId !== null &&
+  // Can schedule if we have a focused item that is a SubCalendarItem
+  const canSchedule = focusedItemId !== null &&
     getItemById(items, focusedItemId) instanceof SubCalendarItem;
 
   return (
@@ -198,7 +195,7 @@ export default function DurationDialog() {
       <DialogActions sx={{ padding: 2 }}>
         <Button onClick={handleClose} color="inherit">Cancel</Button>
         <Button
-          onClick={scheduleSelectedListItem}
+          onClick={scheduleSelectedItem}
           variant="contained"
           color="primary"
           disabled={!canSchedule}

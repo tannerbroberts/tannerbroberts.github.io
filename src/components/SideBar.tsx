@@ -1,4 +1,4 @@
-import { Delete, Schedule, Visibility, Timer, PlaylistAdd, Functions } from "@mui/icons-material";
+import { Delete, Schedule, Timer, PlaylistAdd, Functions } from "@mui/icons-material";
 import { Box, ButtonGroup, Drawer, IconButton, List, ListItem, Toolbar, Typography } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
@@ -17,7 +17,7 @@ import VariableManagementDialog from "./VariableManagementDialog";
 import CreateNewItemDialog from "./CreateNewItemDialog";
 
 export default function SideBar() {
-  const { sideDrawerOpen, focusedItemId, focusedListItemId, items } = useAppState()
+  const { sideDrawerOpen, focusedItemId, items } = useAppState()
   const appDispatch = useAppDispatch()
 
   const [filterString, setFilterString] = useState('')
@@ -28,14 +28,9 @@ export default function SideBar() {
     appDispatch({ type: 'SET_SIDE_DRAWER_OPEN', payload: { sideDrawerOpen: false } })
   }, [appDispatch])
 
-  const deleteFocusedListItemById = useCallback(() => {
-    appDispatch({ type: 'DELETE_ITEM_BY_ID', payload: { id: focusedListItemId } })
-    appDispatch({ type: 'SET_FOCUSED_LIST_ITEM_BY_ID', payload: { focusedListItemId: null } })
-  }, [appDispatch, focusedListItemId])
-
-  const setFocusedItem = useCallback(() => {
-    appDispatch({ type: 'SET_FOCUSED_ITEM_BY_ID', payload: { focusedItemId: focusedListItemId } })
-  }, [appDispatch, focusedListItemId])
+  const deleteFocusedItemById = useCallback(() => {
+    appDispatch({ type: 'DELETE_ITEM_BY_ID', payload: { id: focusedItemId } })
+  }, [appDispatch, focusedItemId])
 
   const openSchedulingDialog = useCallback(() => {
     appDispatch({ type: 'SET_SCHEDULING_DIALOG_OPEN', payload: { schedulingDialogOpen: true } })
@@ -62,34 +57,21 @@ export default function SideBar() {
     if (!focusedItemId) return null
     return getItemById(items, focusedItemId)
   }, [focusedItemId, items])
-  const focusedListItem = useMemo(() => {
-    if (!focusedListItemId) return null
-    return getItemById(items, focusedListItemId)
-  }, [focusedListItemId, items])
-  const canSchedule = useMemo(() => {
-    if (!focusedItem) return true // Can always schedule to the base calendar
-    if (!focusedListItem) return false
-    if (focusedItem.id === focusedListItem.id) return false
-    if (focusedItem.duration < focusedListItem.duration) return false
-    return true
-  }, [focusedItem, focusedListItem])
 
-  const disableSetFocusedItem = useMemo(() => {
-    if (!focusedListItemId) return true
-    if (focusedItemId === focusedListItemId) return true
-  }, [focusedItemId, focusedListItemId])
+  const canSchedule = useMemo(() => {
+    // Can always schedule to the base calendar
+    return true
+  }, [])
 
   const canAddToChecklist = useMemo(() => {
-    if (!focusedListItem || !focusedItem) return false
-    if (focusedItem.id === focusedListItem.id) return false // Can't add to itself
+    if (!focusedItem) return false
     return focusedItem instanceof CheckListItem
-  }, [focusedItem, focusedListItem])
+  }, [focusedItem])
 
   const canScheduleIntoFocusedItem = useMemo(() => {
-    if (!focusedListItem || !focusedItem) return false
-    if (focusedItem.id === focusedListItem.id) return false // Can't schedule into itself
+    if (!focusedItem) return false
     return focusedItem instanceof SubCalendarItem
-  }, [focusedItem, focusedListItem])
+  }, [focusedItem])
 
   return (
     <>
@@ -118,10 +100,7 @@ export default function SideBar() {
             </ListItem>
             <hr />
             <ButtonGroup sx={{ display: 'flex', justifyContent: 'space-around' }}>
-              <IconButton disabled={disableSetFocusedItem} onClick={setFocusedItem}>
-                <Visibility />
-              </IconButton>
-              <IconButton disabled={!focusedListItemId} onClick={deleteFocusedListItemById}>
+              <IconButton disabled={!focusedItemId} onClick={deleteFocusedItemById}>
                 <Delete />
               </IconButton>
 
@@ -156,22 +135,22 @@ export default function SideBar() {
           <List>
             <ListItem>
               <Typography>
-                Name: {focusedListItem?.name}
+                Name: {focusedItem?.name}
               </Typography>
             </ListItem>
             <ListItem>
               <Typography>
-                Milliseconds: {focusedListItem?.duration}
+                Milliseconds: {focusedItem?.duration}
               </Typography>
             </ListItem>
             <ListItem>
               <Typography>
-                Child Count: {focusedListItem ? getChildren(focusedListItem).length : 0}
+                Child Count: {focusedItem ? getChildren(focusedItem).length : 0}
               </Typography>
             </ListItem>
             <ListItem>
               <Typography>
-                Parent Count: {focusedListItem?.parents.length}
+                Parent Count: {focusedItem?.parents.length}
               </Typography>
             </ListItem>
           </List>
