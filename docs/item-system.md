@@ -2,11 +2,31 @@
 
 ## Overview
 
-The Item system is a hierarchical task management system that supports three types of items:
+The Item system is a hierarchical task management system built around **item templates** that can be instantiated as scheduled tasks.
 
-1. **BasicItem** - Simple tasks with no children
-2. **SubCalendarItem** - Tasks that can contain scheduled child tasks with specific start times
-3. **CheckListItem** - Tasks that contain child tasks as checklist items
+### Key Architectural Concepts
+
+#### Item Templates vs. Scheduled Instances
+The system maintains a critical distinction between templates and instances:
+
+**Item Templates:**
+- Reusable definitions stored in the global items array
+- Define structure, relationships, and default properties
+- Have no execution state, completion status, or scheduling information
+- What users create, edit, and manage through the UI
+- Can be instantiated multiple times as scheduled tasks
+
+**Scheduled Instances:**
+- Actual executions of templates placed on calendars/timelines
+- Have specific start times, completion states, and runtime data
+- Created through scheduling dialogs and execution flows
+- Link back to their source template for structure and properties
+
+#### Template Types
+
+1. **BasicItem Templates** - Simple task definitions with no child templates
+2. **SubCalendarItem Templates** - Container definitions that can schedule child templates at specific relative times
+3. **CheckListItem Templates** - List definitions containing ordered child templates
 
 ## Core Classes
 

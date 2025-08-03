@@ -15,11 +15,14 @@ import { useCallback, useState, useEffect } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
 import { TimeInputProvider, useTimeInputDispatch, useTimeInputState } from "../reducerContexts/TimeInput";
 import { NewItemProvider, useNewItemDispatch, useNewItemState } from "../reducerContexts/NewItem";
-import { BasicItem } from "../functions/utils/item/index";
+import { BasicItem, SubCalendarItem, CheckListItem } from "../functions/utils/item/index";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
+import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
+import ChecklistIcon from '@mui/icons-material/Checklist';
+import TaskIcon from '@mui/icons-material/Task';
 import { formatDuration } from "../functions/utils/formatTime";
 
 // Default time presets - now using milliseconds values, labels will be generated dynamically
@@ -38,6 +41,36 @@ type TimePreset = {
   label: string;
   milliseconds: number;
 };
+
+type ItemType = 'basic' | 'subcalendar' | 'checklist';
+
+type ItemTypeOption = {
+  type: ItemType;
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+};
+
+const ITEM_TYPE_OPTIONS: ItemTypeOption[] = [
+  {
+    type: 'basic',
+    label: 'Basic Item',
+    description: 'Simple task with priority',
+    icon: <TaskIcon />
+  },
+  {
+    type: 'subcalendar',
+    label: 'SubCalendar',
+    description: 'Task with scheduled children',
+    icon: <PlaylistPlayIcon />
+  },
+  {
+    type: 'checklist',
+    label: 'CheckList',
+    description: 'Task with checklist items',
+    icon: <ChecklistIcon />
+  }
+];
 
 // Local storage utilities
 const STORAGE_KEY = 'about-time-presets';
@@ -159,6 +192,65 @@ function EditableTimePresets({ presets, setPresets }: Readonly<{ presets: TimePr
           />
         ))}
       </Stack>
+    </Box>
+  );
+}
+
+function ItemTypeSelector({ selectedType, setSelectedType }: Readonly<{ selectedType: ItemType | null, setSelectedType: (type: ItemType) => void }>) {
+  return (
+    <Box sx={{ mb: 3 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <TaskIcon sx={{ mr: 1, color: 'text.secondary' }} />
+        <Typography variant="h6">Item Type</Typography>
+      </Box>
+      <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+        Choose the type of item to create. This cannot be changed after creation.
+      </Typography>
+
+      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+        {ITEM_TYPE_OPTIONS.map((option) => (
+          <Chip
+            key={option.type}
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {option.icon}
+                <Box>
+                  <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                    {option.label}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {option.description}
+                  </Typography>
+                </Box>
+              </Box>
+            }
+            variant={selectedType === option.type ? "filled" : "outlined"}
+            color={selectedType === option.type ? "primary" : "default"}
+            size="medium"
+            onClick={() => setSelectedType(option.type)}
+            sx={{
+              cursor: 'pointer',
+              height: 'auto',
+              minHeight: '56px',
+              padding: '8px 12px',
+              '& .MuiChip-label': {
+                padding: 0,
+                whiteSpace: 'normal',
+                textAlign: 'left'
+              },
+              '&:hover': {
+                backgroundColor: selectedType === option.type ? undefined : 'action.hover'
+              }
+            }}
+          />
+        ))}
+      </Stack>
+
+      {!selectedType && (
+        <Typography variant="body2" color="error" sx={{ mt: 1, fontStyle: 'italic' }}>
+          Please select an item type to continue
+        </Typography>
+      )}
     </Box>
   );
 }
@@ -327,6 +419,9 @@ function CreateNewItemDialogContent() {
   const { name } = useNewItemState();
   const newItemDispatch = useNewItemDispatch();
 
+  // Add item type state
+  const [selectedItemType, setSelectedItemType] = useState<ItemType | null>(null);
+
   // Add variables state
   const [variables, setVariables] = useState<Record<string, number>>({});
   const [variableName, setVariableName] = useState('');
@@ -341,6 +436,7 @@ function CreateNewItemDialogContent() {
     // Reset form on close
     newItemDispatch({ type: "SET_NAME", payload: { name: "" } });
     timeInputDispatch({ type: "RESET" });
+    setSelectedItemType(null);
     setVariables({});
     setVariableName('');
     setVariableQuantity('');
@@ -370,18 +466,45 @@ function CreateNewItemDialogContent() {
       alert("Please enter a duration for the new item");
       return;
     }
-    const newItem = new BasicItem({
-      name: name.trim(),
-      duration: total,
-      variables: variables
-    });
+    if (!selectedItemType) {
+      alert("Please select an item type");
+      return;
+    }
+
+    let newItem;
+    switch (selectedItemType) {
+      case 'basic':
+        newItem = new BasicItem({
+          name: name.trim(),
+          duration: total,
+          variables: variables
+        });
+        break;
+      case 'subcalendar':
+        newItem = new SubCalendarItem({
+          name: name.trim(),
+          duration: total,
+          variables: variables
+        });
+        break;
+      case 'checklist':
+        newItem = new CheckListItem({
+          name: name.trim(),
+          duration: total,
+          variables: variables
+        });
+        break;
+      default:
+        alert("Invalid item type selected");
+        return;
+    }
 
     dispatch({ type: "CREATE_ITEM", payload: { newItem } });
 
     // Variables will be added via separate mechanism if needed
 
     handleClose();
-  }, [dispatch, name, total, variables, handleClose]);
+  }, [dispatch, name, total, variables, selectedItemType, handleClose]);
 
   return (
     <Dialog
@@ -393,6 +516,11 @@ function CreateNewItemDialogContent() {
       <DialogTitle>Create New Item</DialogTitle>
       <DialogContent>
         <Box sx={{ pt: 1 }}>
+          <ItemTypeSelector
+            selectedType={selectedItemType}
+            setSelectedType={setSelectedItemType}
+          />
+
           <TextField
             fullWidth
             label="Item Name"
@@ -480,7 +608,7 @@ function CreateNewItemDialogContent() {
         <Button
           onClick={createNewItem}
           variant="contained"
-          disabled={!name.trim() || total === 0}
+          disabled={!name.trim() || total === 0 || !selectedItemType}
         >
           Create Item
         </Button>

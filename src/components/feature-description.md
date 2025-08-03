@@ -17,6 +17,12 @@ The components system provides the complete React UI layer for the About Time ap
 - **`PaginatedItemList.tsx`**: Virtualized list component for large item collections
 - **`TaskChainAccordion.tsx`**: Specialized display for task chains and dependencies
 
+### Focused Template Editing Components
+- **`focused/FocusedBasicItemDisplay.tsx`**: Template editing interface for BasicItem templates
+- **`focused/FocusedCheckListItemDisplay.tsx`**: Template structure editor for CheckListItem templates with child template management
+- **`focused/FocusedSubCalendarItemDisplay.tsx`**: Timeline template editor for SubCalendarItem templates with child template scheduling
+- **Note**: These components edit *templates*, not scheduled instances. They show template structure, default properties, and relationships between templates.
+
 ### Dialog and Modal Components
 - **`CreateNewItemDialog.tsx`**: Comprehensive item creation interface with type selection
 - **`CheckListChildDialog.tsx`**: Specialized dialog for checklist item management

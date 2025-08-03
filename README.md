@@ -1,3 +1,33 @@
+# About Time Project (ATP)
+
+## Key Architectural Concepts
+
+### Item Templates vs. Scheduled Instances
+**Critical Distinction**: The system has two fundamental concepts:
+
+1. **Item Templates** - Reusable definitions that can be instantiated multiple times
+   - BasicItem templates define simple tasks
+   - CheckListItem templates define task lists with child templates
+   - SubCalendarItem templates define schedulable containers with child templates
+   - Templates have no completion state, execution time, or instance-specific data
+   - Templates are what users create, edit, and manage in the sidebar
+
+2. **Scheduled Instances** - Actual executions of templates placed on the calendar
+   - Created when templates are scheduled via the scheduling dialogs
+   - Have start times, completion states, and execution-specific data
+   - What appears in the ExecutionView and calendar timeline
+   - Multiple instances can be created from the same template
+
+### Focused Views for Template Editing
+The focused item views (when selecting from sidebar) are for **editing templates**, not viewing instances:
+- FocusedBasicItemDisplay: Template properties and configuration
+- FocusedCheckListItemDisplay: Template structure and child template relationships  
+- FocusedSubCalendarItemDisplay: Template timeline and child template scheduling
+
+---
+
+## Current Issues & Notes
+
 The time increments need to auto-scale with the size of the item being viewed, and the user, instead of picking a time unit, needs to be able to pick small, medium and large sizes that correspond to 1 screen height per calendar duration, 2 screen heights per calendar duration, and 6 screen heights per calendar duration.
 
 The scheduler needs to give the units in terms of offset from the current moment. That moment should be calculated when the user schedules the item. They should also be able to round to the nearest minute, hour, day, etc.

@@ -3,7 +3,7 @@ import { Box, ButtonGroup, Drawer, IconButton, List, ListItem, Toolbar, Typograp
 import { useCallback, useMemo, useState } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts/App";
 import { TimeInputProvider } from "../reducerContexts/TimeInput";
-import { getItemById, getChildren, CheckListItem } from "../functions/utils/item/index";
+import { getItemById, getChildren, CheckListItem, SubCalendarItem } from "../functions/utils/item/index";
 import ExportButton from "./ExportButton";
 import ImportButton from "./ImportButton";
 import ItemListFilter from "./ItemListFilter";
@@ -85,6 +85,12 @@ export default function SideBar() {
     return focusedItem instanceof CheckListItem
   }, [focusedItem, focusedListItem])
 
+  const canScheduleIntoFocusedItem = useMemo(() => {
+    if (!focusedListItem || !focusedItem) return false
+    if (focusedItem.id === focusedListItem.id) return false // Can't schedule into itself
+    return focusedItem instanceof SubCalendarItem
+  }, [focusedItem, focusedListItem])
+
   return (
     <>
       <Drawer
@@ -121,7 +127,7 @@ export default function SideBar() {
 
               {focusedItemId ? (
                 <>
-                  <IconButton disabled={!focusedListItemId} onClick={openDurationDialog}>
+                  <IconButton disabled={!canScheduleIntoFocusedItem} onClick={openDurationDialog}>
                     <Timer />
                   </IconButton>
                   <IconButton disabled={!canAddToChecklist} onClick={openCheckListChildDialog}>

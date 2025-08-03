@@ -98,27 +98,20 @@ export default function DurationDialog() {
     const focusedItem = getItemById(items, focusedItemId);
     if (!focusedItem) throw new Error(`Item with id ${focusedItemId} not found`);
 
+    // Only allow scheduling into SubCalendarItems - type should be immutable
+    if (!(focusedItem instanceof SubCalendarItem)) {
+      throw new Error('Can only schedule items into SubCalendarItems');
+    }
+
     // Create child relationship with relative start time
     const childRelationship = new Child({
       id: focusedListItem.id,
       start: Date.now() + total
     });
 
-    // Ensure parent is a SubCalendarItem (convert if needed)
-    const parentItem = focusedItem instanceof SubCalendarItem
-      ? focusedItem
-      : new SubCalendarItem({
-        id: focusedItem.id,
-        name: focusedItem.name,
-        duration: focusedItem.duration,
-        parents: focusedItem.parents,
-        allOrNothing: focusedItem.allOrNothing,
-        children: []
-      });
-
     // Schedule the child (with conflict detection)
     const getDuration = (itemId: string) => getItemById(items, itemId)?.duration ?? 0;
-    const scheduled = parentItem.scheduleChild(childRelationship, getDuration);
+    const scheduled = focusedItem.scheduleChild(childRelationship, getDuration);
 
     if (!scheduled) {
       throw new Error('Unable to schedule item - time slot conflicts with existing children');
@@ -126,18 +119,19 @@ export default function DurationDialog() {
 
     // Create updated child with new parent relationship
     const newParent = new Parent({
-      id: parentItem.id,
+      id: focusedItem.id,
       relationshipId: childRelationship.relationshipId
     });
 
     const updatedChild = addParentToItem(focusedListItem, newParent);
 
-    dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [parentItem, updatedChild] } });
+    dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [focusedItem, updatedChild] } });
     handleClose();
   }, [dispatch, focusedItemId, focusedListItemId, items, total, handleClose]);
 
-  // Can schedule if we have both a focused list item and a focused item (to schedule as child)
-  const canSchedule = focusedListItemId !== null && focusedItemId !== null;
+  // Can schedule if we have both a focused list item and a focused item that is already a SubCalendarItem
+  const canSchedule = focusedListItemId !== null && focusedItemId !== null &&
+    getItemById(items, focusedItemId) instanceof SubCalendarItem;
 
   return (
     <Dialog open={durationDialogOpen} onClose={handleClose}>
