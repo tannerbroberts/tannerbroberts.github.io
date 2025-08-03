@@ -1,33 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { ItemFactory } from '../ItemFactory';
-import { VariableItem } from '../VariableItem';
 import { BasicItem } from '../BasicItem';
 import { SubCalendarItem } from '../SubCalendarItem';
 import { CheckListItem } from '../CheckListItem';
 
 describe('ItemFactory', () => {
   describe('fromJSON', () => {
-    it('should create a VariableItem from JSON', () => {
-      const json = {
-        id: 'var-1',
-        name: 'test-variable',
-        duration: 0,
-        parents: [],
-        allOrNothing: false,
-        type: 'VariableItem',
-        description: 'Test variable description',
-        value: 42
-      };
-
-      const item = ItemFactory.fromJSON(json);
-
-      expect(item).toBeInstanceOf(VariableItem);
-      expect(item.id).toBe('var-1');
-      expect(item.name).toBe('test-variable');
-      expect((item as VariableItem).value).toBe(42);
-      expect((item as VariableItem).description).toBe('Test variable description');
-    });
-
     it('should create BasicItem from JSON', () => {
       const json = {
         id: 'basic-1',
@@ -105,13 +83,13 @@ describe('ItemFactory', () => {
     it('should create array of items from JSON array', () => {
       const jsonArray = [
         {
-          id: 'var-1',
-          name: 'variable-item',
-          duration: 0,
+          id: 'sub-1',
+          name: 'subcalendar-item',
+          duration: 2000,
           parents: [],
           allOrNothing: false,
-          type: 'VariableItem',
-          value: 10
+          type: 'SubCalendarItem',
+          children: []
         },
         {
           id: 'basic-1',
@@ -126,9 +104,9 @@ describe('ItemFactory', () => {
       const items = ItemFactory.fromJSONArray(jsonArray);
 
       expect(items).toHaveLength(2);
-      expect(items[0]).toBeInstanceOf(VariableItem);
+      expect(items[0]).toBeInstanceOf(SubCalendarItem);
       expect(items[1]).toBeInstanceOf(BasicItem);
-      expect(items[0].id).toBe('var-1');
+      expect(items[0].id).toBe('sub-1');
       expect(items[1].id).toBe('basic-1');
     });
 

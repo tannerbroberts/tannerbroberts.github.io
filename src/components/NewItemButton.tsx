@@ -1,7 +1,6 @@
 import { Button } from "@mui/material";
 import { useCallback } from "react";
 import { useAppDispatch } from "../reducerContexts/App";
-import CreateNewItemDialog from "./CreateNewItemDialog";
 
 export default function NewItemButton() {
   const dispatch = useAppDispatch();
@@ -15,7 +14,7 @@ export default function NewItemButton() {
       <Button variant="contained" onClick={openNewItemDialog}>
         CREATE NEW ITEM
       </Button>
-      <CreateNewItemDialog />
+      {/* TODO: Re-implement CreateNewItemDialog for simplified variable system */}
     </>
   );
 }

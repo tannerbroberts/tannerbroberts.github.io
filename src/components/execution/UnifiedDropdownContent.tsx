@@ -8,7 +8,6 @@ import {
   Fade
 } from '@mui/material';
 import { Functions, Schedule, Info } from '@mui/icons-material';
-import { VariableSummary } from '../../functions/utils/item/index';
 import { ChildExecutionStatus } from './executionUtils';
 import { formatDuration } from '../../functions/utils/formatTime';
 
@@ -26,7 +25,7 @@ interface NextChildInfo {
  */
 interface UnifiedDropdownContentProps {
   readonly isExpanded: boolean;
-  readonly variableSummary: VariableSummary;
+  readonly variableSummary: Record<string, number>;
   readonly hasVariables: boolean;
   readonly nextChild?: NextChildInfo | null;
   readonly gapPeriod?: boolean;
@@ -55,33 +54,25 @@ function UnifiedDropdownContent({
 
   // Process variables for display
   const { variableCount, groupedVariables } = useMemo(() => {
-    const variables = Object.entries(variableSummary).map(([name, data]) => ({
+    const variables = Object.entries(variableSummary).map(([name, quantity]) => ({
       name,
-      quantity: data.quantity,
-      unit: data.unit,
-      category: data.category
+      quantity
     }));
 
     const variableCount = variables.length;
 
-    // Group variables by category for organized display
-    const grouped: Record<string, typeof variables> = {};
-    for (const variable of variables) {
-      const category = variable.category || 'uncategorized';
-      if (!grouped[category]) {
-        grouped[category] = [];
-      }
-      grouped[category].push(variable);
-    }
+    // Group variables - for now all go in one category since we simplified
+    const grouped: Record<string, typeof variables> = {
+      'variables': variables
+    };
 
     return { variableCount, groupedVariables: grouped };
   }, [variableSummary]);
 
   // Render a variable chip with appropriate styling and animations
-  const renderVariableChip = (name: string, data: { quantity: number; unit?: string; category?: string }) => {
-    const sign = data.quantity >= 0 ? '+' : '';
-    const unit = data.unit ? ` ${data.unit}` : '';
-    const label = `${sign}${data.quantity}${unit} ${name}`;
+  const renderVariableChip = (name: string, quantity: number) => {
+    const sign = quantity >= 0 ? '+' : '';
+    const label = `${sign}${quantity} ${name}`;
 
     return (
       <Chip
@@ -89,7 +80,7 @@ function UnifiedDropdownContent({
         label={label}
         size="small"
         variant="outlined"
-        color={data.quantity >= 0 ? 'success' : 'error'}
+        color={quantity >= 0 ? 'success' : 'error'}
         sx={{
           m: 0.25,
           fontSize: '0.75rem',
@@ -245,7 +236,7 @@ function UnifiedDropdownContent({
 
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {variables.map(variable =>
-                        renderVariableChip(variable.name, variable)
+                        renderVariableChip(variable.name, variable.quantity)
                       )}
                     </Box>
                   </Box>

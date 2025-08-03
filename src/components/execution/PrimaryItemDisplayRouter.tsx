@@ -9,7 +9,6 @@ import {
 import { useAppState } from "../../reducerContexts/App";
 import PrimaryBasicItemDisplay from "./PrimaryBasicItemDisplay";
 import PrimarySubCalendarItemDisplay from "./PrimarySubCalendarItemDisplay";
-import PrimaryCheckListItemDisplay from "./PrimaryCheckListItemDisplay";
 import {
   getActiveChildForExecution,
   calculateChildStartTime,
@@ -127,13 +126,9 @@ export default function PrimaryItemDisplayRouter({
         </PrimarySubCalendarItemDisplay>
       );
     } else if (item instanceof CheckListItem) {
+      // TODO: Re-implement CheckListItem display for simplified variable system
       return (
-        <PrimaryCheckListItemDisplay
-          item={item}
-          {...commonProps}
-        >
-          {renderChildContent()}
-        </PrimaryCheckListItemDisplay>
+        <div>CheckListItem display not yet implemented for simplified variable system</div>
       );
     }
 

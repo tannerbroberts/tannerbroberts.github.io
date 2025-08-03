@@ -1,8 +1,8 @@
 import React from 'react';
-import { StorageAwareAppProvider } from '../../localStorageImplementation/StorageAwareAppProvider';
+import { AppProvider } from '../../reducerContexts/App';
 
 export const TestWrapper = ({ children }: { children: React.ReactNode }) => (
-  <StorageAwareAppProvider>
+  <AppProvider>
     {children}
-  </StorageAwareAppProvider>
+  </AppProvider>
 );
