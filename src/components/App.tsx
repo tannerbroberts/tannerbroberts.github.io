@@ -4,9 +4,17 @@ import SideBar from './SideBar';
 import MainBody from './MainBody';
 import NotificationSystem from './notifications/NotificationSystem';
 import useItemListValidation from '../functions/utils/useItemListValidation';
+import { useAppState } from '../reducerContexts/App';
+import { useEffect } from 'react';
 
 export default function App() {
   useItemListValidation();
+  const { items } = useAppState();
+
+  // Debug localStorage loading
+  useEffect(() => {
+    console.log(`App loaded with ${items.length} items from localStorage`);
+  }, [items.length]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>

@@ -15,13 +15,14 @@ export default function FocusedCheckListItemDisplay({ item }: FocusedCheckListIt
   const appDispatch = useAppDispatch();
 
   const handleEditTemplate = useCallback(() => {
-    // TODO: Implement template editing
-    alert('Edit Template functionality not yet implemented');
+    // TODO: Implement template property editing (name, checklist items, etc.)
+    alert('Edit Template Properties functionality not yet implemented');
   }, []);
 
   const handleAddChildTemplate = useCallback(() => {
-    // TODO: Implement child template addition - could open a picker dialog
-    alert('Add Child Template functionality not yet implemented - use the main list to drag items here');
+    // TODO: Open a template picker dialog to select which template to add as a child
+    // For now, direct users to use the drag and drop workflow from the sidebar
+    alert('To add child templates to this checklist:\n\n1. Drag a template from the sidebar list\n2. Drop it into the checklist child areas\n\nA dedicated template picker dialog will be added in a future update.');
   }, []);
 
   const handleCreateInstance = useCallback(() => {
@@ -141,7 +142,7 @@ export default function FocusedCheckListItemDisplay({ item }: FocusedCheckListIt
             color="primary"
             onClick={handleEditTemplate}
           >
-            Edit Template
+            Edit Template Properties
           </Button>
           <Button
             variant="outlined"

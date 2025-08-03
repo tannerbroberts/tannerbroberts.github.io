@@ -1,0 +1,36 @@
+[
+  {
+    "id": "test-item-1",
+    "name": "Test Basic Item",
+    "duration": 300000,
+    "parents": [],
+    "allOrNothing": false,
+    "type": "BasicItem",
+    "variables": {},
+    "variableSummary": {},
+    "priority": 1
+  },
+  {
+    "id": "test-item-2",
+    "name": "Test SubCalendar Item",
+    "duration": 600000,
+    "parents": [],
+    "allOrNothing": false,
+    "type": "SubCalendarItem",
+    "variables": {},
+    "variableSummary": {},
+    "children": []
+  },
+  {
+    "id": "test-item-3",
+    "name": "Test CheckList Item",
+    "duration": 450000,
+    "parents": [],
+    "allOrNothing": false,
+    "type": "CheckListItem",
+    "variables": {},
+    "variableSummary": {},
+    "children": [],
+    "sortType": "manual"
+  }
+]

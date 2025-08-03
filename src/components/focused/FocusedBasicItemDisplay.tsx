@@ -13,8 +13,8 @@ export default function FocusedBasicItemDisplay({ item }: FocusedBasicItemDispla
   const appDispatch = useAppDispatch();
 
   const handleEditTemplate = useCallback(() => {
-    // TODO: Implement template editing - could open a dialog or navigate to edit view
-    alert('Edit Template functionality not yet implemented');
+    // TODO: Implement template property editing (name, duration, description, variables, etc.)
+    alert('Edit Template Properties functionality not yet implemented');
   }, []);
 
   const handleCreateInstance = useCallback(() => {
@@ -116,7 +116,7 @@ export default function FocusedBasicItemDisplay({ item }: FocusedBasicItemDispla
             color="primary"
             onClick={handleEditTemplate}
           >
-            Edit Template
+            Edit Template Properties
           </Button>
           <Button
             variant="contained"

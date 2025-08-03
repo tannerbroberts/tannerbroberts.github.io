@@ -3,6 +3,7 @@ import { AppBar, Button, ButtonGroup, IconButton, Toolbar, Typography } from '@m
 import { useMemo, useCallback } from 'react';
 import { useAppDispatch, useAppState } from '../reducerContexts/App';
 import { getItemById } from '../functions/utils/item/index';
+import StorageManagementButton from './StorageManagementButton';
 
 export default function Header() {
   const { sideDrawerOpen, items, focusedItemId, currentView } = useAppState()
@@ -96,6 +97,7 @@ export default function Header() {
               </Button>
             </ButtonGroup>
           )}
+          <StorageManagementButton />
           <ButtonGroup variant="contained" size="small">
             <Button onClick={() => appDispatch({
               type: "SET_MILLISECONDS_PER_SEGMENT",

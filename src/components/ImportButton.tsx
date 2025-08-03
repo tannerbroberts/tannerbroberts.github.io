@@ -46,6 +46,7 @@ export default function ImportButton() {
 
       setInputValue("");
       handleClose();
+      alert(`Successfully imported ${newItems.length} item(s). Data is automatically saved to localStorage.`);
     } catch {
       alert("Invalid JSON input. Please check your data.");
     }

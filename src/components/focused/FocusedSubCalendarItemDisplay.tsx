@@ -19,14 +19,15 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
   const viewportHeight = useViewportHeight();
 
   const handleEditTemplate = useCallback(() => {
-    // TODO: Implement template editing
-    alert('Edit Template functionality not yet implemented');
+    // TODO: Implement template property editing (name, duration, description, etc.)
+    alert('Edit Template Properties functionality not yet implemented');
   }, []);
 
-  const handleAddChildTemplate = useCallback(() => {
-    // Open the duration dialog to add a child template with scheduling
-    appDispatch({ type: 'SET_DURATION_DIALOG_OPEN', payload: { durationDialogOpen: true } });
-  }, [appDispatch]);
+  const handleScheduleChildTemplate = useCallback(() => {
+    // TODO: Open a template picker dialog to select which template to add as a child
+    // For now, direct users to use the sidebar workflow
+    alert('To add child templates:\n\n1. Select a template from the sidebar list\n2. Click the Timer icon (⏲) in the sidebar to schedule it as a child of this SubCalendar\n\nA dedicated template picker dialog will be added in a future update.');
+  }, []);
 
   const handleCreateInstance = useCallback(() => {
     // Open the scheduling dialog to create an instance of this template
@@ -139,16 +140,16 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
             size="small"
             onClick={handleEditTemplate}
           >
-            Edit Template
+            Edit Template Properties
           </Button>
           <Button
             variant="outlined"
-            startIcon={<Add />}
+            startIcon={<Schedule />}
             color="secondary"
             size="small"
-            onClick={handleAddChildTemplate}
+            onClick={handleScheduleChildTemplate}
           >
-            Add Child Template
+            Schedule Child Template
           </Button>
           <Button
             variant="contained"
@@ -226,7 +227,7 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
               No Child Templates Scheduled
             </Typography>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              This template timeline is empty. Use the "Add Child Template" button or the schedule dialog to add child templates to this SubCalendar template.
+              This template timeline is empty. To add child templates:\n              • Select a template from the sidebar, then click the Timer icon (⏲) to schedule it as a child\n              • Or use the "Schedule Child Template" button above for guided instructions
             </Typography>
             <Button
               variant="outlined"

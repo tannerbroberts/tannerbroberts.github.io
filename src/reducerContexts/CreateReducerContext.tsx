@@ -6,6 +6,7 @@ export default function CreateReducerContext<Action, State>(reducer: React.Reduc
   const DispatchContext = createContext<React.Dispatch<Action> | null>(null) // Always null to allow for the checking of out of bounds context usage errors in useDispatchContext
   const Provider = ({ children }: { children: React.ReactNode }) => {
     const [state, dispatch] = useReducer(reducer, initialState)
+
     return (
       <DispatchContext.Provider value={dispatch}>
         <StateContext.Provider value={state}>
