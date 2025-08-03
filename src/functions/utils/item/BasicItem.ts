@@ -14,6 +14,8 @@ export class BasicItem extends Item {
     duration: number;
     parents?: Parent[];
     allOrNothing?: boolean;
+    variables?: Record<string, number>;
+    variableSummary?: Record<string, number>;
     priority?: number;
   }) {
     super(rest);
@@ -28,6 +30,8 @@ export class BasicItem extends Item {
       parents: this.parents,
       allOrNothing: this.allOrNothing,
       type: this.constructor.name,
+      variables: this.variables,
+      variableSummary: this.variableSummary,
       priority: this.priority,
     };
   }
@@ -39,6 +43,8 @@ export class BasicItem extends Item {
       duration: json.duration,
       parents: Array.isArray(json.parents) ? json.parents.map((p) => new Parent(p as { id: string; relationshipId?: string })) : [],
       allOrNothing: json.allOrNothing || false,
+      variables: json.variables || {},
+      variableSummary: json.variableSummary || {},
       priority: typeof json.priority === 'number' ? json.priority : 0,
     });
   }

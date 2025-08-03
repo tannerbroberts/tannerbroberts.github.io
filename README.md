@@ -15,3 +15,6 @@ David says all priority levels need to show on the execution view... Or somethin
 
 Up next should show on the execution view
 
+```javascript
+"I don't like a lot about the 'Variable' idea in this application. My goal is that a variable be incredibly simple, but at the moment it's much too complex. Variables should literally just be a name and an associated quantity. They shouldn't have a definition file, they shouldn't have units, they shouldn't extend off of the item class, they should simply be hosted inside of an item definition. Items should all be able to have variables, so the hosting should be done on the item class level. Each item should have a variable property in its JSON, and that variable property should be an object. Each variable name should be a key in that object. Each variable value specific to that item should be a value corresponding to that key. Similarly, there should be a variable summary object that adds up all of the variables of children in each item. It should be an object with key value pairs, but it should specifically not include an items own variables, only variables of its children. This should lead to an optimization strategy where variable summaries are calculated and propagated up the graph of all parents that schedule the updated item within them."
+```

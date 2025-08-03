@@ -17,6 +17,8 @@ export class SubCalendarItem extends Item {
     duration: number;
     parents?: Parent[];
     allOrNothing?: boolean;
+    variables?: Record<string, number>;
+    variableSummary?: Record<string, number>;
     children?: Child[];
   }) {
     super(rest);
@@ -49,6 +51,8 @@ export class SubCalendarItem extends Item {
       parents: this.parents,
       allOrNothing: this.allOrNothing,
       type: this.constructor.name,
+      variables: this.variables,
+      variableSummary: this.variableSummary,
       children: this.children,
     };
   }
@@ -60,6 +64,8 @@ export class SubCalendarItem extends Item {
       duration: json.duration,
       parents: Array.isArray(json.parents) ? json.parents.map((p) => new Parent(p as { id: string; relationshipId?: string })) : [],
       allOrNothing: json.allOrNothing || false,
+      variables: json.variables || {},
+      variableSummary: json.variableSummary || {},
       children: Array.isArray(json.children) ? json.children.map((c) => new Child(c as { id: string; start: number; relationshipId?: string })) : [],
     });
   }

@@ -7,6 +7,8 @@ export interface ItemJSON {
   parents: Array<{ id: string; relationshipId?: string }>;
   allOrNothing: boolean;
   type: string;
+  variables?: Record<string, number>;
+  variableSummary?: Record<string, number>;
   priority?: number;
   children?: unknown[];
   sortType?: SortType;

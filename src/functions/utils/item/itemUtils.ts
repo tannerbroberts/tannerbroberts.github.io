@@ -58,6 +58,8 @@ export function removeChildById(item: Item, childId: string): Item {
       duration: item.duration,
       parents: item.parents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       children: newChildren,
     });
   } else if (item instanceof CheckListItem) {
@@ -68,6 +70,8 @@ export function removeChildById(item: Item, childId: string): Item {
       duration: item.duration,
       parents: item.parents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       children: newChildren,
       sortType: item.sortType,
     });
@@ -88,6 +92,8 @@ export function removeChildByRelationshipId(item: Item, relationshipId: string):
       duration: item.duration,
       parents: item.parents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       children: newChildren,
     });
   } else if (item instanceof CheckListItem) {
@@ -98,6 +104,8 @@ export function removeChildByRelationshipId(item: Item, relationshipId: string):
       duration: item.duration,
       parents: item.parents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       children: newChildren,
       sortType: item.sortType,
     });
@@ -119,6 +127,8 @@ export function removeParentById(item: Item, parentId: string): Item {
       duration: item.duration,
       parents: newParents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       priority: item.priority,
     });
   } else if (item instanceof SubCalendarItem) {
@@ -128,6 +138,8 @@ export function removeParentById(item: Item, parentId: string): Item {
       duration: item.duration,
       parents: newParents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       children: item.children,
     });
   } else if (item instanceof CheckListItem) {
@@ -137,6 +149,8 @@ export function removeParentById(item: Item, parentId: string): Item {
       duration: item.duration,
       parents: newParents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       children: item.children,
       sortType: item.sortType,
     });
@@ -167,6 +181,8 @@ export function removeParentByRelationshipId(item: Item, relationshipId: string)
       duration: item.duration,
       parents: newParents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       priority: item.priority,
     });
   } else if (item instanceof SubCalendarItem) {
@@ -176,6 +192,8 @@ export function removeParentByRelationshipId(item: Item, relationshipId: string)
       duration: item.duration,
       parents: newParents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       children: item.children,
     });
   } else if (item instanceof CheckListItem) {
@@ -185,6 +203,8 @@ export function removeParentByRelationshipId(item: Item, relationshipId: string)
       duration: item.duration,
       parents: newParents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       children: item.children,
       sortType: item.sortType,
     });
@@ -253,6 +273,8 @@ export function addParentToItem(item: Item, parent: Parent): Item {
       duration: item.duration,
       parents: newParents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       priority: item.priority,
     });
   } else if (item instanceof SubCalendarItem) {
@@ -262,6 +284,8 @@ export function addParentToItem(item: Item, parent: Parent): Item {
       duration: item.duration,
       parents: newParents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       children: item.children,
     });
   } else if (item instanceof CheckListItem) {
@@ -271,6 +295,8 @@ export function addParentToItem(item: Item, parent: Parent): Item {
       duration: item.duration,
       parents: newParents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       children: item.children,
       sortType: item.sortType,
     });
@@ -302,6 +328,8 @@ export function addChildToItem(item: Item, child: Child | CheckListChild): Item 
       duration: item.duration,
       parents: item.parents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       children: newChildren,
     });
   } else if (item instanceof CheckListItem && child instanceof CheckListChild) {
@@ -312,6 +340,8 @@ export function addChildToItem(item: Item, child: Child | CheckListChild): Item 
       duration: item.duration,
       parents: item.parents,
       allOrNothing: item.allOrNothing,
+      variables: item.variables,
+      variableSummary: item.variableSummary,
       children: newChildren,
       sortType: item.sortType,
     });
