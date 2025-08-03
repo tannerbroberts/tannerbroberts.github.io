@@ -73,15 +73,15 @@ export function useItemVariables(itemId: string) {
     // Core data
     variables,
     variableSummary,
-    
+
     // Mutation functions
     setVariable,
     removeVariable,
     setVariables,
-    
+
     // Query functions
     getVariableQuantity,
-    getVariableNames, 
+    getVariableNames,
     hasVariable: hasVariableNamed
   };
 }

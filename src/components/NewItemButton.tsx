@@ -10,11 +10,8 @@ export default function NewItemButton() {
   }, [dispatch]);
 
   return (
-    <>
-      <Button variant="contained" onClick={openNewItemDialog}>
-        CREATE NEW ITEM
-      </Button>
-      {/* TODO: Re-implement CreateNewItemDialog for simplified variable system */}
-    </>
+    <Button variant="contained" onClick={openNewItemDialog}>
+      CREATE NEW ITEM
+    </Button>
   );
 }

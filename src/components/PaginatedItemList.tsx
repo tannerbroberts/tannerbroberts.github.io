@@ -22,18 +22,26 @@ export default function PaginatedItemList({ filterString, filteredItemIds }: Pag
   }, [filteredItemIds]);
 
   // Virtualize the list
-  const sortedByDurationItems = useMemo(() => [...items].sort((a, b) => a.duration - b.duration), [items])
+  const sortedByDurationItems = useMemo(() => {
+    const sorted = [...items].sort((a, b) => a.duration - b.duration);
+    return sorted;
+  }, [items])
 
   const filteredItems = useMemo(() => {
     // If we have variable filter results, use those
-    if (usingVariableFilter && filteredItemIds) {
+    if (usingVariableFilter && filteredItemIds && filteredItemIds.length > 0) {
       const filteredItemsMap = new Set(filteredItemIds);
-      return sortedByDurationItems.filter(item => filteredItemsMap.has(item.id));
+      const result = sortedByDurationItems.filter(item => filteredItemsMap.has(item.id));
+      return result;
     }
 
     // Otherwise use name filtering
-    if (!filterString) return sortedByDurationItems
-    return sortedByDurationItems.filter(item => item.name.toLowerCase().includes(filterString.toLowerCase()))
+    if (!filterString) {
+      return sortedByDurationItems;
+    }
+
+    const result = sortedByDurationItems.filter(item => item.name.toLowerCase().includes(filterString.toLowerCase()));
+    return result;
   }, [filterString, sortedByDurationItems, filteredItemIds, usingVariableFilter])
 
   // Reset pagination to first page when filter changes
@@ -53,10 +61,14 @@ export default function PaginatedItemList({ filterString, filteredItemIds }: Pag
   const paginatedItems = useMemo(() => {
     const minDuration = min
     const maxDuration = max
-    return filteredItems.slice(minDuration, maxDuration)
+    const sliced = filteredItems.slice(minDuration, maxDuration);
+    return sliced;
   }, [min, max, filteredItems])
 
-  const totalItemPages = useMemo(() => Math.ceil(filteredItems.length / DEFAULT_WINDOW_RANGE_SIZE), [filteredItems])
+  const totalItemPages = useMemo(() => {
+    const pages = Math.ceil(filteredItems.length / DEFAULT_WINDOW_RANGE_SIZE);
+    return pages;
+  }, [filteredItems])
 
   const handlePageChange = useCallback((_event: React.ChangeEvent<unknown>, value: number) => {
     const minDuration = (value - 1) * DEFAULT_WINDOW_RANGE_SIZE
