@@ -73,7 +73,7 @@ function TimeUnitControl({ label, value, onChange }: Readonly<TimeUnitControlPro
 }
 
 export default function DurationDialog() {
-  const { durationDialogOpen, items, focusedItemId } = useAppState();
+  const { durationDialogOpen, items, focusedItemId, selectedItemId } = useAppState();
   const { weeks, days, hours, minutes, seconds, millis, total } = useTimeInputState();
   const dispatch = useAppDispatch();
   const timeInputDispatch = useTimeInputDispatch();
@@ -90,20 +90,24 @@ export default function DurationDialog() {
   }, [dispatch]);
 
   const scheduleSelectedItem = useCallback(() => {
-    if (!focusedItemId) throw new Error('DurationDialog requires a focused item');
+    if (!focusedItemId) throw new Error('DurationDialog requires a focused item (parent SubCalendar)');
+    if (!selectedItemId) throw new Error('DurationDialog requires a selected item (child to schedule)');
 
     const focusedItem = getItemById(items, focusedItemId);
-    if (!focusedItem) throw new Error(`Item with id ${focusedItemId} not found`);
+    if (!focusedItem) throw new Error(`Focused item with id ${focusedItemId} not found`);
+
+    const selectedItem = getItemById(items, selectedItemId);
+    if (!selectedItem) throw new Error(`Selected item with id ${selectedItemId} not found`);
 
     // Only allow scheduling into SubCalendarItems - type should be immutable
     if (!(focusedItem instanceof SubCalendarItem)) {
       throw new Error('Can only schedule items into SubCalendarItems');
     }
 
-    // Create child relationship with relative start time
+    // Create child relationship with relative start time (using total milliseconds from time input)
     const childRelationship = new Child({
-      id: focusedItem.id, // Note: This logic might need updating based on your actual requirements
-      start: Date.now() + total
+      id: selectedItem.id, // Use selected item as the child
+      start: total // Use relative time from the time input
     });
 
     // Schedule the child (with conflict detection)
@@ -120,25 +124,41 @@ export default function DurationDialog() {
       relationshipId: childRelationship.relationshipId
     });
 
-    const updatedChild = addParentToItem(focusedItem, newParent);
+    const updatedChild = addParentToItem(selectedItem, newParent);
 
     dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [focusedItem, updatedChild] } });
     handleClose();
-  }, [dispatch, focusedItemId, items, total, handleClose]);
+  }, [dispatch, focusedItemId, selectedItemId, items, total, handleClose]);
 
-  // Can schedule if we have a focused item that is a SubCalendarItem
+  // Can schedule if we have both a focused item (SubCalendar parent) and a selected item (child)
   const canSchedule = focusedItemId !== null &&
+    selectedItemId !== null &&
     getItemById(items, focusedItemId) instanceof SubCalendarItem;
+
+  const focusedItem = focusedItemId ? getItemById(items, focusedItemId) : null;
+  const selectedItem = selectedItemId ? getItemById(items, selectedItemId) : null;
 
   return (
     <Dialog open={durationDialogOpen} onClose={handleClose}>
       <DialogTitle>
-        Schedule Item Inside Focused Item
+        Schedule Child Template
       </DialogTitle>
       <DialogContent sx={{ padding: 3, minWidth: 450 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          {/* Show what's being scheduled */}
+          {focusedItem && selectedItem && (
+            <Box sx={{ p: 2, bgcolor: '#e3f2fd', borderRadius: 1, mb: 2 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                Scheduling: {selectedItem.name}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Into SubCalendar: {focusedItem.name}
+              </Typography>
+            </Box>
+          )}
+
           <Typography variant="subtitle1" sx={{ mb: 2 }}>
-            Set Duration from Now (relative to parent):
+            Set start time (relative to parent start):
           </Typography>
 
           <TimeUnitControl

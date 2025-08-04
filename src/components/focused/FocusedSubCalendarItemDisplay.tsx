@@ -24,10 +24,10 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
   }, []);
 
   const handleScheduleChildTemplate = useCallback(() => {
-    // TODO: Open a template picker dialog to select which template to add as a child
-    // For now, direct users to use the sidebar workflow
-    alert('To add child templates:\n\n1. Select a template from the sidebar list\n2. Click the Timer icon (⏲) in the sidebar to schedule it as a child of this SubCalendar\n\nA dedicated template picker dialog will be added in a future update.');
-  }, []);
+    // Open the sidebar to help users understand the workflow
+    appDispatch({ type: 'SET_SIDE_DRAWER_OPEN', payload: { sideDrawerOpen: true } });
+    alert('To add child templates:\n\n1. Select a template from the sidebar list (it will appear as "Selected Item")\n2. Click the Timer icon (⏲) in the sidebar to schedule it as a child of this SubCalendar\n\nThe sidebar is now open to guide you through this process.');
+  }, [appDispatch]);
 
   const handleCreateInstance = useCallback(() => {
     // Open the scheduling dialog to create an instance of this template
@@ -227,13 +227,16 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
               No Child Templates Scheduled
             </Typography>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              This template timeline is empty. To add child templates:\n              • Select a template from the sidebar, then click the Timer icon (⏲) to schedule it as a child\n              • Or use the "Schedule Child Template" button above for guided instructions
+              This template timeline is empty. To add child templates:
+              {'\n'}• Select a template from the sidebar, then click the Timer icon (⏲) to schedule it as a child
+              {'\n'}• Or use the "Schedule Child Template" button above for guided instructions
             </Typography>
             <Button
               variant="outlined"
               startIcon={<Add />}
               color="primary"
               sx={{ mt: 2 }}
+              onClick={handleScheduleChildTemplate}
             >
               Add First Child Template
             </Button>

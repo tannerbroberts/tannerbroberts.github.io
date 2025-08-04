@@ -17,7 +17,7 @@ import VariableManagementDialog from "./VariableManagementDialog";
 import CreateNewItemDialog from "./CreateNewItemDialog";
 
 export default function SideBar() {
-  const { sideDrawerOpen, focusedItemId, items } = useAppState()
+  const { sideDrawerOpen, focusedItemId, selectedItemId, items, durationDialogOpen } = useAppState()
   const appDispatch = useAppDispatch()
 
   const [filterString, setFilterString] = useState('')
@@ -58,6 +58,11 @@ export default function SideBar() {
     return getItemById(items, focusedItemId)
   }, [focusedItemId, items])
 
+  const selectedItem = useMemo(() => {
+    if (!selectedItemId) return null
+    return getItemById(items, selectedItemId)
+  }, [selectedItemId, items])
+
   const canSchedule = useMemo(() => {
     // Can always schedule to the base calendar
     return true
@@ -69,9 +74,9 @@ export default function SideBar() {
   }, [focusedItem])
 
   const canScheduleIntoFocusedItem = useMemo(() => {
-    if (!focusedItem) return false
+    if (!focusedItem || !selectedItem) return false
     return focusedItem instanceof SubCalendarItem
-  }, [focusedItem])
+  }, [focusedItem, selectedItem])
 
   return (
     <>
@@ -132,15 +137,33 @@ export default function SideBar() {
             />
           </List>
           <hr />
+
+          {/* Child Scheduling Mode Indicator */}
+          {durationDialogOpen && (
+            <Box sx={{ p: 2, bgcolor: 'primary.light', borderRadius: 1, mx: 2, mb: 2 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.contrastText' }}>
+                🎯 Child Scheduling Mode
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'primary.contrastText' }}>
+                Click items below to select as child templates
+              </Typography>
+            </Box>
+          )}
+
           <List>
             <ListItem>
-              <Typography>
-                Name: {focusedItem?.name}
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                Focused Item (Parent):
               </Typography>
             </ListItem>
             <ListItem>
               <Typography>
-                Milliseconds: {focusedItem?.duration}
+                Name: {focusedItem?.name || 'None'}
+              </Typography>
+            </ListItem>
+            <ListItem>
+              <Typography>
+                Duration: {focusedItem?.duration || 0}ms
               </Typography>
             </ListItem>
             <ListItem>
@@ -150,7 +173,23 @@ export default function SideBar() {
             </ListItem>
             <ListItem>
               <Typography>
-                Parent Count: {focusedItem?.parents.length}
+                Parent Count: {focusedItem?.parents.length || 0}
+              </Typography>
+            </ListItem>
+
+            <ListItem>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'secondary.main' }}>
+                Selected Item (Child):
+              </Typography>
+            </ListItem>
+            <ListItem>
+              <Typography>
+                Name: {selectedItem?.name || 'None'}
+              </Typography>
+            </ListItem>
+            <ListItem>
+              <Typography>
+                Duration: {selectedItem?.duration || 0}ms
               </Typography>
             </ListItem>
           </List>

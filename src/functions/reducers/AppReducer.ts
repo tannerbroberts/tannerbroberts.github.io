@@ -46,6 +46,10 @@ export type AppAction =
     payload: { focusedItemId: string | null };
   }
   | {
+    type: "SET_SELECTED_ITEM_BY_ID";
+    payload: { selectedItemId: string | null };
+  }
+  | {
     type: "SET_CURRENT_VIEW";
     payload: { currentView: 'execution' | 'accounting' };
   }
@@ -118,6 +122,7 @@ export const initialState = {
   pixelsPerSegment: 30,
   expandSearchItems: false,
   focusedItemId: null as string | null,
+  selectedItemId: null as string | null,
   currentView: 'execution' as 'execution' | 'accounting',
   items: new Array<Item>(),
   baseCalendar: new Map<string, BaseCalendarEntry>(),
@@ -249,6 +254,21 @@ export default function reducer(
       //* focusedItemId
       //* ****************************************************
       return { ...previous, focusedItemId };
+    }
+    case "SET_SELECTED_ITEM_BY_ID": {
+      const { selectedItemId } = action.payload;
+
+      //* ****************************************************
+      //* appState
+      //* selectedItemId
+      //* ****************************************************
+      if (!selectedItemId) return { ...previous, selectedItemId: null };
+
+      //* ****************************************************
+      //* appState
+      //* selectedItemId
+      //* ****************************************************
+      return { ...previous, selectedItemId };
     }
     case "SET_CURRENT_VIEW": {
       const { currentView } = action.payload;
