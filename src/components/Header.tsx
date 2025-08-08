@@ -1,13 +1,17 @@
 import { Menu, MenuOpen, AccountBalance, PlayArrow } from '@mui/icons-material';
-import { AppBar, Button, ButtonGroup, IconButton, Toolbar, Typography } from '@mui/material';
-import { useMemo, useCallback } from 'react';
+import { AppBar, Button, ButtonGroup, IconButton, Toolbar, Typography, Avatar, Tooltip } from '@mui/material';
+import { useMemo, useCallback, useState } from 'react';
 import { useAppDispatch, useAppState } from '../reducerContexts/App';
 import { getItemById } from '../functions/utils/item/index';
 import StorageManagementButton from './StorageManagementButton';
+import { useAuth } from '../auth/AuthContext';
+import LoginDialog from './LoginDialog';
 
 export default function Header() {
+  const { user, logout } = useAuth()
   const { sideDrawerOpen, items, focusedItemId, currentView } = useAppState()
   const appDispatch = useAppDispatch()
+  const [loginOpen, setLoginOpen] = useState(false)
 
   const focusedItem = useMemo(() => {
     return getItemById(items, focusedItemId)
@@ -98,6 +102,18 @@ export default function Header() {
             </ButtonGroup>
           )}
           <StorageManagementButton />
+          {user ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Tooltip title={user.email || user.id}>
+                <Avatar sx={{ width: 28, height: 28 }}>
+                  {(user.email || user.id).slice(0, 1).toUpperCase()}
+                </Avatar>
+              </Tooltip>
+              <Button variant="outlined" size="small" onClick={logout} sx={{ color: 'white', borderColor: 'white' }}>Logout</Button>
+            </div>
+          ) : (
+            <Button variant="outlined" size="small" onClick={() => setLoginOpen(true)} sx={{ color: 'white', borderColor: 'white' }}>Login</Button>
+          )}
           <ButtonGroup variant="contained" size="small">
             <Button onClick={() => appDispatch({
               type: "SET_MILLISECONDS_PER_SEGMENT",
@@ -121,6 +137,7 @@ export default function Header() {
             })}>Week</Button>
           </ButtonGroup>
         </div>
+        <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
       </Toolbar>
     </AppBar>
   )
