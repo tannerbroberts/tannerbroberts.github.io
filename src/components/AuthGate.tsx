@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Tabs, Tab, Alert } from '@mui/material'
+import { Box, Paper, Tabs, Tab, TextField, Button, Alert, Typography } from '@mui/material'
 import { useAuth } from '../auth/useAuth'
 
-export default function LoginDialog({ open, onClose }: Readonly<{ open: boolean; onClose: () => void }>) {
+export default function AuthGate() {
   const { login, register } = useAuth()
   const [mode, setMode] = useState<'login' | 'register'>('login')
   const [email, setEmail] = useState('')
@@ -15,7 +15,6 @@ export default function LoginDialog({ open, onClose }: Readonly<{ open: boolean;
     try {
       if (mode === 'login') await login(email, password)
       else await register(email, password)
-      onClose()
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Failed'
       setError(message)
@@ -25,21 +24,20 @@ export default function LoginDialog({ open, onClose }: Readonly<{ open: boolean;
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle>Welcome</DialogTitle>
-      <Tabs value={mode} onChange={(_e, v) => setMode(v)} sx={{ px: 2 }}>
-        <Tab value="login" label="Login" />
-        <Tab value="register" label="Register" />
-      </Tabs>
-      <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
+    <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: (t) => t.palette.background.default, p: 2 }}>
+      <Paper elevation={4} sx={{ width: '100%', maxWidth: 420, p: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Typography variant="h5" sx={{ textAlign: 'center', fontWeight: 600 }}>About Time</Typography>
+        <Tabs value={mode} onChange={(_e, v) => setMode(v)} centered>
+          <Tab value="login" label="Login" />
+          <Tab value="register" label="Register" />
+        </Tabs>
         {error && <Alert severity="error">{error}</Alert>}
         <TextField label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} fullWidth autoFocus />
         <TextField label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} fullWidth />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={loading}>Cancel</Button>
-        <Button onClick={handleSubmit} variant="contained" disabled={loading}>{mode === 'login' ? 'Login' : 'Create Account'}</Button>
-      </DialogActions>
-    </Dialog>
+        <Button onClick={handleSubmit} variant="contained" disabled={loading} fullWidth>
+          {mode === 'login' ? 'Login' : 'Create Account'}
+        </Button>
+      </Paper>
+    </Box>
   )
 }

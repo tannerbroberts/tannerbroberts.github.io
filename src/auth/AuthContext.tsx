@@ -1,29 +1,18 @@
-import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react'
-
-type User = { id: string; email?: string }
-
-type AuthContextType = {
-  user: User | null
-  token: string | null
-  login: (email: string, password: string) => Promise<void>
-  register: (email: string, password: string) => Promise<void>
-  logout: () => void
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+import React, { useEffect, useMemo, useState, useCallback } from 'react'
+import { AuthContext, User } from './AuthContextCore'
 
 const API = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:4000'
 
 export function AuthProvider({ children }: Readonly<{ children: React.ReactNode }>) {
-  const [user, setUser] = useState<User | null>(null)
-  const [token, setToken] = useState<string | null>(null)
-
-  useEffect(() => {
-    const t = localStorage.getItem('auth_token')
-    const u = localStorage.getItem('auth_user')
-    if (t) setToken(t)
-    if (u) setUser(JSON.parse(u))
-  }, [])
+  // Initialize from localStorage synchronously to avoid unauthenticated flash
+  const initialToken = (() => {
+    try { return localStorage.getItem('auth_token') } catch { return null }
+  })()
+  const initialUser = (() => {
+    try { const u = localStorage.getItem('auth_user'); return u ? JSON.parse(u) as User : null } catch { return null }
+  })()
+  const [user, setUser] = useState<User | null>(initialUser)
+  const [token, setToken] = useState<string | null>(initialToken)
 
   useEffect(() => {
     if (token) localStorage.setItem('auth_token', token)
@@ -68,8 +57,4 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
-export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
-  return ctx
-}
+// This file only exports a component (AuthProvider) for fast refresh compatibility

@@ -4,7 +4,7 @@ import { useMemo, useCallback, useState } from 'react';
 import { useAppDispatch, useAppState } from '../reducerContexts/App';
 import { getItemById } from '../functions/utils/item/index';
 import StorageManagementButton from './StorageManagementButton';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../auth/useAuth';
 import LoginDialog from './LoginDialog';
 
 export default function Header() {
