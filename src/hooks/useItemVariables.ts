@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react';
-import { useAppState, useAppDispatch } from '../reducerContexts/App';
+import { useAppState, useAppDispatch } from '../reducerContexts';
 import {
   setVariableOnItem,
   removeVariableFromItem,

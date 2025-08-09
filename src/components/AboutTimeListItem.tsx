@@ -1,7 +1,7 @@
 import { ListItem, ListItemButton, ListItemText } from "@mui/material"
 import { useCallback } from "react"
 import { Item } from "../functions/utils/item/index"
-import { useAppDispatch, useAppState } from "../reducerContexts/App"
+import { useAppDispatch, useAppState } from "../reducerContexts"
 
 interface AboutTimeListItemProps {
   readonly item: Item

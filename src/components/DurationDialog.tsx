@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Box, Typography, IconButton, TextField } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import { useCallback, useEffect } from "react";
-import { useAppDispatch, useAppState } from "../reducerContexts/App";
+import { useAppDispatch, useAppState } from "../reducerContexts";
 import { getItemById, SubCalendarItem, Child, Parent, addParentToItem } from "../functions/utils/item/index";
 import { useTimeInputState, useTimeInputDispatch } from "../reducerContexts/TimeInput";
 

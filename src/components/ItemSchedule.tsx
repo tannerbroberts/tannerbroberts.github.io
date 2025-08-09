@@ -1,6 +1,6 @@
 import { Typography, Button, Box, Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import { useCallback } from "react";
-import { useAppDispatch, useAppState } from "../reducerContexts/App";
+import { useAppDispatch, useAppState } from "../reducerContexts";
 import { getItemById, Item, SubCalendarItem, CheckListItem, getChildId, type ChildReference } from "../functions/utils/item/index";
 import { ExpandMore } from "@mui/icons-material";
 

@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './components/App'
 import { AuthProvider } from './auth/AuthContext'
-import { AppProvider } from './reducerContexts/App'
+import { AppProvider } from './reducerContexts'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

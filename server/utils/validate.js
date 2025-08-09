@@ -7,20 +7,26 @@ const ITEM_TYPES = {
 }
 
 const TEMPLATE_KINDS = new Set(['basic', 'container', 'checklist', 'variable-group'])
+const VISIBILITY = new Set(['private', 'public'])
+const LICENSES = new Set(['proprietary', 'free'])
 
 function isNumber(x) { return typeof x === 'number' && Number.isFinite(x) }
 function isString(x) { return typeof x === 'string' && x.length > 0 }
 function isNullableString(x) { return x == null || typeof x === 'string' }
 
 export function validateTemplate(input) {
-  const allowedKeys = new Set(['hash', 'name', 'kind', 'data'])
+  const allowedKeys = new Set(['hash', 'name', 'kind', 'data', 'visibility', 'license', 'origin'])
   const extra = Object.keys(input || {}).filter(k => !allowedKeys.has(k))
   if (extra.length) return { ok: false, error: `invalid_fields:${extra.join(',')}` }
   if (!isString(input?.hash)) return { ok: false, error: 'missing:hash' }
   if (!isString(input?.name)) return { ok: false, error: 'missing:name' }
   if (!isString(input?.kind) || !TEMPLATE_KINDS.has(input.kind)) return { ok: false, error: 'invalid:kind' }
+  // optional
+  const visibility = input?.visibility && isString(input.visibility) && VISIBILITY.has(input.visibility) ? input.visibility : 'private'
+  const license = input?.license && isString(input.license) && LICENSES.has(input.license) ? input.license : 'proprietary'
+  const origin = input?.origin && typeof input.origin === 'object' ? input.origin : undefined
   // data is free-form for now
-  return { ok: true, value: { hash: input.hash, name: input.name, kind: input.kind, data: input.data } }
+  return { ok: true, value: { hash: input.hash, name: input.name, kind: input.kind, data: input.data, visibility, license, origin } }
 }
 
 export function validateCalendarItem(input) {
@@ -55,4 +61,4 @@ export function validateCalendarItem(input) {
   return { ok: false, error: 'unsupported_type' }
 }
 
-export const __constants = { ITEM_TYPES, TEMPLATE_KINDS }
+export const __constants = { ITEM_TYPES, TEMPLATE_KINDS, VISIBILITY, LICENSES }

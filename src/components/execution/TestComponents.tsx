@@ -1,12 +1,7 @@
 // Test file to verify components can be imported and basic functionality works
 import React from 'react';
-import {
-  PrimaryBasicItemDisplay,
-  PrimaryItemDisplayRouter,
-  PrimarySubCalendarItemDisplay,
-  UnifiedDropdownContent
-} from './index';
-import { BasicItem, SubCalendarItem, CheckListItem } from '../../functions/utils/item/index';
+import { PrimaryBasicItemDisplay, PrimarySubCalendarItemDisplay } from './index';
+import { BasicItem, SubCalendarItem } from '../../functions/utils/item/index';
 
 // This file serves as a basic import test and type check
 // It should not be included in the final build
@@ -22,11 +17,6 @@ const TestComponents: React.FC = () => {
   const mockSubCalendarItem = new SubCalendarItem({
     name: 'Test SubCalendar Item',
     duration: 300000 // 5 minutes
-  });
-
-  const mockCheckListItem = new CheckListItem({
-    name: 'Test CheckList Item',
-    duration: 180000 // 3 minutes
   });
 
   const mockProps = {
@@ -56,14 +46,7 @@ const TestComponents: React.FC = () => {
         />
       </div>
 
-      <div>
-        <h3>CheckListItem Display</h3>
-        <PrimaryBasicItemDisplay
-          item={items[0]}
-          childExecutionStatus={childExecutionStatus}
-          isCurrentPhase={true}
-        />
-      </div>
+      {/* Placeholder area for additional component checks */}
     </div>
   );
 };

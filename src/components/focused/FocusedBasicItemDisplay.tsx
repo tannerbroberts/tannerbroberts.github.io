@@ -3,7 +3,7 @@ import { Edit, Schedule, Delete } from '@mui/icons-material';
 import { BasicItem } from '../../functions/utils/item/index';
 import { formatDuration } from '../../functions/utils/formatTime';
 import { useCallback } from 'react';
-import { useAppDispatch } from '../../reducerContexts/App';
+import { useAppDispatch } from '../../reducerContexts';
 
 interface FocusedBasicItemDisplayProps {
   readonly item: BasicItem;

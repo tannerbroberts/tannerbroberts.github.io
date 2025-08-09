@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Box } from "@mui/material";
 import { useCallback } from "react";
-import { useAppDispatch, useAppState } from "../reducerContexts/App";
-import { getItemById, CheckListItem } from "../functions/utils/item/index";
+import { useAppDispatch, useAppState } from "../reducerContexts";
+import { getItemById } from "../functions/utils/item/index";
 
 export default function CheckListChildDialog() {
   const { checkListChildDialogOpen, items, focusedItemId } = useAppState();
@@ -13,7 +13,6 @@ export default function CheckListChildDialog() {
 
   // For now, disable this functionality since we need to redesign it without sidebar selection
   const focusedItem = focusedItemId ? getItemById(items, focusedItemId) : null;
-  const isChecklistFocused = focusedItem instanceof CheckListItem;
 
   return (
     <Dialog open={checkListChildDialogOpen} onClose={handleClose}>

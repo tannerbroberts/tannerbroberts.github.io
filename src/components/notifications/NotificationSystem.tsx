@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Snackbar, Alert, AlertTitle, Button } from '@mui/material';
 import { useItemInstances } from '../../hooks/useItemInstances';
-import { useAppState } from '../../reducerContexts/App';
+import { useAppState } from '../../reducerContexts';
 import { getItemById } from '../../functions/utils/item/utils';
 
 interface Notification {
@@ -21,6 +21,24 @@ export default function NotificationSystem() {
   const { items } = useAppState();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [currentNotification, setCurrentNotification] = useState<Notification | null>(null);
+
+  function enqueue(n: Notification) {
+    setNotifications(prev => {
+      const exists = prev.some(x => x.id === n.id)
+      return exists ? prev : [...prev, n]
+    })
+  }
+
+  // Allow global enqueue via CustomEvent('app:notify', { detail: Notification })
+  useEffect(() => {
+    const onNotify = (e: Event) => {
+      const n = (e as CustomEvent<Notification>).detail
+      if (!n?.id) return
+      enqueue(n)
+    }
+    window.addEventListener('app:notify', onNotify as EventListener)
+    return () => window.removeEventListener('app:notify', onNotify as EventListener)
+  }, [])
 
   // Check for overdue items
   useEffect(() => {
@@ -49,13 +67,7 @@ export default function NotificationSystem() {
         autoHideDuration: 10000
       };
 
-      setNotifications(prev => {
-        const existing = prev.find(n => n.id === notification.id);
-        if (!existing) {
-          return [...prev, notification];
-        }
-        return prev;
-      });
+      enqueue(notification)
     }
   }, [accountingInstances, items]);
 
@@ -72,9 +84,7 @@ export default function NotificationSystem() {
   };
 
   const handleAction = () => {
-    if (currentNotification?.action) {
-      currentNotification.action.onClick();
-    }
+    currentNotification?.action?.onClick();
     handleClose();
   };
 

@@ -3,7 +3,7 @@ import { Edit, Schedule, Delete, Add, Remove, DragIndicator } from '@mui/icons-m
 import { CheckListItem } from '../../functions/utils/item/index';
 import { formatDuration } from '../../functions/utils/formatTime';
 import { getItemById } from '../../functions/utils/item/utils';
-import { useAppState, useAppDispatch } from '../../reducerContexts/App';
+import { useAppState, useAppDispatch } from '../../reducerContexts';
 import { useMemo, useCallback } from 'react';
 
 interface FocusedCheckListItemDisplayProps {

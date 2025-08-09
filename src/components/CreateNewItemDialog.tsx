@@ -12,7 +12,7 @@ import {
   Chip
 } from "@mui/material";
 import { useCallback, useState, useEffect } from "react";
-import { useAppDispatch, useAppState } from "../reducerContexts/App";
+import { useAppDispatch, useAppState } from "../reducerContexts";
 import { TimeInputProvider, useTimeInputDispatch, useTimeInputState } from "../reducerContexts/TimeInput";
 import { NewItemProvider, useNewItemDispatch, useNewItemState } from "../reducerContexts/NewItem";
 import { BasicItem, SubCalendarItem, CheckListItem } from "../functions/utils/item/index";

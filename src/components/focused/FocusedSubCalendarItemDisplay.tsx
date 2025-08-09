@@ -3,7 +3,7 @@ import { Edit, Schedule, Delete, Add } from '@mui/icons-material';
 import { SubCalendarItem, hasChildren, getChildren, getChildId, type ChildReference } from '../../functions/utils/item/index';
 import { formatDuration } from '../../functions/utils/formatTime';
 import { getItemById } from '../../functions/utils/item/utils';
-import { useAppState, useAppDispatch } from '../../reducerContexts/App';
+import { useAppState, useAppDispatch } from '../../reducerContexts';
 import { useViewportHeight } from '../../hooks/useViewportHeight';
 import { useMemo, useCallback } from 'react';
 import ItemSchedule from '../ItemSchedule';

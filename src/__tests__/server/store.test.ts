@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest'
 import { Store } from '../../../server/store/timeIndex.js'
-
-const user = 'test-user'
+import { randomUUID } from 'node:crypto'
 
 describe('Store time-index', () => {
   it('inserts and queries largest fit items', () => {
+    const user = `test-user-${randomUUID()}`
     Store.ensureUser(user)
     const a = Store.upsertItem(user, { type: 'container', start: 0, end: 1000, templateHash: 'A' })
-    const b = Store.upsertItem(user, { type: 'basic', start: 100, end: 200, priority: 1, templateHash: 'B', parentId: a.id })
-    const c = Store.upsertItem(user, { type: 'basic', start: 300, end: 400, priority: 0, templateHash: 'C', parentId: a.id })
+    Store.upsertItem(user, { type: 'basic', start: 100, end: 200, priority: 1, templateHash: 'B', parentId: a.id })
+    Store.upsertItem(user, { type: 'basic', start: 300, end: 400, priority: 0, templateHash: 'C', parentId: a.id })
 
     const r = Store.query(user, 0, 1000, { largestFit: true })
     expect(r[0].id).toBe(a.id)
@@ -20,6 +20,8 @@ describe('Store time-index', () => {
   })
 
   it('detects conflict groups by priority', () => {
+    const user = `test-user-${randomUUID()}`
+    Store.ensureUser(user)
     const start = 10000
     Store.upsertItem(user, { type: 'basic', start: start, end: start + 100, priority: 0, templateHash: 'X' })
     Store.upsertItem(user, { type: 'basic', start: start + 50, end: start + 120, priority: 2, templateHash: 'Y' })
@@ -29,6 +31,8 @@ describe('Store time-index', () => {
   })
 
   it('summarizes busy by priority buckets', () => {
+    const user = `test-user-${randomUUID()}`
+    Store.ensureUser(user)
     const now = Date.now()
     const windowStart = now
     const windowEnd = now + 3600_000

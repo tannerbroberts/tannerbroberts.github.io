@@ -1,7 +1,7 @@
 import { IconButton, Tooltip } from '@mui/material';
 import { Shuffle } from '@mui/icons-material';
 import { useCallback } from 'react';
-import { useAppDispatch, useAppState } from '../reducerContexts/App';
+import { useAppDispatch, useAppState } from '../reducerContexts';
 
 export default function RandomItemButton() {
   const { items } = useAppState();

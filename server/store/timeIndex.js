@@ -1,4 +1,5 @@
-import { IntervalTree } from 'node-interval-tree'
+// Use the default DataIntervalTree which supports insert(low, high, data) and returns data from search()
+import IntervalTree from 'node-interval-tree'
 import { v4 as uuidv4 } from 'uuid'
 import { readState, updateState, onShutdown } from './persistence.js'
 

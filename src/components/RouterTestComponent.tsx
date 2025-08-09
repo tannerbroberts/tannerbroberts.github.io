@@ -1,6 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import { PrimaryItemDisplayRouter } from './execution';
-import { useAppState } from '../reducerContexts/App';
+import { useAppState } from '../reducerContexts';
+import type { Item } from '../functions/utils/item';
 import { BasicItem, SubCalendarItem, CheckListItem } from '../functions/utils/item';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 
@@ -13,9 +14,9 @@ export default function RouterTestComponent() {
   const currentTime = useCurrentTime();
 
   // Find different types of items for testing
-  const basicItem = items.find(item => item instanceof BasicItem);
-  const subCalendarItem = items.find(item => item instanceof SubCalendarItem);
-  const checkListItem = items.find(item => item instanceof CheckListItem);
+  const basicItem = items.find((item: Item) => item instanceof BasicItem);
+  const subCalendarItem = items.find((item: Item) => item instanceof SubCalendarItem);
+  const checkListItem = items.find((item: Item) => item instanceof CheckListItem);
 
   const baseStartTime = currentTime - 30000; // 30 seconds ago
 

@@ -1,12 +1,13 @@
 import { Button } from "@mui/material";
 import { useCallback } from "react";
-import { useAppState } from "../reducerContexts/App";
+import { useAppState } from "../reducerContexts";
+import type { Item } from "../functions/utils/item";
 
 export default function ExportButton() {
   const { items } = useAppState();
 
   const exportItems = useCallback(() => {
-    const itemsJSON = items.map(item => item.toJSON());
+    const itemsJSON = items.map((item: Item) => item.toJSON());
     const jsonString = JSON.stringify(itemsJSON, null, 2);
 
     const blob = new Blob([jsonString], { type: "application/json" });

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Box } from "@mui/material";
 import { SubCalendarItem } from "../../functions/utils/item/index";
 import { getChildExecutionStatus } from "./executionUtils";
-import { useAppState } from "../../reducerContexts/App";
+import { useAppState } from "../../reducerContexts";
 import { useItemVariables } from "../../hooks/useItemVariables";
 import SubCalendarStatusBar from "./SubCalendarStatusBar";
 import UnifiedDropdownContent from "./UnifiedDropdownContent";

@@ -6,6 +6,7 @@ import calendarRouter from './routes/calendar.js'
 import templatesRouter from './routes/templates.js'
 import usersRouter from './routes/users.js'
 import authRouter from './routes/auth.js'
+import publicRouter from './routes/public.js'
 
 const app = express()
 const PORT = process.env.PORT || 4000
@@ -15,6 +16,9 @@ app.use(bodyParser.json({ limit: '2mb' }))
 
 // Health
 app.get('/health', (_req, res) => res.json({ ok: true }))
+
+// Public, no auth required
+app.use('/public', publicRouter)
 
 // Attach auth; for now accept x-user-id header, or create a dev user
 app.use(authMiddleware)
