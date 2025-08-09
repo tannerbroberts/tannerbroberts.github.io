@@ -1,8 +1,26 @@
 import { Router } from 'express'
 import { hashPassword, verifyPassword, signToken } from '../utils/auth.js'
+import { readState, updateState, onShutdown } from '../store/persistence.js'
 
 // simple in-memory user store {id,email,passwordHash}
 const users = new Map()
+
+function persistUsers() {
+  const arr = Array.from(users.values())
+  updateState(state => ({ ...state, users: arr }))
+}
+
+function loadUsers() {
+  const state = readState()
+  const arr = Array.isArray(state.users) ? state.users : []
+  for (const u of arr) {
+    if (u && u.email) users.set(u.email, u)
+  }
+}
+
+// initialize from disk and ensure shutdown flush
+loadUsers()
+onShutdown(() => { try { persistUsers() } catch (e) { console.error('[auth] shutdown persist failed', e) } })
 
 const router = Router()
 
@@ -14,6 +32,7 @@ router.post('/register', async (req, res) => {
   const passwordHash = await hashPassword(password)
   const user = { id, email, passwordHash }
   users.set(email, user)
+  persistUsers()
   const token = signToken(user)
   res.json({ token, user: { id, email } })
 })

@@ -1,11 +1,9 @@
-import IntervalTree from 'node-interval-tree'
+import { IntervalTree } from 'node-interval-tree'
 import { v4 as uuidv4 } from 'uuid'
-import fs from 'fs'
-import path from 'path'
+import { readState, updateState, onShutdown } from './persistence.js'
 
 // Per-user stores held in-memory
 const userStores = new Map()
-const MEMORY_FILE = path.resolve(process.cwd(), 'server_memory.json')
 
 function serializeStore() {
   const obj = {}
@@ -15,13 +13,13 @@ function serializeStore() {
       templates: Array.from(store.templates.values()),
     }
   }
-  return JSON.stringify(obj)
+  return obj
 }
 
 function persistToDisk() {
   try {
-    const data = serializeStore()
-    fs.writeFileSync(MEMORY_FILE, data)
+    const snapshot = serializeStore()
+    updateState(state => ({ ...state, stores: snapshot }))
   } catch (e) {
     console.error('[store] persist failed', e)
   }
@@ -29,10 +27,11 @@ function persistToDisk() {
 
 function loadFromDisk() {
   try {
-    if (!fs.existsSync(MEMORY_FILE)) return
-    const data = fs.readFileSync(MEMORY_FILE, 'utf-8')
-    const parsed = JSON.parse(data || '{}')
-    for (const [userId, payload] of Object.entries(parsed)) {
+    const state = readState()
+    // Back-compat: older files stored stores at top-level (no wrapper key)
+    const source = state.stores && typeof state.stores === 'object' ? state.stores : state
+    for (const [userId, payload] of Object.entries(source || {})) {
+      if (userId === 'users') continue // never treat auth users array as a calendar user store
       const s = getUserStore(userId)
       // rebuild maps
       for (const it of payload.items || []) {
@@ -257,6 +256,5 @@ export const Store = {
 // load persisted data at startup
 loadFromDisk()
 
-// best-effort save on exit
-process.on('SIGINT', () => { try { persistToDisk() } finally { process.exit(0) } })
-process.on('SIGTERM', () => { try { persistToDisk() } finally { process.exit(0) } })
+// best-effort save on exit using centralized shutdown handling
+onShutdown(() => { try { persistToDisk() } catch (e) { console.error('[store] shutdown persist failed', e) } })

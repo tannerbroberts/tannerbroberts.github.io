@@ -1,1 +1,1 @@
-{}
+{"users":[{"id":"u_4w3x2p52c8j","email":"a@b.com","passwordHash":"$2a$08$.2Zux5F5sa6QPlFdNNmlx.gmOIVmcLDSMMtZG4z7Lt2BAJGKmSiFW"}],"stores":{"u_demo":{"items":[{"id":"b55eb650-bc90-4c5e-93d8-bcff1f64f166","type":"basic","start":1754768888957,"end":1754772488957,"templateHash":"tpl1","priority":1,"parentId":null}],"templates":[]}}}
