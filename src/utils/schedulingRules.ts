@@ -2,6 +2,7 @@ import { Item, CheckListItem, BasicItem, getItemById, SubCalendarItem, CheckList
 import type { SchedulingConfig, SchedulingRule, ConditionExpr, ConditionStep, MatchCriteria } from '../functions/utils/item/types/Scheduling'
 
 export type SchedulingEvalResult = { updatedItems: Item[]; summary?: string }
+export type SchedulingPreflight = { ok: boolean; failedRuleIndexes: number[] }
 
 function matchName(name: string, m: MatchCriteria): boolean {
   if (m.nameEquals && name !== m.nameEquals) return false
@@ -22,6 +23,7 @@ function matchName(name: string, m: MatchCriteria): boolean {
 
 function matches(item: Item, m?: MatchCriteria): boolean {
   if (!m) return true
+  if (m.idEquals && (item as { id: string }).id !== m.idEquals) return false
   const name = item.name
   if (!matchName(name, m)) return false
   if (m.typeIs && item.constructor.name !== m.typeIs) return false
@@ -85,6 +87,20 @@ function applyActions(actions: SchedulingRule['then'], scope: Item[], parent: Su
         updated.push(target)
         summaries.push(`added to checklist: ${target.name}`)
       }
+    } else if (action.type === 'addExistingToChecklist') {
+      let target: CheckListItem | null = null
+      if (action.target !== 'firstMatch') {
+        const explicit = getItemById(updated.length ? updated : scope, (action.target as { checklistId: string }).checklistId)
+        if (explicit && explicit instanceof CheckListItem) target = explicit
+      }
+      if (!target) {
+        for (const i of [...scope, parent]) { if (i instanceof CheckListItem) { target = i; break } }
+      }
+      if (target) {
+        target.addChild(new CheckListChild({ itemId: action.sourceItemId }))
+        updated.push(target)
+        summaries.push(`added existing to checklist: ${target.name}`)
+      }
     }
   }
 }
@@ -105,4 +121,21 @@ export function evaluateScheduling(items: Item[], parent: SubCalendarItem, child
   }
 
   return { updatedItems: updated, summary: summaries.join('; ') || undefined }
+}
+
+// Preflight: if a rule has no actions (then.length === 0), treat it as a gating condition.
+// If its condition does not hold, scheduling should be blocked before applying.
+export function verifySchedulingPreconditions(items: Item[], parent: SubCalendarItem, child: Item, config?: SchedulingConfig): SchedulingPreflight {
+  const failed: number[] = []
+  const rules: SchedulingRule[] = config?.rules || child.scheduling?.rules || []
+  rules.forEach((rule, idx) => {
+    if ((rule.then?.length ?? 0) > 0) return // only gating when no side effects
+    let scope: Item[] = rule.when.start === 'child' ? [child] : [parent]
+    for (const s of rule.when.chain || []) {
+      scope = step(items, scope, s, parent)
+    }
+    const ok = assertConditions(scope, rule.when.assert)
+    if (!ok) failed.push(idx)
+  })
+  return { ok: failed.length === 0, failedRuleIndexes: failed }
 }

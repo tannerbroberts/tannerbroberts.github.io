@@ -1,6 +1,8 @@
 export type ItemTypeName = 'BasicItem' | 'CheckListItem' | 'SubCalendarItem'
 
 export interface MatchCriteria {
+  // Specific item id to match (UI dropdown-friendly)
+  idEquals?: string;
   nameEquals?: string;
   nameIncludes?: string;
   nameRegex?: string;
@@ -39,6 +41,11 @@ export type ActionExpr =
     type: 'addToChecklist';
     target: 'firstMatch';
     source: 'lastCreatedItem';
+  }
+  | {
+    type: 'addExistingToChecklist';
+    sourceItemId: string; // must be an existing item id
+    target: 'firstMatch' | { checklistId: string }; // optional explicit target checklist
   };
 
 export interface SchedulingRule {

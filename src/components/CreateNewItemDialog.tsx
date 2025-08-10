@@ -9,13 +9,18 @@ import {
   Typography,
   Divider,
   Stack,
-  Chip
+  Chip,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
 } from "@mui/material";
 import { useCallback, useState, useEffect } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts";
 import { TimeInputProvider, useTimeInputDispatch, useTimeInputState } from "../reducerContexts/TimeInput";
 import { NewItemProvider, useNewItemDispatch, useNewItemState } from "../reducerContexts/NewItem";
 import { BasicItem, SubCalendarItem, CheckListItem } from "../functions/utils/item/index";
+import type { ConditionStep, ActionExpr } from "../functions/utils/item/types/Scheduling";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
@@ -426,21 +431,30 @@ function CreateNewItemDialogContent() {
   const [variables, setVariables] = useState<Record<string, number>>({});
   const [variableName, setVariableName] = useState('');
   const [variableQuantity, setVariableQuantity] = useState('');
-  // Scheduling rules (minimal builder v1)
-  type Rule = {
-    id: string;
-    whenNameIncludes: string;
-    thenCreateName: string;
-    thenCreateDuration: number;
-    thenAddToChecklist: boolean;
-  };
-  const [rules, setRules] = useState<Rule[]>([]);
-  const [tmpRule, setTmpRule] = useState<Rule>({ id: crypto.randomUUID(), whenNameIncludes: '', thenCreateName: '', thenCreateDuration: 120000, thenAddToChecklist: true });
+  // Scheduling rules (Condition/Operation builder)
+  type ConditionKind = 'none' | 'parentHasChild' | 'parentHasChecklist' | 'parentHasChildNameIncludes'
+  type OperationKind = 'none' | 'createItem' | 'addExistingToChecklist'
+  type UIRule = {
+    id: string
+    conditionKind: ConditionKind
+    conditionItemId?: string
+    conditionText?: string
+    operationKind: OperationKind
+    // createItem fields
+    createName?: string
+    createDuration?: number
+    createAddToChecklist?: boolean
+    // addExistingToChecklist fields
+    existingItemId?: string
+    targetChecklistId?: string // empty string => firstMatch
+  }
+  const [rules, setRules] = useState<UIRule[]>([])
+  const [tmpRule, setTmpRule] = useState<UIRule>({ id: crypto.randomUUID(), conditionKind: 'none', operationKind: 'none', createDuration: 120000, createAddToChecklist: true, targetChecklistId: 'firstMatch' })
   const addRule = useCallback(() => {
     setRules(r => [...r, { ...tmpRule, id: crypto.randomUUID() }])
-    setTmpRule({ id: crypto.randomUUID(), whenNameIncludes: '', thenCreateName: '', thenCreateDuration: 120000, thenAddToChecklist: true })
-  }, [tmpRule]);
-  const removeRule = useCallback((id: string) => setRules(rs => rs.filter(r => r.id !== id)), []);
+    setTmpRule({ id: crypto.randomUUID(), conditionKind: 'none', operationKind: 'none', createDuration: 120000, createAddToChecklist: true, targetChecklistId: 'firstMatch' })
+  }, [tmpRule])
+  const removeRule = useCallback((id: string) => setRules(rs => rs.filter(r => r.id !== id)), [])
 
   const setName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     newItemDispatch({ type: "SET_NAME", payload: { name: event.target.value } });
@@ -456,7 +470,7 @@ function CreateNewItemDialogContent() {
     setVariableName('');
     setVariableQuantity('');
     setRules([]);
-    setTmpRule({ id: crypto.randomUUID(), whenNameIncludes: '', thenCreateName: '', thenCreateDuration: 120000, thenAddToChecklist: true });
+    setTmpRule({ id: crypto.randomUUID(), conditionKind: 'none', operationKind: 'none', createDuration: 120000, createAddToChecklist: true, targetChecklistId: 'firstMatch' });
   }, [dispatch, newItemDispatch, timeInputDispatch]);
 
   const handleAddVariable = useCallback(() => {
@@ -474,22 +488,72 @@ function CreateNewItemDialogContent() {
     setVariableQuantity('');
   }, [variableName, variableQuantity]);
 
+  const { items } = useAppState()
+
   const buildScheduling = useCallback(() => {
     if (rules.length === 0) return undefined
     return {
-      rules: rules.map(r => ({
-        when: {
-          start: 'parent' as const,
-          chain: [{ op: 'findChildren' as const }, { op: 'filter' as const, match: { nameIncludes: r.whenNameIncludes || undefined } }],
-          assert: [{ kind: 'exists' as const, value: true }]
-        },
-        then: [
-          ...(r.thenCreateName ? [{ type: 'createItem' as const, name: r.thenCreateName, duration: r.thenCreateDuration }] : []),
-          ...(r.thenAddToChecklist ? [{ type: 'addToChecklist' as const, target: 'firstMatch' as const, source: 'lastCreatedItem' as const }] : [])
-        ]
-      }))
+      rules: rules.map((r): { when: { start: 'parent'; chain?: ConditionStep[]; assert?: { kind: 'exists'; value: boolean }[] }; then: ActionExpr[] } => {
+        // Build condition
+        const chain: ConditionStep[] = []
+        let assert: Array<{ kind: 'exists'; value: boolean }> | undefined
+
+        switch (r.conditionKind) {
+          case 'parentHasChild':
+            chain.push({ op: 'findChildren' }, { op: 'filter', match: r.conditionItemId ? { idEquals: r.conditionItemId } : undefined })
+            assert = [{ kind: 'exists', value: true }]
+            break
+          case 'parentHasChecklist':
+            chain.push({ op: 'findChildren' }, { op: 'filter', match: r.conditionItemId ? { idEquals: r.conditionItemId } : { typeIs: 'CheckListItem' } })
+            assert = [{ kind: 'exists', value: true }]
+            break
+          case 'parentHasChildNameIncludes':
+            chain.push({ op: 'findChildren' }, { op: 'filter', match: r.conditionText ? { nameIncludes: r.conditionText } : undefined })
+            assert = [{ kind: 'exists', value: true }]
+            break
+          case 'none':
+          default:
+          // No assert => always true (scope is [parent])
+        }
+
+        // Build operations
+        const then: ActionExpr[] = []
+        if (r.operationKind === 'createItem' && r.createName && (r.createDuration ?? 0) > 0) {
+          then.push({ type: 'createItem', name: r.createName, duration: r.createDuration as number })
+          if (r.createAddToChecklist) {
+            then.push({ type: 'addToChecklist', target: 'firstMatch', source: 'lastCreatedItem' })
+          }
+        } else if (r.operationKind === 'addExistingToChecklist' && r.existingItemId) {
+          const target = r.targetChecklistId ? { checklistId: r.targetChecklistId } as const : 'firstMatch'
+          then.push({ type: 'addExistingToChecklist', sourceItemId: r.existingItemId, target })
+        }
+
+        return { when: { start: 'parent', chain, assert }, then }
+      })
     }
-  }, [rules]);
+  }, [rules])
+
+  const renderRuleSummary = (r: UIRule, itemsList: { id: string; name: string }[]) => {
+    const nameById = (id?: string) => itemsList.find(i => i.id === id)?.name
+    let cond = 'No condition'
+    if (r.conditionKind === 'parentHasChild' && r.conditionItemId) {
+      cond = `If parent has child "${nameById(r.conditionItemId) || 'item'}"`
+    } else if (r.conditionKind === 'parentHasChecklist') {
+      cond = r.conditionItemId ? `If parent has checklist "${nameById(r.conditionItemId) || 'checklist'}"` : 'If parent has a checklist'
+    } else if (r.conditionKind === 'parentHasChildNameIncludes' && r.conditionText) {
+      cond = `If parent has child name includes "${r.conditionText}"`
+    }
+    let op = 'No operation'
+    if (r.operationKind === 'createItem' && r.createName) {
+      op = `Create "${r.createName}" (${r.createDuration ?? 0}ms)`
+      if (r.createAddToChecklist) op += ' and add to first matching checklist'
+    } else if (r.operationKind === 'addExistingToChecklist' && r.existingItemId) {
+      const src = nameById(r.existingItemId) || 'existing item'
+      const tgt = nameById(r.targetChecklistId) || 'first matching checklist'
+      op = `Add "${src}" to ${tgt}`
+    }
+    return `${cond} → ${op}`
+  }
 
   const createNewItem = useCallback(() => {
     if (name.trim() === "") {
@@ -641,26 +705,103 @@ function CreateNewItemDialogContent() {
 
           <Box sx={{ mt: 3 }}>
             <Typography variant="subtitle2" gutterBottom>
-              Scheduling Rules (beta)
+              Scheduling Rules
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
-              Build rules that run when this item is scheduled.
+              Add a Condition and/or an Operation. If only Condition is set, it becomes a required precondition. If only Operation is set, it runs every time.
             </Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: 1, alignItems: 'end', mb: 1 }}>
-              <TextField size="small" label="When child of parent has name including" value={tmpRule.whenNameIncludes} onChange={(e) => setTmpRule(v => ({ ...v, whenNameIncludes: e.target.value }))} />
-              <TextField size="small" label="Then create item named" value={tmpRule.thenCreateName} onChange={(e) => setTmpRule(v => ({ ...v, thenCreateName: e.target.value }))} />
-              <TextField size="small" label="Duration (ms)" type="number" value={tmpRule.thenCreateDuration} onChange={(e) => setTmpRule(v => ({ ...v, thenCreateDuration: parseInt(e.target.value) || 0 }))} />
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <input id="add-to-checklist" type="checkbox" checked={tmpRule.thenAddToChecklist} onChange={(e) => setTmpRule(v => ({ ...v, thenAddToChecklist: e.target.checked }))} />
-                <label htmlFor="add-to-checklist">Add to checklist</label>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, alignItems: 'start', mb: 2 }}>
+              {/* Condition */}
+              <Box>
+                <FormControl fullWidth size="small" sx={{ mb: 1 }}>
+                  <InputLabel id="condition-kind-label">Condition</InputLabel>
+                  <Select labelId="condition-kind-label" label="Condition" value={tmpRule.conditionKind} onChange={(e) => setTmpRule(v => ({ ...v, conditionKind: e.target.value as ConditionKind }))}>
+                    <MenuItem value="none">None</MenuItem>
+                    <MenuItem value="parentHasChild">Parent has child…</MenuItem>
+                    <MenuItem value="parentHasChecklist">Parent has checklist…</MenuItem>
+                    <MenuItem value="parentHasChildNameIncludes">Parent has child name includes…</MenuItem>
+                  </Select>
+                </FormControl>
+                {tmpRule.conditionKind === 'parentHasChild' && (
+                  <FormControl fullWidth size="small">
+                    <InputLabel id="condition-item-label">Select item</InputLabel>
+                    <Select labelId="condition-item-label" label="Select item" value={tmpRule.conditionItemId || ''} onChange={(e) => setTmpRule(v => ({ ...v, conditionItemId: String(e.target.value) }))}>
+                      {items.map(i => (
+                        <MenuItem key={i.id} value={i.id}>{i.name}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
+                {tmpRule.conditionKind === 'parentHasChecklist' && (
+                  <FormControl fullWidth size="small">
+                    <InputLabel id="condition-checklist-label">Select checklist (optional)</InputLabel>
+                    <Select labelId="condition-checklist-label" label="Select checklist (optional)" value={tmpRule.conditionItemId || ''} onChange={(e) => setTmpRule(v => ({ ...v, conditionItemId: String(e.target.value) }))}>
+                      <MenuItem value="">Any checklist</MenuItem>
+                      {items.filter(i => i.constructor.name === 'CheckListItem').map(i => (
+                        <MenuItem key={i.id} value={i.id}>{i.name}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
+                {tmpRule.conditionKind === 'parentHasChildNameIncludes' && (
+                  <TextField fullWidth size="small" label="Name includes" value={tmpRule.conditionText || ''} onChange={(e) => setTmpRule(v => ({ ...v, conditionText: e.target.value }))} />
+                )}
+              </Box>
+
+              {/* Operation */}
+              <Box>
+                <FormControl fullWidth size="small" sx={{ mb: 1 }}>
+                  <InputLabel id="operation-kind-label">Operation</InputLabel>
+                  <Select labelId="operation-kind-label" label="Operation" value={tmpRule.operationKind} onChange={(e) => setTmpRule(v => ({ ...v, operationKind: e.target.value as OperationKind }))}>
+                    <MenuItem value="none">None</MenuItem>
+                    <MenuItem value="createItem">Create item…</MenuItem>
+                    <MenuItem value="addExistingToChecklist">Add existing item to checklist…</MenuItem>
+                  </Select>
+                </FormControl>
+
+                {tmpRule.operationKind === 'createItem' && (
+                  <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 140px', gap: 1, alignItems: 'end' }}>
+                    <TextField size="small" label="Name" value={tmpRule.createName || ''} onChange={(e) => setTmpRule(v => ({ ...v, createName: e.target.value }))} />
+                    <TextField size="small" label="Duration (ms)" type="number" value={tmpRule.createDuration ?? 0} onChange={(e) => setTmpRule(v => ({ ...v, createDuration: parseInt(e.target.value) || 0 }))} />
+                    <Box sx={{ gridColumn: '1 / span 2', display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <input id="create-add-to-checklist" type="checkbox" checked={!!tmpRule.createAddToChecklist} onChange={(e) => setTmpRule(v => ({ ...v, createAddToChecklist: e.target.checked }))} />
+                      <label htmlFor="create-add-to-checklist">Add to first matching checklist</label>
+                    </Box>
+                  </Box>
+                )}
+
+                {tmpRule.operationKind === 'addExistingToChecklist' && (
+                  <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel id="existing-item-label">Existing item</InputLabel>
+                      <Select labelId="existing-item-label" label="Existing item" value={tmpRule.existingItemId || ''} onChange={(e) => setTmpRule(v => ({ ...v, existingItemId: String(e.target.value) }))}>
+                        {items.map(i => (
+                          <MenuItem key={i.id} value={i.id}>{i.name}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormControl fullWidth size="small">
+                      <InputLabel id="target-checklist-label">Target checklist</InputLabel>
+                      <Select labelId="target-checklist-label" label="Target checklist" value={tmpRule.targetChecklistId || ''} onChange={(e) => setTmpRule(v => ({ ...v, targetChecklistId: String(e.target.value) }))}>
+                        <MenuItem value="">First matching in Condition scope</MenuItem>
+                        {items.filter(i => i.constructor.name === 'CheckListItem').map(i => (
+                          <MenuItem key={i.id} value={i.id}>{i.name}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
+                )}
               </Box>
             </Box>
+
             <Button variant="outlined" size="small" onClick={addRule}>Add Rule</Button>
             {rules.length > 0 && (
               <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
                 {rules.map((r) => (
                   <Box key={r.id} sx={{ p: 1, border: '1px solid', borderColor: 'grey.300', borderRadius: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="body2">When child name includes "{r.whenNameIncludes}" then create "{r.thenCreateName}" ({r.thenCreateDuration}ms){r.thenAddToChecklist ? ' and add to checklist' : ''}</Typography>
+                    <Typography variant="body2">
+                      {renderRuleSummary(r, items)}
+                    </Typography>
                     <Button size="small" onClick={() => removeRule(r.id)}>Remove</Button>
                   </Box>
                 ))}

@@ -5,6 +5,7 @@ import { useAppDispatch, useAppState } from "../reducerContexts";
 import { getItemById, SubCalendarItem, Child, Parent, addParentToItem } from "../functions/utils/item/index";
 import { useTimeInputState, useTimeInputDispatch } from "../reducerContexts/TimeInput";
 import { applySchedulingRules } from "../utils/schedulingBehaviors";
+import { verifySchedulingPreconditions } from "../utils/schedulingRules";
 
 interface TimeUnitControlProps {
   label: string;
@@ -103,6 +104,20 @@ export default function DurationDialog() {
     // Only allow scheduling into SubCalendarItems - type should be immutable
     if (!(focusedItem instanceof SubCalendarItem)) {
       throw new Error('Can only schedule items into SubCalendarItems');
+    }
+
+    // Preflight check for gating rules (condition-only rules)
+    const pre = verifySchedulingPreconditions(items, focusedItem, selectedItem)
+    if (!pre.ok) {
+      window.dispatchEvent(new CustomEvent('app:notify', {
+        detail: {
+          id: `preflight-${Date.now()}`,
+          type: 'error',
+          title: 'Cannot schedule: requirements not met',
+          message: 'One or more required conditions were not met for this item.'
+        }
+      }))
+      return
     }
 
     // Create child relationship with relative start time (using total milliseconds from time input)
