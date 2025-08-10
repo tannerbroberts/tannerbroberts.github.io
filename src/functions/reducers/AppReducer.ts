@@ -78,6 +78,10 @@ export type AppAction =
     payload: { checkListChildDialogOpen: boolean };
   }
   | {
+    type: "SET_SCHEDULING_MODE";
+    payload: { schedulingMode: boolean };
+  }
+  | {
     type: "SET_PIXELS_PER_SEGMENT";
     payload: { pixelsPerSegment: number };
   }
@@ -133,6 +137,7 @@ export const initialState = {
   checkListChildDialogOpen: false,
   sideDrawerOpen: false,
   newItemDialogOpen: false,
+  schedulingMode: false,
 };
 
 export default function reducer(
@@ -301,6 +306,14 @@ export default function reducer(
       //* ****************************************************
       const { checkListChildDialogOpen } = action.payload;
       return { ...previous, checkListChildDialogOpen };
+    }
+    case "SET_SCHEDULING_MODE": {
+      //* ****************************************************
+      //* appState
+      //* schedulingMode
+      //* ****************************************************
+      const { schedulingMode } = action.payload;
+      return { ...previous, schedulingMode };
     }
     case "SET_SIDE_DRAWER_OPEN": {
       //* ****************************************************

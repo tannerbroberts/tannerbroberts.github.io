@@ -9,18 +9,19 @@ interface AboutTimeListItemProps {
 
 export default function AboutTimeListItem({ item }: AboutTimeListItemProps) {
   const dispatch = useAppDispatch()
-  const { durationDialogOpen } = useAppState()
+  const { schedulingMode } = useAppState()
 
   const handleItemClick = useCallback(() => {
-    if (durationDialogOpen) {
-      // During child scheduling workflow: only set selected item (preserve focused parent)
+    if (schedulingMode) {
+      // Scheduling flow: select as child and open duration dialog
       dispatch({ type: 'SET_SELECTED_ITEM_BY_ID', payload: { selectedItemId: item.id } })
+      dispatch({ type: 'SET_DURATION_DIALOG_OPEN', payload: { durationDialogOpen: true } })
     } else {
       // Normal navigation: set both focused and selected
       dispatch({ type: 'SET_FOCUSED_ITEM_BY_ID', payload: { focusedItemId: item.id } })
       dispatch({ type: 'SET_SELECTED_ITEM_BY_ID', payload: { selectedItemId: item.id } })
     }
-  }, [dispatch, item.id, durationDialogOpen])
+  }, [dispatch, item.id, schedulingMode])
 
   return (
     <ListItem disablePadding>

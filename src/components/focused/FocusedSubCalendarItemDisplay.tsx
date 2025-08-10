@@ -24,9 +24,13 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
   }, []);
 
   const handleScheduleChildTemplate = useCallback(() => {
-    // Open the sidebar to help users understand the workflow
-    appDispatch({ type: 'SET_SIDE_DRAWER_OPEN', payload: { sideDrawerOpen: true } });
-    alert('To add child templates:\n\n1. Select a template from the sidebar list (it will appear as "Selected Item")\n2. Click the Timer icon (⏲) in the sidebar to schedule it as a child of this SubCalendar\n\nThe sidebar is now open to guide you through this process.');
+    // Enter scheduling mode and open the sidebar
+    appDispatch({
+      type: 'BATCH', payload: [
+        { type: 'SET_SCHEDULING_MODE', payload: { schedulingMode: true } },
+        { type: 'SET_SIDE_DRAWER_OPEN', payload: { sideDrawerOpen: true } }
+      ]
+    });
   }, [appDispatch]);
 
   const handleCreateInstance = useCallback(() => {

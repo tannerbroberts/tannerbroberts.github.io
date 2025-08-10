@@ -6,9 +6,10 @@ interface ItemListFilterProps {
   readonly value: string;
   readonly setValue: (value: string) => void;
   readonly onFilteredItemsChange: (filteredIds: string[] | null) => void;
+  readonly hideVariableFilter?: boolean;
 }
 
-export default function ItemListFilter({ value, setValue, onFilteredItemsChange }: ItemListFilterProps) {
+export default function ItemListFilter({ value, setValue, onFilteredItemsChange, hideVariableFilter = false }: ItemListFilterProps) {
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
     setValue(newValue);
@@ -28,7 +29,7 @@ export default function ItemListFilter({ value, setValue, onFilteredItemsChange 
         placeholder="Type to filter items..."
       />
       <Divider sx={{ my: 2 }} />
-      <PantryFilter onFiltered={onFilteredItemsChange} />
+      {!hideVariableFilter && <PantryFilter onFiltered={onFilteredItemsChange} />}
     </Box>
   );
 }

@@ -1,4 +1,4 @@
-import { Delete, Schedule, Timer, PlaylistAdd, Functions } from "@mui/icons-material";
+import { Delete, Schedule, Timer, PlaylistAdd, Functions, Close } from "@mui/icons-material";
 import { Box, ButtonGroup, Drawer, IconButton, List, ListItem, Toolbar, Typography } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts";
@@ -17,7 +17,7 @@ import VariableManagementDialog from "./VariableManagementDialog";
 import CreateNewItemDialog from "./CreateNewItemDialog";
 
 export default function SideBar() {
-  const { sideDrawerOpen, focusedItemId, selectedItemId, items, durationDialogOpen } = useAppState()
+  const { sideDrawerOpen, focusedItemId, selectedItemId, items, schedulingMode } = useAppState()
   const appDispatch = useAppDispatch()
 
   const [filterString, setFilterString] = useState('')
@@ -25,7 +25,13 @@ export default function SideBar() {
   const [variableDialogOpen, setVariableDialogOpen] = useState(false)
 
   const closeDrawer = useCallback(() => {
-    appDispatch({ type: 'SET_SIDE_DRAWER_OPEN', payload: { sideDrawerOpen: false } })
+    appDispatch({
+      type: 'BATCH', payload: [
+        { type: 'SET_SIDE_DRAWER_OPEN', payload: { sideDrawerOpen: false } },
+        { type: 'SET_SCHEDULING_MODE', payload: { schedulingMode: false } },
+        { type: 'SET_DURATION_DIALOG_OPEN', payload: { durationDialogOpen: false } }
+      ]
+    })
   }, [appDispatch])
 
   const deleteFocusedItemById = useCallback(() => {
@@ -37,7 +43,12 @@ export default function SideBar() {
   }, [appDispatch])
 
   const openDurationDialog = useCallback(() => {
-    appDispatch({ type: 'SET_DURATION_DIALOG_OPEN', payload: { durationDialogOpen: true } })
+    appDispatch({
+      type: 'BATCH', payload: [
+        { type: 'SET_SCHEDULING_MODE', payload: { schedulingMode: true } },
+        { type: 'SET_DURATION_DIALOG_OPEN', payload: { durationDialogOpen: true } }
+      ]
+    })
   }, [appDispatch])
 
   const openCheckListChildDialog = useCallback(() => {
@@ -74,9 +85,44 @@ export default function SideBar() {
   }, [focusedItem])
 
   const canScheduleIntoFocusedItem = useMemo(() => {
-    if (!focusedItem || !selectedItem) return false
+    if (!focusedItem) return false
     return focusedItem instanceof SubCalendarItem
-  }, [focusedItem, selectedItem])
+  }, [focusedItem])
+
+  // If entering scheduling mode from a SubCalendar, pre-filter list to show only items that fit
+  const durationFilterIds = useMemo(() => {
+    if (!schedulingMode || !(focusedItem instanceof SubCalendarItem)) return null;
+
+    // Build occupied intervals from existing children
+    const intervals: Array<{ start: number; end: number }> = focusedItem.children
+      .map(c => {
+        const d = getItemById(items, c.id)?.duration ?? 0;
+        return { start: c.start, end: c.start + d };
+      })
+      .filter(iv => iv.end > iv.start)
+      .sort((a, b) => a.start - b.start);
+
+    // Compute largest available gap in [0, focusedItem.duration)
+    let maxGap = 0;
+    let cursor = 0;
+    for (const iv of intervals) {
+      if (iv.start > cursor) {
+        maxGap = Math.max(maxGap, iv.start - cursor);
+      }
+      cursor = Math.max(cursor, iv.end);
+    }
+    if (focusedItem.duration > cursor) {
+      maxGap = Math.max(maxGap, focusedItem.duration - cursor);
+    }
+    if (intervals.length === 0) {
+      maxGap = focusedItem.duration;
+    }
+
+    const ids = items
+      .filter(i => i.id !== focusedItem.id && i.duration > 0 && i.duration <= maxGap)
+      .map(i => i.id);
+    return ids.length ? ids : null;
+  }, [schedulingMode, focusedItem, items])
 
   return (
     <>
@@ -95,51 +141,68 @@ export default function SideBar() {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            <ListItem>
-              <ButtonGroup>
-                <RandomItemButton />
-                <NewItemButton />
-                <ImportButton />
-                <ExportButton />
-              </ButtonGroup>
-            </ListItem>
+            {!schedulingMode && (
+              <ListItem>
+                <ButtonGroup>
+                  <RandomItemButton />
+                  <NewItemButton />
+                  <ImportButton />
+                  <ExportButton />
+                </ButtonGroup>
+              </ListItem>
+            )}
             <hr />
-            <ButtonGroup sx={{ display: 'flex', justifyContent: 'space-around' }}>
-              <IconButton disabled={!focusedItemId} onClick={deleteFocusedItemById}>
-                <Delete />
-              </IconButton>
-
-              {focusedItemId ? (
+            <ButtonGroup sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+              {schedulingMode ? (
                 <>
-                  <IconButton disabled={!canScheduleIntoFocusedItem} onClick={openDurationDialog}>
-                    <Timer />
-                  </IconButton>
-                  <IconButton disabled={!canAddToChecklist} onClick={openCheckListChildDialog}>
-                    <PlaylistAdd />
-                  </IconButton>
-                  <IconButton disabled={!focusedItemId} onClick={openVariableDialog}>
-                    <Functions />
+                  <Typography variant="body2" sx={{ flex: 1, px: 1 }}>
+                    Schedule into: {focusedItem?.name ?? '—'}
+                  </Typography>
+                  <IconButton onClick={closeDrawer}>
+                    <Close />
                   </IconButton>
                 </>
-              ) : (<IconButton disabled={!canSchedule} onClick={openSchedulingDialog}>
-                <Schedule />
-              </IconButton>)}
+              ) : (
+                <>
+                  <IconButton disabled={!focusedItemId} onClick={deleteFocusedItemById}>
+                    <Delete />
+                  </IconButton>
+                  {focusedItemId ? (
+                    <>
+                      <IconButton disabled={!canScheduleIntoFocusedItem} onClick={openDurationDialog}>
+                        <Timer />
+                      </IconButton>
+                      <IconButton disabled={!canAddToChecklist} onClick={openCheckListChildDialog}>
+                        <PlaylistAdd />
+                      </IconButton>
+                      <IconButton disabled={!focusedItemId} onClick={openVariableDialog}>
+                        <Functions />
+                      </IconButton>
+                    </>
+                  ) : (
+                    <IconButton disabled={!canSchedule} onClick={openSchedulingDialog}>
+                      <Schedule />
+                    </IconButton>
+                  )}
+                </>
+              )}
             </ButtonGroup>
             <hr />
             <ItemListFilter
               value={filterString}
               setValue={setFilterString}
               onFilteredItemsChange={setFilteredItemIds}
+              hideVariableFilter={schedulingMode}
             />
             <PaginatedItemList
               filterString={filterString}
-              filteredItemIds={filteredItemIds ?? undefined}
+              filteredItemIds={(schedulingMode && durationFilterIds) ? durationFilterIds : (filteredItemIds ?? undefined)}
             />
           </List>
           <hr />
 
           {/* Child Scheduling Mode Indicator */}
-          {durationDialogOpen && (
+          {schedulingMode && (
             <Box sx={{ p: 2, bgcolor: 'primary.light', borderRadius: 1, mx: 2, mb: 2 }}>
               <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.contrastText' }}>
                 🎯 Child Scheduling Mode
@@ -150,49 +213,51 @@ export default function SideBar() {
             </Box>
           )}
 
-          <List>
-            <ListItem>
-              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                Focused Item (Parent):
-              </Typography>
-            </ListItem>
-            <ListItem>
-              <Typography>
-                Name: {focusedItem?.name || 'None'}
-              </Typography>
-            </ListItem>
-            <ListItem>
-              <Typography>
-                Duration: {focusedItem?.duration || 0}ms
-              </Typography>
-            </ListItem>
-            <ListItem>
-              <Typography>
-                Child Count: {focusedItem ? getChildren(focusedItem).length : 0}
-              </Typography>
-            </ListItem>
-            <ListItem>
-              <Typography>
-                Parent Count: {focusedItem?.parents.length || 0}
-              </Typography>
-            </ListItem>
+          {!schedulingMode && (
+            <List>
+              <ListItem>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                  Focused Item (Parent):
+                </Typography>
+              </ListItem>
+              <ListItem>
+                <Typography>
+                  Name: {focusedItem?.name || 'None'}
+                </Typography>
+              </ListItem>
+              <ListItem>
+                <Typography>
+                  Duration: {focusedItem?.duration || 0}ms
+                </Typography>
+              </ListItem>
+              <ListItem>
+                <Typography>
+                  Child Count: {focusedItem ? getChildren(focusedItem).length : 0}
+                </Typography>
+              </ListItem>
+              <ListItem>
+                <Typography>
+                  Parent Count: {focusedItem?.parents.length || 0}
+                </Typography>
+              </ListItem>
 
-            <ListItem>
-              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'secondary.main' }}>
-                Selected Item (Child):
-              </Typography>
-            </ListItem>
-            <ListItem>
-              <Typography>
-                Name: {selectedItem?.name || 'None'}
-              </Typography>
-            </ListItem>
-            <ListItem>
-              <Typography>
-                Duration: {selectedItem?.duration || 0}ms
-              </Typography>
-            </ListItem>
-          </List>
+              <ListItem>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'secondary.main' }}>
+                  Selected Item (Child):
+                </Typography>
+              </ListItem>
+              <ListItem>
+                <Typography>
+                  Name: {selectedItem?.name || 'None'}
+                </Typography>
+              </ListItem>
+              <ListItem>
+                <Typography>
+                  Duration: {selectedItem?.duration || 0}ms
+                </Typography>
+              </ListItem>
+            </List>
+          )}
         </Box>
       </Drawer>
       <TimeInputProvider>

@@ -88,7 +88,12 @@ export default function DurationDialog() {
   }, [durationDialogOpen, timeInputDispatch]);
 
   const handleClose = useCallback(() => {
-    dispatch({ type: 'SET_DURATION_DIALOG_OPEN', payload: { durationDialogOpen: false } });
+    dispatch({
+      type: 'BATCH', payload: [
+        { type: 'SET_DURATION_DIALOG_OPEN', payload: { durationDialogOpen: false } },
+        { type: 'SET_SCHEDULING_MODE', payload: { schedulingMode: false } }
+      ]
+    });
   }, [dispatch]);
 
   const scheduleSelectedItem = useCallback(() => {
