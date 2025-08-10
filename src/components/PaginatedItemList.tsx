@@ -6,7 +6,7 @@ import { DEFAULT_WINDOW_RANGE_SIZE } from "../functions/reducers/AppReducer"
 
 interface PaginatedItemListProps {
   readonly filterString: string;
-  readonly filteredItemIds?: string[]; // Item IDs from variable filtering
+  readonly filteredItemIds?: string[] | null; // Item IDs from variable filtering
 }
 
 export default function PaginatedItemList({ filterString, filteredItemIds }: PaginatedItemListProps) {
@@ -18,7 +18,7 @@ export default function PaginatedItemList({ filterString, filteredItemIds }: Pag
 
   // Update filtering mode when filteredItemIds changes
   useEffect(() => {
-    setUsingVariableFilter(!!filteredItemIds);
+    setUsingVariableFilter(Array.isArray(filteredItemIds) && filteredItemIds.length > 0);
   }, [filteredItemIds]);
 
   // Virtualize the list

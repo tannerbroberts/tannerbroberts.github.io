@@ -21,7 +21,7 @@ export default function SideBar() {
   const appDispatch = useAppDispatch()
 
   const [filterString, setFilterString] = useState('')
-  const [filteredItemIds, setFilteredItemIds] = useState<string[]>([])
+  const [filteredItemIds, setFilteredItemIds] = useState<string[] | null>(null)
   const [variableDialogOpen, setVariableDialogOpen] = useState(false)
 
   const closeDrawer = useCallback(() => {
@@ -133,7 +133,7 @@ export default function SideBar() {
             />
             <PaginatedItemList
               filterString={filterString}
-              filteredItemIds={filteredItemIds}
+              filteredItemIds={filteredItemIds ?? undefined}
             />
           </List>
           <hr />

@@ -73,6 +73,6 @@ Purpose: Living plan to ship the food-focused MVP (meal plans, shopping, prep ti
 - [ ] Multi-child scheduling support and UI
 - [ ] “Up next” chip in ExecutionView
 - [ ] Starter templates: Weekly Meal Plan, Grocery Trip, Meal Prep (public/free)
-- [ ] Pantry variable inspector: “What can I make?” filter
+- [x] Pantry variable inspector: “What can I make?” filter
 
-Status: initial anchor created. Update this file as we implement.
+Status: Pantry filter implemented in sidebar (What can I make?).

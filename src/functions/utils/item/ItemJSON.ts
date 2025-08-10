@@ -12,4 +12,14 @@ export interface ItemJSON {
   priority?: number;
   children?: unknown[];
   sortType?: SortType;
+  color?: string;
+  pattern?: string;
+  scheduling?: import('./types/Scheduling').SchedulingConfig;
+  behavior?: {
+    autoShoppingList?: boolean;
+    targetChecklistName?: string;
+  };
+  criteria?: {
+    requireChecklistNamed?: string;
+  };
 }

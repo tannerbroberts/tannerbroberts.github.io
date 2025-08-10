@@ -426,6 +426,21 @@ function CreateNewItemDialogContent() {
   const [variables, setVariables] = useState<Record<string, number>>({});
   const [variableName, setVariableName] = useState('');
   const [variableQuantity, setVariableQuantity] = useState('');
+  // Scheduling rules (minimal builder v1)
+  type Rule = {
+    id: string;
+    whenNameIncludes: string;
+    thenCreateName: string;
+    thenCreateDuration: number;
+    thenAddToChecklist: boolean;
+  };
+  const [rules, setRules] = useState<Rule[]>([]);
+  const [tmpRule, setTmpRule] = useState<Rule>({ id: crypto.randomUUID(), whenNameIncludes: '', thenCreateName: '', thenCreateDuration: 120000, thenAddToChecklist: true });
+  const addRule = useCallback(() => {
+    setRules(r => [...r, { ...tmpRule, id: crypto.randomUUID() }])
+    setTmpRule({ id: crypto.randomUUID(), whenNameIncludes: '', thenCreateName: '', thenCreateDuration: 120000, thenAddToChecklist: true })
+  }, [tmpRule]);
+  const removeRule = useCallback((id: string) => setRules(rs => rs.filter(r => r.id !== id)), []);
 
   const setName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     newItemDispatch({ type: "SET_NAME", payload: { name: event.target.value } });
@@ -440,6 +455,8 @@ function CreateNewItemDialogContent() {
     setVariables({});
     setVariableName('');
     setVariableQuantity('');
+    setRules([]);
+    setTmpRule({ id: crypto.randomUUID(), whenNameIncludes: '', thenCreateName: '', thenCreateDuration: 120000, thenAddToChecklist: true });
   }, [dispatch, newItemDispatch, timeInputDispatch]);
 
   const handleAddVariable = useCallback(() => {
@@ -456,6 +473,23 @@ function CreateNewItemDialogContent() {
     setVariableName('');
     setVariableQuantity('');
   }, [variableName, variableQuantity]);
+
+  const buildScheduling = useCallback(() => {
+    if (rules.length === 0) return undefined
+    return {
+      rules: rules.map(r => ({
+        when: {
+          start: 'parent' as const,
+          chain: [{ op: 'findChildren' as const }, { op: 'filter' as const, match: { nameIncludes: r.whenNameIncludes || undefined } }],
+          assert: [{ kind: 'exists' as const, value: true }]
+        },
+        then: [
+          ...(r.thenCreateName ? [{ type: 'createItem' as const, name: r.thenCreateName, duration: r.thenCreateDuration }] : []),
+          ...(r.thenAddToChecklist ? [{ type: 'addToChecklist' as const, target: 'firstMatch' as const, source: 'lastCreatedItem' as const }] : [])
+        ]
+      }))
+    }
+  }, [rules]);
 
   const createNewItem = useCallback(() => {
     if (name.trim() === "") {
@@ -477,21 +511,24 @@ function CreateNewItemDialogContent() {
         newItem = new BasicItem({
           name: name.trim(),
           duration: total,
-          variables: variables
+          variables: variables,
+          scheduling: buildScheduling()
         });
         break;
       case 'subcalendar':
         newItem = new SubCalendarItem({
           name: name.trim(),
           duration: total,
-          variables: variables
+          variables: variables,
+          scheduling: buildScheduling()
         });
         break;
       case 'checklist':
         newItem = new CheckListItem({
           name: name.trim(),
           duration: total,
-          variables: variables
+          variables: variables,
+          scheduling: buildScheduling()
         });
         break;
       default:
@@ -504,7 +541,7 @@ function CreateNewItemDialogContent() {
     // Variables will be added via separate mechanism if needed
 
     handleClose();
-  }, [dispatch, name, total, variables, selectedItemType, handleClose]);
+  }, [dispatch, name, total, variables, selectedItemType, handleClose, buildScheduling]);
 
   return (
     <Dialog
@@ -599,6 +636,35 @@ function CreateNewItemDialogContent() {
               <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
                 No variables defined
               </Typography>
+            )}
+          </Box>
+
+          <Box sx={{ mt: 3 }}>
+            <Typography variant="subtitle2" gutterBottom>
+              Scheduling Rules (beta)
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+              Build rules that run when this item is scheduled.
+            </Typography>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: 1, alignItems: 'end', mb: 1 }}>
+              <TextField size="small" label="When child of parent has name including" value={tmpRule.whenNameIncludes} onChange={(e) => setTmpRule(v => ({ ...v, whenNameIncludes: e.target.value }))} />
+              <TextField size="small" label="Then create item named" value={tmpRule.thenCreateName} onChange={(e) => setTmpRule(v => ({ ...v, thenCreateName: e.target.value }))} />
+              <TextField size="small" label="Duration (ms)" type="number" value={tmpRule.thenCreateDuration} onChange={(e) => setTmpRule(v => ({ ...v, thenCreateDuration: parseInt(e.target.value) || 0 }))} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <input id="add-to-checklist" type="checkbox" checked={tmpRule.thenAddToChecklist} onChange={(e) => setTmpRule(v => ({ ...v, thenAddToChecklist: e.target.checked }))} />
+                <label htmlFor="add-to-checklist">Add to checklist</label>
+              </Box>
+            </Box>
+            <Button variant="outlined" size="small" onClick={addRule}>Add Rule</Button>
+            {rules.length > 0 && (
+              <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {rules.map((r) => (
+                  <Box key={r.id} sx={{ p: 1, border: '1px solid', borderColor: 'grey.300', borderRadius: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2">When child name includes "{r.whenNameIncludes}" then create "{r.thenCreateName}" ({r.thenCreateDuration}ms){r.thenAddToChecklist ? ' and add to checklist' : ''}</Typography>
+                    <Button size="small" onClick={() => removeRule(r.id)}>Remove</Button>
+                  </Box>
+                ))}
+              </Box>
             )}
           </Box>
         </Box>

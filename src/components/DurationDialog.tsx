@@ -4,6 +4,7 @@ import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts";
 import { getItemById, SubCalendarItem, Child, Parent, addParentToItem } from "../functions/utils/item/index";
 import { useTimeInputState, useTimeInputDispatch } from "../reducerContexts/TimeInput";
+import { applySchedulingRules } from "../utils/schedulingBehaviors";
 
 interface TimeUnitControlProps {
   label: string;
@@ -126,7 +127,21 @@ export default function DurationDialog() {
 
     const updatedChild = addParentToItem(selectedItem, newParent);
 
-    dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [focusedItem, updatedChild] } });
+    // Apply scheduling behavior (e.g., auto shopping list updates)
+    const behavior = applySchedulingRules(items, focusedItem, selectedItem)
+
+    dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [focusedItem, updatedChild, ...behavior.updatedItems] } });
+    if (behavior.summary) {
+      window.dispatchEvent(new CustomEvent('app:notify', {
+        detail: {
+          id: `auto-shop-${Date.now()}`,
+          type: 'success',
+          title: 'Scheduled actions executed',
+          message: behavior.summary,
+          autoHideDuration: 5000
+        }
+      }))
+    }
     handleClose();
   }, [dispatch, focusedItemId, selectedItemId, items, total, handleClose]);
 
