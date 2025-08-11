@@ -38,15 +38,6 @@ const ItemContainer = styled(Box, {
   }),
 }));
 
-const AnimatedLinearProgress = styled(LinearProgress)(({ theme }) => ({
-  height: 10,
-  borderRadius: 5,
-  backgroundColor: theme.palette.grey[200],
-  '& .MuiLinearProgress-bar': {
-    borderRadius: 5,
-    transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-  },
-}));
 
 interface PrimaryBasicItemDisplayProps {
   readonly item: BasicItem;
@@ -153,7 +144,7 @@ export default function PrimaryBasicItemDisplay({
           </Typography>
         </Box>
 
-        <AnimatedLinearProgress
+        <LinearProgress
           variant="determinate"
           value={Math.min(progress, 100)}
           color={progressColor}

@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Autocomplete, TextField, Box } from "@mui/material";
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Autocomplete, TextField, Box, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts";
 import SchedulingTimeInput from "./SchedulingTimeInput";
@@ -13,6 +13,7 @@ export default function SchedulingDialog() {
   const dispatch = useAppDispatch()
   const timeInputDispatch = useTimeInputDispatch()
   const [chosenItemId, setChosenItemId] = useState<string | null>(null)
+  const [isCustomTime, setIsCustomTime] = useState(false)
 
   // Reset time input when dialog opens
   useEffect(() => {
@@ -20,6 +21,7 @@ export default function SchedulingDialog() {
       // Reset time and initialize selection from focused or globally selected item
       timeInputDispatch({ type: 'RESET' })
       setChosenItemId(focusedItemId ?? selectedItemId ?? null)
+      setIsCustomTime(false)
     }
   }, [schedulingDialogOpen, timeInputDispatch, focusedItemId, selectedItemId])
 
@@ -35,8 +37,8 @@ export default function SchedulingDialog() {
     const item = getItemById(items, itemId)
     if (item === null) throw new Error(`Item with id ${itemId} not found`)
 
-    // Use the absolute timestamp from the time input
-    const scheduledTime = total;
+    // Default behavior: schedule now (+2 seconds) unless user set a custom time
+    const scheduledTime = isCustomTime ? total : Date.now() + 2000;
 
     // Schedule directly onto the base calendar (absolute time scheduling)
     const baseCalendarEntry = createBaseCalendarEntry(item.id, scheduledTime)
@@ -46,7 +48,7 @@ export default function SchedulingDialog() {
     })
 
     handleClose()
-  }, [dispatch, idToSchedule, items, total, handleClose])
+  }, [dispatch, idToSchedule, items, total, handleClose, isCustomTime])
 
   // Can schedule if we have some item selected (focused or chosen)
   const canSchedule = idToSchedule !== null
@@ -56,6 +58,18 @@ export default function SchedulingDialog() {
     if (chosenItemId) return getItemById(items, chosenItemId)
     return null
   }, [focusedItemId, chosenItemId, items])
+
+  // Helper to format remaining time as mm:ss or h:mm:ss
+  const formatRemaining = useCallback((ms: number) => {
+    const clamped = Math.max(0, ms)
+    const totalSeconds = Math.floor(clamped / 1000)
+    const hours = Math.floor(totalSeconds / 3600)
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+    const seconds = totalSeconds % 60
+    const mm = minutes.toString().padStart(hours > 0 ? 2 : 1, '0')
+    const ss = seconds.toString().padStart(2, '0')
+    return hours > 0 ? `${hours}:${mm}:${ss}` : `${mm}:${ss}`
+  }, [])
 
   return (
     <Dialog open={schedulingDialogOpen} onClose={handleClose}>
@@ -77,18 +91,33 @@ export default function SchedulingDialog() {
             )}
           />
         </Box>
-        <SchedulingTimeInput />
+        <SchedulingTimeInput
+          onUserTimeChange={() => setIsCustomTime(true)}
+          onResetToNow={() => setIsCustomTime(false)}
+        />
       </DialogContent>
-      <DialogActions sx={{ padding: 2 }}>
-        <Button onClick={handleClose} color="inherit">Cancel</Button>
-        <Button
-          onClick={scheduleSelectedItem}
-          variant="contained"
-          color="primary"
-          disabled={!canSchedule}
-        >
-          Schedule
-        </Button>
+      <DialogActions sx={{ padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 1 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+          <Button onClick={handleClose} color="inherit">Cancel</Button>
+          <Button
+            onClick={scheduleSelectedItem}
+            variant="contained"
+            color="primary"
+            disabled={!canSchedule}
+          >
+            {isCustomTime ? 'Schedule' : 'Schedule now'}
+          </Button>
+        </Box>
+        {isCustomTime && (
+          <Box sx={{ width: '100%', mt: 0.5 }}>
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+              starts in {formatRemaining((total ?? 0) - Date.now())}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Scheduled for: {new Date(total).toLocaleString()}
+            </Typography>
+          </Box>
+        )}
       </DialogActions>
     </Dialog>
   )

@@ -4,10 +4,13 @@ import { Item, SubCalendarItem, CheckListItem } from "../functions/utils/item/in
 interface CurrentTaskDisplayProps {
   task: Item;
   currentTime: number;
-  rootItem: Item;
+  taskChain: Item[];
+  rootStartTime: number;
 }
 
-export default function CurrentTaskDisplay({ task, currentTime }: Readonly<CurrentTaskDisplayProps>) {
+import { getTaskProgress } from "../functions/utils/item/utils";
+
+export default function CurrentTaskDisplay({ task, currentTime, taskChain, rootStartTime }: Readonly<CurrentTaskDisplayProps>) {
   const formatDuration = (duration: number): string => {
     const minutes = Math.floor(duration / 60000);
     const seconds = Math.floor((duration % 60000) / 1000);
@@ -23,19 +26,31 @@ export default function CurrentTaskDisplay({ task, currentTime }: Readonly<Curre
     });
   };
 
-  // Calculate progress through the current task
-  const getTaskProgress = (task: Item, currentTime: number): number => {
-    if (!task.duration) return 0;
-
-    // Find when this task started within its parent context
-    // For now, we'll use a simple calculation - this would need to be more sophisticated
-    // based on the actual scheduling within the parent
-    const elapsed = currentTime % task.duration;
-    return Math.min((elapsed / task.duration) * 100, 100);
+  // Compute absolute start time for the current task from the chain
+  const computeAbsoluteStarts = (taskChain: Item[], rootStartTime: number): number[] => {
+    const starts: number[] = [];
+    let acc = rootStartTime;
+    starts.push(acc);
+    for (let i = 1; i < taskChain.length; i++) {
+      const parent = taskChain[i - 1];
+      const child = taskChain[i];
+      if (parent instanceof SubCalendarItem) {
+        const ref = parent.children.find((c) => c.id === child.id);
+        acc = acc + (ref?.start ?? 0);
+      } else if (parent instanceof CheckListItem) {
+        // Checklist children share parent start (no change)
+      }
+      starts.push(acc);
+    }
+    return starts;
   };
 
-  const progress = getTaskProgress(task, currentTime);
-  const remainingTime = task.duration - (currentTime % task.duration);
+  const starts = computeAbsoluteStarts(taskChain, rootStartTime);
+  const idx = taskChain.findIndex(it => it.id === task.id);
+  const startTime = starts[idx] ?? rootStartTime;
+
+  const progress = getTaskProgress(task, currentTime, startTime);
+  const remainingTime = Math.max(0, task.duration - (currentTime - startTime));
 
   return (
     <Paper

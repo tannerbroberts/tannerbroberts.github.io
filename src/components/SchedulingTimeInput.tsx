@@ -1,48 +1,12 @@
-import { Box, Input, Typography } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { Box, Typography, TextField, InputAdornment, Button } from "@mui/material";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { useCallback, useMemo, useEffect } from "react";
 import { useTimeInputDispatch, useTimeInputState } from "../reducerContexts/TimeInput";
 
-interface TimeUnit {
-  label: string;
-  value: number;
-  onChange: (val: number) => void;
-  max?: number;
-}
-
-function TimeUnitInput({ label, value, onChange, max }: Readonly<TimeUnit>) {
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseInt(e.target.value);
-    if (!isNaN(val) && val >= 0 && (!max || val <= max)) {
-      onChange(val);
-    }
-  }, [onChange, max]);
-
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-      <Typography variant="body2" sx={{ minWidth: 100 }}>
-        {label}:
-      </Typography>
-      <Input
-        type="number"
-        value={value}
-        onChange={handleChange}
-        inputProps={{ min: 0, max }}
-        sx={{
-          width: "8ch",
-          border: "1px solid #ccc",
-          borderRadius: "4px",
-          padding: "4px",
-        }}
-      />
-    </Box>
-  );
-}
-
-export default function SchedulingTimeInput() {
+export default function SchedulingTimeInput({ onUserTimeChange, onResetToNow }: Readonly<{ onUserTimeChange?: () => void; onResetToNow?: () => void }>) {
   const { absoluteTimestamp } = useTimeInputState();
   const timeInputDispatch = useTimeInputDispatch();
 
@@ -75,22 +39,19 @@ export default function SchedulingTimeInput() {
     }
   }, [absoluteTimestamp, timeInputDispatch]);
 
-  const handleDateChange = useCallback((newDate: Dayjs | null) => {
-    if (newDate) {
-      // Keep existing time components, just change the date
-      const newTimestamp = newDate
-        .hour(timeComponents.hours)
-        .minute(timeComponents.minutes)
-        .second(timeComponents.seconds)
-        .millisecond(timeComponents.milliseconds)
-        .valueOf();
+  const handleDateTimeChange = useCallback((newDate: Dayjs | null) => {
+    if (!newDate) return;
+    // Preserve current milliseconds when changing via picker (since UI doesn't expose ms)
+    const newTimestamp = newDate
+      .millisecond(timeComponents.milliseconds)
+      .valueOf();
 
-      timeInputDispatch({
-        type: "SET_ABSOLUTE_TIMESTAMP",
-        payload: { timestamp: newTimestamp }
-      });
-    }
-  }, [timeInputDispatch, timeComponents]);
+    timeInputDispatch({
+      type: "SET_ABSOLUTE_TIMESTAMP",
+      payload: { timestamp: newTimestamp }
+    });
+    onUserTimeChange?.();
+  }, [timeInputDispatch, timeComponents.milliseconds, onUserTimeChange]);
 
   const handleTimeComponentChange = useCallback((
     component: 'hours' | 'minutes' | 'seconds' | 'milliseconds',
@@ -116,59 +77,64 @@ export default function SchedulingTimeInput() {
       type: "SET_ABSOLUTE_TIMESTAMP",
       payload: { timestamp: newTimestamp }
     });
-  }, [currentDate, timeInputDispatch]);
+    onUserTimeChange?.();
+  }, [currentDate, timeInputDispatch, onUserTimeChange]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Typography variant="h6">Schedule Date & Time</Typography>
 
-        <Box>
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>
-            Select Date:
-          </Typography>
-          <DatePicker
-            value={currentDate}
-            onChange={handleDateChange}
-            sx={{ width: '100%' }}
-          />
+        <DateTimePicker
+          value={currentDate}
+          onChange={handleDateTimeChange}
+          slotProps={{
+            textField: {
+              fullWidth: true,
+            },
+          }}
+        />
+
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: -1 }}>
+          <Button
+            type="button"
+            size="small"
+            variant="text"
+            onClick={() => {
+              const now = Date.now();
+              timeInputDispatch({ type: 'SET_ABSOLUTE_TIMESTAMP', payload: { timestamp: now } });
+              onResetToNow?.();
+            }}
+          >
+            Reset to now
+          </Button>
         </Box>
 
-        <Box>
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>
-            Set Time:
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+          <Typography variant="caption" color="text.secondary" sx={{ minWidth: 100 }}>
+            Milliseconds (optional)
           </Typography>
-          <TimeUnitInput
-            label="Hours"
-            value={timeComponents.hours}
-            onChange={(val) => handleTimeComponentChange('hours', val)}
-            max={23}
-          />
-          <TimeUnitInput
-            label="Minutes"
-            value={timeComponents.minutes}
-            onChange={(val) => handleTimeComponentChange('minutes', val)}
-            max={59}
-          />
-          <TimeUnitInput
-            label="Seconds"
-            value={timeComponents.seconds}
-            onChange={(val) => handleTimeComponentChange('seconds', val)}
-            max={59}
-          />
-          <TimeUnitInput
-            label="Milliseconds"
+          <TextField
+            type="number"
+            size="small"
             value={timeComponents.milliseconds}
-            onChange={(val) => handleTimeComponentChange('milliseconds', val)}
-            max={999}
+            slotProps={{
+              input: {
+                inputProps: { min: 0, max: 999 },
+                endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+              },
+            }}
+            onChange={(e) => {
+              const val = parseInt(e.target.value);
+              if (!isNaN(val) && val >= 0 && val <= 999) {
+                handleTimeComponentChange('milliseconds', val);
+              }
+            }}
+            sx={{ width: 120 }}
           />
         </Box>
 
-        <Box sx={{ mt: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
-          <Typography variant="body2" color="text.secondary">
-            Scheduled for: {currentDate.format('MMMM D, YYYY at h:mm:ss.SSS A')}
-          </Typography>
-        </Box>
+        {/* Summary moved below the Schedule button in SchedulingDialog */}
       </Box>
     </LocalizationProvider>
   );
