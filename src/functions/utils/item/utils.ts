@@ -70,8 +70,21 @@ export function getCurrentTaskChain(
     const topMostItem = findTopMostActiveItem(items, currentTime, baseCalendar);
     if (!topMostItem) return chain;
 
-    // Get the start time for the top-most item from the base calendar
-    const topMostStartTime = getBaseStartTime(topMostItem, baseCalendar);
+    // Get the correct start time for the selected root item from the base calendar
+    // Prefer the entry that is active at currentTime; if none, choose the nearest
+    let topMostStartTime = 0;
+    if (baseCalendar) {
+      const entriesForItem: BaseCalendarEntry[] = [];
+      for (const [, entry] of baseCalendar) {
+        if (entry.itemId === topMostItem.id) entriesForItem.push(entry);
+      }
+      if (entriesForItem.length > 0) {
+        const active = entriesForItem.find(e => currentTime >= e.startTime && currentTime < e.startTime + (topMostItem.duration || 0));
+        topMostStartTime = (active ?? entriesForItem
+          .slice()
+          .sort((a, b) => Math.abs(currentTime - a.startTime) - Math.abs(currentTime - b.startTime))[0])?.startTime || 0;
+      }
+    }
 
     // Build chain recursively from top-most parent to deepest child
     buildChainRecursively(items, topMostItem, currentTime, chain, 0, topMostStartTime);

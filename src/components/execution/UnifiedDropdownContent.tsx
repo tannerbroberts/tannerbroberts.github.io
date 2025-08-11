@@ -31,6 +31,10 @@ interface UnifiedDropdownContentProps {
   readonly gapPeriod?: boolean;
   readonly currentPhase?: string;
   readonly childExecutionStatus?: ChildExecutionStatus;
+  readonly totalChildren?: number;
+  readonly completedChildren?: number;
+  readonly nextBasicDescendant?: { item: { name: string }; startTime: number; timeUntilStart: number } | null;
+  readonly hasActiveBasicDescendant?: boolean;
 }
 
 /**
@@ -48,7 +52,11 @@ function UnifiedDropdownContent({
   nextChild,
   gapPeriod = false,
   currentPhase,
-  childExecutionStatus
+  childExecutionStatus,
+  totalChildren,
+  completedChildren,
+  nextBasicDescendant,
+  hasActiveBasicDescendant
 }: UnifiedDropdownContentProps): React.JSX.Element {
   const theme = useTheme();
 
@@ -315,6 +323,49 @@ function UnifiedDropdownContent({
                       }}
                     >
                       Time remaining: {formatDuration(nextChild.timeUntilStart)}
+                    </Typography>
+                  )}
+                </Box>
+              )}
+
+              {/* Children summary */}
+              {typeof totalChildren === 'number' && (
+                <Box sx={{
+                  p: 2,
+                  backgroundColor: 'grey.50',
+                  border: '1px solid',
+                  borderColor: 'grey.200',
+                  borderRadius: 2,
+                  mb: 2
+                }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                    Children
+                  </Typography>
+                  <Typography variant="body2">
+                    {completedChildren ?? 0} of {totalChildren} complete
+                  </Typography>
+                </Box>
+              )}
+
+              {/* Next basic descendant info when none active */}
+              {nextBasicDescendant && hasActiveBasicDescendant === false && (
+                <Box sx={{
+                  p: 2,
+                  backgroundColor: 'info.50',
+                  border: '1px solid',
+                  borderColor: 'info.200',
+                  borderRadius: 2,
+                  mb: 2
+                }}>
+                  <Typography variant="subtitle2" color="info.main" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                    Next Basic Item
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {nextBasicDescendant.item.name}
+                  </Typography>
+                  {nextBasicDescendant.timeUntilStart > 0 && (
+                    <Typography variant="caption" color="text.secondary">
+                      Starts in {formatDuration(nextBasicDescendant.timeUntilStart)}
                     </Typography>
                   )}
                 </Box>

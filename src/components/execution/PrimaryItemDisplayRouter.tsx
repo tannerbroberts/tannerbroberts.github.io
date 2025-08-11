@@ -92,12 +92,12 @@ export default function PrimaryItemDisplayRouter({
         taskChain={taskChain}
         currentTime={currentTime}
         startTime={childStartTime}
-        isDeepest={isDeepest}
+        isDeepest={depth + 1 === taskChain.length}
         depth={depth + 1}
         executionContext={executionContext}
       />
     );
-  }, [activeChild, taskChain, currentTime, childStartTime, isDeepest, depth, canRenderChildren, executionContext]);
+  }, [activeChild, taskChain, currentTime, childStartTime, depth, canRenderChildren, executionContext]);
 
   // Route to appropriate primary display component
   const renderPrimaryDisplay = useCallback(() => {
@@ -126,7 +126,7 @@ export default function PrimaryItemDisplayRouter({
         </PrimarySubCalendarItemDisplay>
       );
     } else if (item instanceof CheckListItem) {
-      // TODO: Re-implement CheckListItem display for simplified variable system
+      // CheckListItem display placeholder pending simplified variable system integration
       return (
         <div>CheckListItem display not yet implemented for simplified variable system</div>
       );

@@ -1,5 +1,5 @@
-import { Delete, Schedule, Timer, PlaylistAdd, Functions, Close } from "@mui/icons-material";
-import { Box, ButtonGroup, Drawer, IconButton, List, ListItem, Toolbar, Typography } from "@mui/material";
+import { Delete, Schedule, PlaylistAdd, Functions } from "@mui/icons-material";
+import { Box, Button, ButtonGroup, Drawer, List, ListItem, Toolbar, Tooltip, Typography } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts";
 import { TimeInputProvider } from "../reducerContexts/TimeInput";
@@ -42,14 +42,7 @@ export default function SideBar() {
     appDispatch({ type: 'SET_SCHEDULING_DIALOG_OPEN', payload: { schedulingDialogOpen: true } })
   }, [appDispatch])
 
-  const openDurationDialog = useCallback(() => {
-    appDispatch({
-      type: 'BATCH', payload: [
-        { type: 'SET_SCHEDULING_MODE', payload: { schedulingMode: true } },
-        { type: 'SET_DURATION_DIALOG_OPEN', payload: { durationDialogOpen: true } }
-      ]
-    })
-  }, [appDispatch])
+  // Removed: openDurationDialog (replaced by scheduleChildTemplate for parity with main view)
 
   const openCheckListChildDialog = useCallback(() => {
     appDispatch({ type: 'SET_CHECKLIST_CHILD_DIALOG_OPEN', payload: { checkListChildDialogOpen: true } })
@@ -62,6 +55,25 @@ export default function SideBar() {
   const closeVariableDialog = useCallback(() => {
     setVariableDialogOpen(false)
   }, [])
+
+  const exitSchedulingMode = useCallback(() => {
+    appDispatch({
+      type: 'BATCH', payload: [
+        { type: 'SET_SCHEDULING_MODE', payload: { schedulingMode: false } },
+        { type: 'SET_DURATION_DIALOG_OPEN', payload: { durationDialogOpen: false } },
+      ]
+    })
+  }, [appDispatch])
+
+  // Match main view's "Schedule Child Template" action
+  const scheduleChildTemplate = useCallback(() => {
+    appDispatch({
+      type: 'BATCH', payload: [
+        { type: 'SET_SCHEDULING_MODE', payload: { schedulingMode: true } },
+        { type: 'SET_SIDE_DRAWER_OPEN', payload: { sideDrawerOpen: true } },
+      ]
+    })
+  }, [appDispatch])
 
   // Can schedule if:
   const focusedItem = useMemo(() => {
@@ -144,49 +156,59 @@ export default function SideBar() {
             {!schedulingMode && (
               <ListItem>
                 <ButtonGroup>
-                  <RandomItemButton />
                   <NewItemButton />
+                  <RandomItemButton />
                   <ImportButton />
                   <ExportButton />
                 </ButtonGroup>
               </ListItem>
             )}
             <hr />
-            <ButtonGroup sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2 }}>
               {schedulingMode ? (
                 <>
-                  <Typography variant="body2" sx={{ flex: 1, px: 1 }}>
-                    Schedule into: {focusedItem?.name ?? '—'}
+                  <Typography variant="body2" sx={{ flex: 1 }}>
+                    Scheduling into: {focusedItem?.name ?? '—'}
                   </Typography>
-                  <IconButton onClick={closeDrawer}>
-                    <Close />
-                  </IconButton>
+                  <Button size="small" onClick={exitSchedulingMode} variant="outlined">
+                    Exit scheduling
+                  </Button>
                 </>
               ) : (
-                <>
-                  <IconButton disabled={!focusedItemId} onClick={deleteFocusedItemById}>
-                    <Delete />
-                  </IconButton>
+                <ButtonGroup variant="outlined" size="small" sx={{ flexWrap: 'wrap' }}>
                   {focusedItemId ? (
                     <>
-                      <IconButton disabled={!canScheduleIntoFocusedItem} onClick={openDurationDialog}>
-                        <Timer />
-                      </IconButton>
-                      <IconButton disabled={!canAddToChecklist} onClick={openCheckListChildDialog}>
-                        <PlaylistAdd />
-                      </IconButton>
-                      <IconButton disabled={!focusedItemId} onClick={openVariableDialog}>
-                        <Functions />
-                      </IconButton>
+                      <Tooltip title={canScheduleIntoFocusedItem ? 'Enter child scheduling mode for this SubCalendar' : 'Focus a SubCalendar to schedule children'}>
+                        <span>
+                          <Button onClick={scheduleChildTemplate} disabled={!canScheduleIntoFocusedItem} startIcon={<Schedule />}>Schedule child template</Button>
+                        </span>
+                      </Tooltip>
+                      <Tooltip title={canAddToChecklist ? 'Add a selected item to this checklist' : 'Focus a Checklist to add items'}>
+                        <span>
+                          <Button onClick={openCheckListChildDialog} disabled={!canAddToChecklist} startIcon={<PlaylistAdd />}>Add checklist item</Button>
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="Manage variables for the focused item">
+                        <span>
+                          <Button onClick={openVariableDialog} disabled={!focusedItemId} startIcon={<Functions />}>Variables</Button>
+                        </span>
+                      </Tooltip>
+                      <Tooltip title={focusedItemId ? 'Delete focused item' : ''}>
+                        <span>
+                          <Button color="error" onClick={deleteFocusedItemById} disabled={!focusedItemId} startIcon={<Delete />}>Delete</Button>
+                        </span>
+                      </Tooltip>
                     </>
                   ) : (
-                    <IconButton disabled={!canSchedule} onClick={openSchedulingDialog}>
-                      <Schedule />
-                    </IconButton>
+                    <Tooltip title="Open the scheduler to plan items on the base calendar">
+                      <span>
+                        <Button onClick={openSchedulingDialog} disabled={!canSchedule} startIcon={<Schedule />}>Open scheduler</Button>
+                      </span>
+                    </Tooltip>
                   )}
-                </>
+                </ButtonGroup>
               )}
-            </ButtonGroup>
+            </Box>
             <hr />
             <ItemListFilter
               value={filterString}

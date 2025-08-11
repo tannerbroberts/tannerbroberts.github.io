@@ -6,7 +6,8 @@ import {
   CheckListChild,
   ItemInstance,
   ItemInstanceImpl,
-  getCurrentTaskChain
+  getCurrentTaskChain,
+  BasicItem
 } from "../../functions/utils/item/index";
 import { getItemById } from "../../functions/utils/item/utils";
 import type { BaseCalendarEntry } from "../../functions/reducers/AppReducer";
@@ -23,6 +24,7 @@ export interface ChildExecutionStatus {
   } | null;
   gapPeriod: boolean;
   currentPhase: 'pre-start' | 'active' | 'gap' | 'complete';
+  activeChildIndex?: number | null;
 }
 
 /**
@@ -34,6 +36,20 @@ export interface ExecutionContextWithInstances {
   taskChain: Array<{ item: Item; instance: ItemInstance | null }>;
   baseStartTime: number;
   actualStartTime?: number;
+}
+
+/**
+ * High-level hierarchy status for parent displays
+ */
+export interface HierarchyStatus {
+  totalChildren: number;
+  completedChildren: number;
+  hasActiveBasicDescendant: boolean;
+  nextBasicDescendant: {
+    item: Item;
+    startTime: number;
+    timeUntilStart: number;
+  } | null;
 }
 
 /**
@@ -61,11 +77,23 @@ export function getExecutionContext(
   const rootItem = taskChain[0];
   let baseCalendarEntry: BaseCalendarEntry | null = null;
 
+  // Prefer the calendar entry that is actually active at the current time
+  // This avoids accidentally picking an older instance when the same template
+  // has been scheduled multiple times.
+  const candidateEntries: BaseCalendarEntry[] = [];
   for (const [, entry] of baseCalendar) {
-    if (entry.itemId === rootItem.id) {
-      baseCalendarEntry = entry;
-      break;
-    }
+    if (entry.itemId === rootItem.id) candidateEntries.push(entry);
+  }
+  if (candidateEntries.length > 0) {
+    // Active if currentTime is within [startTime, startTime + duration)
+    baseCalendarEntry = candidateEntries.find(e => currentTime >= e.startTime && currentTime < e.startTime + (rootItem.duration || 0))
+      || null;
+
+    // Fallback: if none are currently active (e.g., pre-start or post-complete),
+    // choose the nearest entry in time to currentTime to keep context stable.
+    baseCalendarEntry ??= candidateEntries
+      .slice()
+      .sort((a, b) => Math.abs(currentTime - a.startTime) - Math.abs(currentTime - b.startTime))[0] || null;
   }
 
   if (!baseCalendarEntry) {
@@ -188,6 +216,128 @@ function findItemById(items: Item[], id: string): Item | null {
 }
 
 /**
+ * Compute immediate child completion counts for a SubCalendar item
+ */
+function getSubCalendarImmediateCompletion(
+  parentItem: SubCalendarItem,
+  items: Item[],
+  currentTime: number,
+  parentStartTime: number
+): { total: number; complete: number } {
+  const total = parentItem.children.length;
+  let complete = 0;
+  for (const child of parentItem.children) {
+    const childItem = findItemById(items, child.id);
+    if (!childItem) continue;
+    const startAbs = parentStartTime + child.start;
+    const endAbs = startAbs + (childItem.duration || 0);
+    if (currentTime >= endAbs) complete++;
+  }
+  return { total, complete };
+}
+
+/**
+ * Compute immediate child completion counts for a CheckList item
+ */
+function getCheckListImmediateCompletion(parentItem: CheckListItem): { total: number; complete: number } {
+  const total = parentItem.children.length;
+  const complete = parentItem.children.filter(c => !!c.complete).length;
+  return { total, complete };
+}
+
+/**
+ * Recursively scan descendants to find an active BasicItem or the next BasicItem start
+ */
+function scanBasic(
+  item: BasicItem,
+  currentTime: number,
+  startTime: number
+) {
+  const end = startTime + (item.duration || 0);
+  if (currentTime >= startTime && currentTime < end) return { active: item, next: null as { item: Item; start: number } | null };
+  if (startTime > currentTime) return { active: null as Item | null, next: { item, start: startTime } };
+  return { active: null as Item | null, next: null as { item: Item; start: number } | null };
+}
+
+function scanSubCalendar(
+  item: SubCalendarItem,
+  items: Item[],
+  currentTime: number,
+  startTime: number
+) {
+  let bestNext: { item: Item; start: number } | null = null;
+  for (const ch of item.children) {
+    const childItem = findItemById(items, ch.id);
+    if (!childItem) continue;
+    const childStartAbs = startTime + ch.start;
+    const res = scanForActiveOrNextBasic(childItem, items, currentTime, childStartAbs);
+    if (res.active) return { active: res.active, next: null as { item: Item; start: number } | null };
+    if (res.next && (!bestNext || res.next.start < bestNext.start)) bestNext = res.next;
+  }
+  return { active: null as Item | null, next: bestNext };
+}
+
+function scanChecklist(
+  item: CheckListItem,
+  items: Item[],
+  currentTime: number,
+  startTime: number
+) {
+  for (const ch of item.children) {
+    const childItem = findItemById(items, ch.itemId);
+    if (!childItem) continue;
+    if (!ch.complete) {
+      if (childItem instanceof BasicItem) return { active: childItem as Item, next: null as { item: Item; start: number } | null };
+      const res = scanForActiveOrNextBasic(childItem, items, currentTime, startTime);
+      if (res.active) return res;
+      if (res.next) return { active: null as Item | null, next: res.next };
+    }
+  }
+  return { active: null as Item | null, next: null as { item: Item; start: number } | null };
+}
+
+function scanForActiveOrNextBasic(
+  parent: Item,
+  items: Item[],
+  currentTime: number,
+  startTime: number
+): { active: Item | null; next: { item: Item; start: number } | null } {
+  if (parent instanceof BasicItem) return scanBasic(parent, currentTime, startTime);
+  if (parent instanceof SubCalendarItem) return scanSubCalendar(parent, items, currentTime, startTime);
+  if (parent instanceof CheckListItem) return scanChecklist(parent, items, currentTime, startTime);
+  return { active: null, next: null };
+}
+
+/**
+ * Public helper to summarize hierarchy status for an item
+ */
+export function getHierarchyStatus(
+  parentItem: SubCalendarItem | CheckListItem,
+  items: Item[],
+  currentTime: number,
+  parentStartTime: number
+): HierarchyStatus {
+  let counts: { total: number; complete: number };
+  if (parentItem instanceof SubCalendarItem) {
+    counts = getSubCalendarImmediateCompletion(parentItem, items, currentTime, parentStartTime);
+  } else {
+    counts = getCheckListImmediateCompletion(parentItem);
+  }
+
+  const scan = scanForActiveOrNextBasic(parentItem, items, currentTime, parentStartTime);
+  const next = scan.next
+    ? { item: scan.next.item, startTime: scan.next.start, timeUntilStart: Math.max(0, scan.next.start - currentTime) }
+    : null;
+
+  return {
+    totalChildren: counts.total,
+    completedChildren: counts.complete,
+    hasActiveBasicDescendant: !!scan.active,
+    nextBasicDescendant: next
+  };
+}
+
+/**
  * Enhanced version of getActiveChildForExecution with countdown information
  */
 export function getChildExecutionStatus(
@@ -224,7 +374,8 @@ function getSubCalendarExecutionStatus(
       activeChild: null,
       nextChild: null,
       gapPeriod: false,
-      currentPhase: 'complete'
+      currentPhase: 'complete',
+      activeChildIndex: null
     };
   }
 
@@ -237,7 +388,8 @@ function getSubCalendarExecutionStatus(
       activeChild: null,
       nextChild: null,
       gapPeriod: false,
-      currentPhase: 'complete'
+      currentPhase: 'complete',
+      activeChildIndex: null
     };
   }
 
@@ -258,7 +410,8 @@ function getSubCalendarExecutionStatus(
           startTime: firstChildAbsoluteStartTime
         },
         gapPeriod: false,
-        currentPhase: 'pre-start'
+        currentPhase: 'pre-start',
+        activeChildIndex: null
       };
     }
   }
@@ -280,7 +433,8 @@ function getSubCalendarExecutionStatus(
         activeChild: childItem,
         nextChild: getNextChildInfo(sortedChildren, items, i + 1, parentStartTime, currentTime),
         gapPeriod: false,
-        currentPhase: 'active'
+        currentPhase: 'active',
+        activeChildIndex: i
       };
     }
 
@@ -297,7 +451,8 @@ function getSubCalendarExecutionStatus(
           startTime: childAbsoluteStartTime
         },
         gapPeriod: true,
-        currentPhase: 'gap'
+        currentPhase: 'gap',
+        activeChildIndex: null
       };
     }
   }
@@ -307,7 +462,8 @@ function getSubCalendarExecutionStatus(
     activeChild: null,
     nextChild: null,
     gapPeriod: false,
-    currentPhase: 'complete'
+    currentPhase: 'complete',
+    activeChildIndex: null
   };
 }
 

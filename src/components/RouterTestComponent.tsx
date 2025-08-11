@@ -11,7 +11,7 @@ import { useCurrentTime } from '../hooks/useCurrentTime';
  */
 export default function RouterTestComponent() {
   const { items } = useAppState();
-  const currentTime = useCurrentTime();
+  const currentTime = useCurrentTime(20);
 
   // Find different types of items for testing
   const basicItem = items.find((item: Item) => item instanceof BasicItem);

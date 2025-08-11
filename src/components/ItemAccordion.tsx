@@ -31,7 +31,7 @@ export default function ItemAccordion({
 }: ItemAccordionProps) {
   const { items, baseCalendar } = useAppState();
   const appDispatch = useAppDispatch();
-  const currentTime = useCurrentTime(1000); // Reduced frequency to prevent performance issues
+  const currentTime = useCurrentTime(20);
   const [expanded, setExpanded] = useState(true);
 
   // Calculate progress for this item (memoized with less frequent updates)

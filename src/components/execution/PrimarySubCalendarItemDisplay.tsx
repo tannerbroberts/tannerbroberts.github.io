@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Box } from "@mui/material";
 import { SubCalendarItem } from "../../functions/utils/item/index";
-import { getChildExecutionStatus } from "./executionUtils";
+import { getChildExecutionStatus, getHierarchyStatus } from "./executionUtils";
 import { useAppState } from "../../reducerContexts";
 import { useItemVariables } from "../../hooks/useItemVariables";
 import SubCalendarStatusBar from "./SubCalendarStatusBar";
@@ -39,6 +39,10 @@ export default function PrimarySubCalendarItemDisplay({
     return getChildExecutionStatus(item, items, currentTime, startTime);
   }, [item, items, currentTime, startTime]);
 
+  const hierarchyStatus = useMemo(() => {
+    return getHierarchyStatus(item, items, currentTime, startTime);
+  }, [item, items, currentTime, startTime]);
+
   // Enhanced next child information with countdown
   const { nextChild, gapPeriod, currentPhase } = childExecutionStatus;
 
@@ -57,6 +61,10 @@ export default function PrimarySubCalendarItemDisplay({
         childExecutionStatus={childExecutionStatus}
         showCountdown={true}
         showPreparationHints={true}
+        totalChildren={hierarchyStatus.totalChildren}
+        completedChildren={hierarchyStatus.completedChildren}
+        nextBasicDescendant={hierarchyStatus.nextBasicDescendant}
+        hasActiveBasicDescendant={hierarchyStatus.hasActiveBasicDescendant}
       />
 
       {/* Unified Dropdown Content */}
@@ -68,6 +76,10 @@ export default function PrimarySubCalendarItemDisplay({
         gapPeriod={gapPeriod}
         currentPhase={currentPhase}
         childExecutionStatus={childExecutionStatus}
+        totalChildren={hierarchyStatus.totalChildren}
+        completedChildren={hierarchyStatus.completedChildren}
+        nextBasicDescendant={hierarchyStatus.nextBasicDescendant}
+        hasActiveBasicDescendant={hierarchyStatus.hasActiveBasicDescendant}
       />
 
       {/* Render children directly with no extra styling */}

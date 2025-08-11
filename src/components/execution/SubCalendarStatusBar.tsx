@@ -143,6 +143,10 @@ interface SubCalendarStatusBarProps {
   readonly childExecutionStatus?: ChildExecutionStatus; // Enhanced child execution status
   readonly showCountdown?: boolean; // Whether to show countdown timers
   readonly showPreparationHints?: boolean; // Whether to show preparation hints
+  readonly totalChildren?: number;
+  readonly completedChildren?: number;
+  readonly nextBasicDescendant?: { item: Item; startTime: number; timeUntilStart: number } | null;
+  readonly hasActiveBasicDescendant?: boolean;
 }
 
 interface ChildStatus {
@@ -165,7 +169,11 @@ function SubCalendarStatusBar({
   onClick,
   childExecutionStatus,
   showCountdown = true,
-  showPreparationHints = true
+  showPreparationHints = true,
+  totalChildren,
+  completedChildren,
+  nextBasicDescendant,
+  hasActiveBasicDescendant
 }: SubCalendarStatusBarProps) {
   // Add state type for status bar
   type StatusBarState = 'active' | 'countdown' | 'gap' | 'preparation' | 'complete';
@@ -482,6 +490,32 @@ function SubCalendarStatusBar({
 
         {/* Right side: Time information */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          {/* Hierarchy summary chips */}
+          {(typeof totalChildren === 'number') && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="caption" color="text.secondary">Children</Typography>
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
+                {completedChildren ?? 0}/{totalChildren}
+              </Typography>
+            </Box>
+          )}
+
+          {/* Next basic descendant when none active */}
+          {nextBasicDescendant && hasActiveBasicDescendant === false && (
+            <Tooltip title={`Next basic starts at ${new Date(nextBasicDescendant.startTime).toLocaleTimeString()}`} arrow>
+              <Box sx={{ textAlign: 'center', minWidth: '120px' }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'medium' }}>
+                  Next Basic
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 'bold', lineHeight: 1.2 }}>
+                  {nextBasicDescendant.item.name}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                  in {formatCompactTime(nextBasicDescendant.timeUntilStart)}
+                </Typography>
+              </Box>
+            </Tooltip>
+          )}
           <Tooltip title="Time elapsed since SubCalendar started" arrow>
             <Box sx={{ textAlign: 'center', minWidth: '80px' }}>
               <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'medium' }}>

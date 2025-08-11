@@ -3,10 +3,13 @@ import { Box, Typography, Fade, Chip } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Schedule } from "@mui/icons-material";
 import { PrimaryItemDisplayRouter } from "./execution";
+import ContextStack from "./execution/ContextStack";
 import { useAppState, useAppDispatch } from "../reducerContexts";
 import { useCurrentTime } from "../hooks/useCurrentTime";
 import { useItemInstances } from "../hooks/useItemInstances";
-import { getExecutionContext, ExecutionContextWithInstances } from "./execution/executionUtils";
+import { getExecutionContext, ExecutionContextWithInstances, getChildExecutionStatus, getHierarchyStatus } from "./execution/executionUtils";
+import { SubCalendarItem, CheckListItem, Item, ItemInstance } from "../functions/utils/item/index";
+import type { BaseCalendarEntry } from "../functions/reducers/AppReducer";
 import { ConflictPrioritizationDialog, ConflictItem } from './dialogs/ConflictPrioritizationDialog';
 import { conflictGroups, upsertItem } from '../api/client';
 
@@ -55,7 +58,7 @@ const ExecutionView = React.memo<ExecutionViewProps>(({
   const [decisionCooldownUntil, setDecisionCooldownUntil] = useState<number>(0)
 
   // Optimized current time hook - reduce frequency for less critical updates
-  const currentTime = useCurrentTime(500);
+  const currentTime = useCurrentTime(20);
 
   // Enhanced execution context with instances
   const executionContext = useMemo((): ExecutionContextWithInstances => {
@@ -74,16 +77,36 @@ const ExecutionView = React.memo<ExecutionViewProps>(({
 
   // Auto-start instance tracking when execution begins
   useEffect(() => {
-    const { currentInstance, baseStartTime } = executionContext;
+    // Mark the ROOT instance started when execution begins, even if there is no child instance yet
+    const chainItems = executionContext.taskChain.map(({ item }) => item);
+    if (chainItems.length === 0) return;
 
-    if (currentInstance && !currentInstance.actualStartTime && currentTime >= baseStartTime) {
-      // Mark instance as started
-      dispatch({
-        type: 'MARK_INSTANCE_STARTED',
-        payload: { instanceId: currentInstance.id, startTime: currentTime }
-      });
+    const root: Item = chainItems[0];
+    const baseStartTime = executionContext.baseStartTime;
+
+    if (currentTime < baseStartTime) return; // not started yet
+
+    // Find the active or nearest base calendar entry for the root item
+    const matchingEntries: { id: string; entry: BaseCalendarEntry }[] = [];
+    for (const [id, entry] of baseCalendar) {
+      if (entry.itemId === root.id) matchingEntries.push({ id, entry });
     }
-  }, [executionContext, currentTime, dispatch]);
+    if (matchingEntries.length === 0) return;
+
+    const active = matchingEntries.find(m => currentTime >= m.entry.startTime && currentTime < m.entry.startTime + (root.duration || 0));
+    let chosen = active;
+    if (!chosen) {
+      const sorted = matchingEntries.slice().sort((a, b) => Math.abs(currentTime - a.entry.startTime) - Math.abs(currentTime - b.entry.startTime));
+      chosen = sorted[0];
+    }
+    const instanceId = chosen.entry.instanceId;
+    if (!instanceId) return;
+
+    const instance: ItemInstance | undefined = (allInstances as Map<string, ItemInstance>).get(instanceId);
+    if (instance && !instance.actualStartTime) {
+      dispatch({ type: 'MARK_INSTANCE_STARTED', payload: { instanceId, startTime: currentTime } });
+    }
+  }, [executionContext, currentTime, dispatch, baseCalendar, allInstances]);
 
   // Conflict detection – show dialog if >=2 active overlaps
   useEffect(() => {
@@ -121,6 +144,27 @@ const ExecutionView = React.memo<ExecutionViewProps>(({
   const taskChain = useMemo(() => {
     return executionContext.taskChain.map(({ item }) => item);
   }, [executionContext]);
+
+  // Compute "Up next" based on the root container's next child (more accurate than taskChain[1])
+  const nextChipText = useMemo(() => {
+    if (taskChain.length === 0) return null;
+    const root = taskChain[0];
+    if (!(root instanceof SubCalendarItem || root instanceof CheckListItem)) return null;
+    const status = getChildExecutionStatus(root, items, currentTime, startTime);
+    return status.nextChild ? `Up next: ${status.nextChild.item.name}` : null;
+  }, [taskChain, items, currentTime, startTime]);
+
+  const hierarchyChip = useMemo(() => {
+    if (taskChain.length === 0) return null;
+    const root = taskChain[0];
+    if (!(root instanceof SubCalendarItem || root instanceof CheckListItem)) return null;
+    const h = getHierarchyStatus(root, items, currentTime, startTime);
+    const count = `${h.completedChildren}/${h.totalChildren}`;
+    if (!h.hasActiveBasicDescendant && h.nextBasicDescendant) {
+      return `Children: ${count} • Next basic: ${h.nextBasicDescendant.item.name}`;
+    }
+    return `Children: ${count}`;
+  }, [taskChain, items, currentTime, startTime]);
 
   // Render idle state if no current task
   if (!executionContext.currentItem || taskChain.length === 0) {
@@ -197,9 +241,16 @@ const ExecutionView = React.memo<ExecutionViewProps>(({
               variant="outlined"
             />
           )}
-          {taskChain.length > 1 && (
+          {nextChipText && (
             <Chip
-              label={`Up next: ${taskChain[1].name}`}
+              label={nextChipText}
+              color="default"
+              variant="outlined"
+            />
+          )}
+          {hierarchyChip && (
+            <Chip
+              label={hierarchyChip}
               color="default"
               variant="outlined"
             />
@@ -209,6 +260,7 @@ const ExecutionView = React.memo<ExecutionViewProps>(({
 
       <Fade in timeout={300}>
         <Box>
+          <ContextStack taskChain={taskChain} currentTime={currentTime} rootStartTime={startTime} />
           <PrimaryItemDisplayRouter
             item={taskChain[0]}
             taskChain={taskChain}

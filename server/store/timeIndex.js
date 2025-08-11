@@ -1,5 +1,7 @@
 // Use the default DataIntervalTree which supports insert(low, high, data) and returns data from search()
-import IntervalTree from 'node-interval-tree'
+// In ESM, importing a CJS module returns the module.exports object; access `.default` for the constructor
+import IntervalTreeModule from 'node-interval-tree'
+const IntervalTree = IntervalTreeModule?.default ?? IntervalTreeModule
 import { v4 as uuidv4 } from 'uuid'
 import { readState, updateState, onShutdown } from './persistence.js'
 
