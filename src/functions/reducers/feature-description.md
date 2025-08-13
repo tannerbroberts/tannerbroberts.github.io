@@ -1,5 +1,7 @@
 # Reducers System - State Management Core
 
+Breadcrumb: Docs > Architecture > Functions System > Reducers
+
 ## Feature Overview
 The reducers system provides the central state management for the About Time application, implementing a Redux-like pattern with immutable state updates, action-based state transitions, and comprehensive state validation. This system serves as the single source of truth for all application state and coordinates state changes across all application features.
 

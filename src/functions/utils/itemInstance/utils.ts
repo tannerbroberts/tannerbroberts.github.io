@@ -59,15 +59,10 @@ export function getPastIncompleteInstances(
   currentTime: number = Date.now()
 ): ItemInstance[] {
   return Array.from(instances.values()).filter(instance => {
-    // Not complete
-    if (instance.isComplete) return false;
-
-    // In the past (scheduled start time has passed)
+    // Exclude terminal or future instances
+    if (instance.status === 'complete' || instance.status === 'canceled') return false;
     if (instance.scheduledStartTime > currentTime) return false;
-
-    // Not currently executing (this will be determined by execution context)
-    // For now, consider it past if it should have started
-    return true;
+    return true; // pending or partial in the past
   });
 }
 
@@ -80,12 +75,8 @@ export function getCompletedInstances(
   currentTime: number = Date.now()
 ): ItemInstance[] {
   return Array.from(instances.values()).filter(instance => {
-    // Must be complete
-    if (!instance.isComplete) return false;
-
-    // Must have completed before current time (if completedAt is available)
+    if (instance.status !== 'complete') return false;
     if (instance.completedAt && instance.completedAt > currentTime) return false;
-
     return true;
   });
 }

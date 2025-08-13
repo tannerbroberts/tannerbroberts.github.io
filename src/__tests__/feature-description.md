@@ -1,5 +1,7 @@
 # Testing System - Comprehensive Test Infrastructure
 
+Breadcrumb: Docs > Architecture > Testing System
+
 ## Feature Overview
 The testing system provides comprehensive test coverage for the About Time application, including unit tests, integration tests, performance benchmarks, and utility testing. This system ensures application reliability, performance, and maintainability through automated testing at multiple levels of the application architecture.
 

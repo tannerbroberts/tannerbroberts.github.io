@@ -1,5 +1,7 @@
 # Custom Hooks System - Reusable State Logic
 
+Breadcrumb: Docs > Architecture > Hooks System
+
 ## Feature Overview
 The hooks system provides custom React hooks that encapsulate reusable stateful logic, UI interactions, and complex state management patterns. These hooks serve as the integration layer between the pure business logic functions and React components, providing clean APIs for common application patterns.
 

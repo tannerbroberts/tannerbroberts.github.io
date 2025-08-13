@@ -1,5 +1,7 @@
 # Functions Utils System - Core Business Logic Utilities
 
+Breadcrumb: Docs > Architecture > Functions System > Utils
+
 ## Feature Overview
 The functions utils system provides the comprehensive collection of utility functions, data structures, and business logic that powers the About Time application. This system includes item management, variable systems, performance optimization, filtering logic, and validation utilities that form the computational backbone of the application.
 

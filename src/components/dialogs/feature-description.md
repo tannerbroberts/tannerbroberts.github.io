@@ -1,5 +1,7 @@
 # Dialog Components - Modal Interface System
 
+Breadcrumb: Docs > Architecture > Components System > Dialogs
+
 ## Feature Overview
 The dialog components system provides specialized modal interfaces for complex user interactions, data input, and workflow management. These components handle multi-step processes, complex form interactions, and specialized input scenarios that require focused user attention away from the main application interface.
 

@@ -1,5 +1,7 @@
 # Item System - Core Data Model and Hierarchy Management
 
+Breadcrumb: Docs > Architecture > Functions System > Utils > Item System
+
 ## Feature Overview
 The item system provides the foundational data model for the About Time application, implementing a sophisticated hierarchical item architecture with multiple item types, bidirectional relationships, type-safe inheritance patterns, and comprehensive data management utilities. This system serves as the core entity model that all other application features build upon.
 

@@ -1,5 +1,7 @@
 # Functions System - Business Logic and State Management
 
+Breadcrumb: Docs > Architecture > Functions System
+
 ## Feature Overview
 The functions system contains the core business logic, state management, and data processing utilities for the About Time application. This layer handles all non-UI logic including state reduction, item management, variable calculations, and data transformations, maintaining clear separation from the presentation layer.
 

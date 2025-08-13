@@ -1,5 +1,7 @@
 # Utils System - General-Purpose Utilities
 
+Breadcrumb: Docs > Architecture > Utils System
+
 ## Feature Overview
 The utils system provides general-purpose utility functions and validation logic that support the broader application architecture. These utilities handle cross-cutting concerns and provide reusable functionality that doesn't fit into the more specialized system modules.
 

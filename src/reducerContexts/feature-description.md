@@ -1,5 +1,7 @@
 # Reducer Contexts - State Management Integration
 
+Breadcrumb: Docs > Architecture > Reducer Contexts
+
 ## Feature Overview
 The reducer contexts system provides React Context-based state management that integrates global application state with component trees. This system creates the bridge between the Redux-like state management pattern and React's Context API, providing type-safe, predictable state management throughout the application.
 

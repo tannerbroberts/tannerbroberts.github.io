@@ -1,5 +1,7 @@
 # Feature Description Architecture - Hierarchical Documentation Summary
 
+Breadcrumb: Docs > Architecture > Feature Architecture Summary
+
 ## Overview
 This document provides a comprehensive overview of the hierarchical feature description system created for the About Time (ATP) application, ensuring consistency across all documentation levels and validating the architectural integrity of the system.
 

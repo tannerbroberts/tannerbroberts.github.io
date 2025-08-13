@@ -6,14 +6,14 @@ describe('ItemInstance', () => {
   const mockItemId = 'test-item';
   const mockStartTime = Date.now();
 
-  it('should create an instance with default incomplete status', () => {
+  it('should create an instance with default pending status', () => {
     const instance = new ItemInstanceImpl({
       itemId: mockItemId,
       calendarEntryId: mockCalendarEntryId,
       scheduledStartTime: mockStartTime
     });
 
-    expect(instance.isComplete).toBe(false);
+    expect(instance.status).toBe('pending');
     expect(instance.itemId).toBe(mockItemId);
     expect(instance.calendarEntryId).toBe(mockCalendarEntryId);
     expect(instance.scheduledStartTime).toBe(mockStartTime);
@@ -21,7 +21,7 @@ describe('ItemInstance', () => {
     expect(instance.completedAt).toBeUndefined();
   });
 
-  it('should maintain incomplete status even if explicitly set to true initially', () => {
+  it('should migrate legacy isComplete=true to status complete', () => {
     const instance = new ItemInstanceImpl({
       itemId: mockItemId,
       calendarEntryId: mockCalendarEntryId,
@@ -29,8 +29,9 @@ describe('ItemInstance', () => {
       isComplete: true // This should be ignored per requirements
     });
 
-    // According to requirements: DEFAULT TO INCOMPLETE - never auto-complete
-    expect(instance.isComplete).toBe(true); // Actually, constructor allows setting it
+    expect(instance.status).toBe('complete');
+  // Transitional legacy flag still derived for backward compatibility
+  expect(instance.isComplete).toBe(true);
   });
 
   it('should serialize and deserialize correctly', () => {
@@ -84,9 +85,9 @@ describe('ItemInstance', () => {
     const completedInstance = instance.markCompleted(completedTime);
 
     expect(completedInstance).not.toBe(instance); // Should be different object
-    expect(completedInstance.isComplete).toBe(true);
+  expect(completedInstance.status).toBe('complete');
     expect(completedInstance.completedAt).toBe(completedTime);
-    expect(instance.isComplete).toBe(false); // Original unchanged
+  expect(instance.status).toBe('pending'); // Original unchanged
   });
 
   it('should update execution details immutably', () => {

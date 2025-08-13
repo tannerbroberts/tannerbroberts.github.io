@@ -4,6 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "docs:validate": "node scripts/validate-docs-breadcrumbs.mjs",
+    "docs:validate:fix": "node scripts/validate-docs-breadcrumbs.mjs --fix",
+    "docs:validate:update-map": "node scripts/validate-docs-breadcrumbs.mjs --write-missing",
+    "docs:context": "node scripts/generate-doc-context.mjs && echo 'Size:' $(wc -c < docs/doc-graph.json) 'bytes'",
+    "docs:drift": "node scripts/check-doc-drift.mjs",
+    "docs:links": "node scripts/check-markdown-links.mjs",
+  "docs:gov": "node scripts/generate-governance-summary.mjs",
     "start": "vite --host",
     "server": "nodemon server/index.js",
     "publish": "vite build && gh-pages -d dist",

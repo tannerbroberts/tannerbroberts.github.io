@@ -1,5 +1,7 @@
 # Components System - UI Layer Architecture
 
+Breadcrumb: Docs > Architecture > Components System
+
 ## Feature Overview
 The components system provides the complete React UI layer for the About Time application, organized into a hierarchical component architecture that supports both execution-focused and accounting-overview workflows. Components are built using Material-UI and follow consistent design patterns throughout the application.
 

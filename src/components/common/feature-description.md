@@ -1,5 +1,7 @@
 # Common Components - Shared UI Building Blocks
 
+Breadcrumb: Docs > Architecture > Components System > Common
+
 ## Feature Overview
 The common components system provides reusable UI building blocks and utilities that are shared across the application. These components implement consistent design patterns, accessibility features, and common interaction patterns that maintain UI coherence throughout the About Time application.
 

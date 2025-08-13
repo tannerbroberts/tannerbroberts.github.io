@@ -1,5 +1,7 @@
 # Item System Documentation
 
+Breadcrumb: Docs > Domain Model > Item System
+
 ## Overview
 
 The Item system is a hierarchical task management system built around **item templates** that can be instantiated as scheduled tasks.

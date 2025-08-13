@@ -1,5 +1,7 @@
 # Food Vertical MVP – Anchor Document
 
+Breadcrumb: Docs > Initiatives > Food MVP Anchor
+
 Purpose: Living plan to ship the food-focused MVP (meal plans, shopping, prep time, cost, flexible rescheduling, QR import) with Firebase backend.
 
 ## Vision (tip of the wedge)

@@ -1,5 +1,29 @@
 # About Time Project (ATP)
 
+Documentation Hub: See [docs/README.md](./docs/README.md) for the hierarchical index and update process.
+
+<!-- GOV-SUMMARY:BEGIN -->
+<!-- Auto-generated governance summary. Do not edit inside markers; run `npm run docs:gov` -->
+### Stats
+- Mapped markdown files: 28
+- Process doc hash: 822a9380
+- Coverage map hash: 851d65a7
+- Breadcrumb map hash: 8f0860bd
+
+### Code → Doc Coverage
+- src/components/ → src/components/feature-description.md
+- src/functions/ → src/functions/feature-description.md
+- src/hooks/ → src/hooks/feature-description.md
+- src/reducerContexts/ → src/reducerContexts/feature-description.md
+- src/utils/ → src/utils/feature-description.md
+- server/ → server/README.md
+
+
+_Last updated: 2025-08-13T16:37:26.386Z_
+<!-- GOV-SUMMARY:END -->
+
+# About Time Project (ATP)
+
 ## Key Architectural Concepts
 
 ### Item Templates vs. Scheduled Instances

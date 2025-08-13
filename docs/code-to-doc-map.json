@@ -1,0 +1,10 @@
+{
+  "mappings": [
+    { "code": "src/components/", "doc": "src/components/feature-description.md" },
+    { "code": "src/functions/", "doc": "src/functions/feature-description.md" },
+    { "code": "src/hooks/", "doc": "src/hooks/feature-description.md" },
+    { "code": "src/reducerContexts/", "doc": "src/reducerContexts/feature-description.md" },
+    { "code": "src/utils/", "doc": "src/utils/feature-description.md" },
+    { "code": "server/", "doc": "server/README.md" }
+  ]
+}

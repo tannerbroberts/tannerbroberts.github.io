@@ -1,5 +1,7 @@
 # Execution Components - Task Execution Interface
 
+Breadcrumb: Docs > Architecture > Components System > Execution
+
 ## Feature Overview
 The execution components provide a focused, distraction-free interface for task execution and progress tracking. This system implements the core "doing" experience of the About Time application, with real-time progress tracking, current task display, and execution workflow management that keeps users focused on completion.
 

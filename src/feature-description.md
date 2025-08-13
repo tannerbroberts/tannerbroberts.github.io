@@ -1,5 +1,7 @@
 # About Time (ATP) - Root Application Architecture
 
+Breadcrumb: Docs > Architecture > Root Application Architecture
+
 ## Feature Overview
 About Time (ATP) is a comprehensive React/TypeScript task management and productivity application that enables users to create, manage, schedule, and execute hierarchical task items with sophisticated variable tracking and relationship management. The application provides both accounting (overview) and execution (focused) views to support different user workflows.
 

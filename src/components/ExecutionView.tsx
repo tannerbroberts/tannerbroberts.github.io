@@ -236,8 +236,8 @@ const ExecutionView = React.memo<ExecutionViewProps>(({
           </Typography>
           {executionContext.currentInstance && (
             <Chip
-              label={executionContext.currentInstance.isComplete ? "Completed" : "In Progress"}
-              color={executionContext.currentInstance.isComplete ? "success" : "primary"}
+              label={executionContext.currentInstance.status === 'complete' ? "Completed" : executionContext.currentInstance.status === 'canceled' ? 'Canceled' : executionContext.currentInstance.status === 'partial' ? 'Partial' : "In Progress"}
+              color={executionContext.currentInstance.status === 'complete' ? "success" : executionContext.currentInstance.status === 'canceled' ? 'default' : "primary"}
               variant="outlined"
             />
           )}

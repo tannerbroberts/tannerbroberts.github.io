@@ -417,7 +417,12 @@ export default function reducer(
         throw new Error(`Cannot add children to item of type ${parentItem.constructor.name}`);
       }
 
-      // Update items in state
+      // Enforce duration uniqueness between linked items
+      if (parentItem.duration === childItem.duration) {
+        console.warn('ADD_CHILD_TO_ITEM rejected: parent and child share identical duration', parentItem.duration);
+        return previous;
+      }
+
       const newItems = [...previous.items];
       newItems[parentIndex] = updatedParent;
       newItems[childIndex] = updatedChild;

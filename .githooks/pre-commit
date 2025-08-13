@@ -1,0 +1,8 @@
+#!/bin/sh
+echo "Running doc governance checks..." >&2
+npm run --silent docs:validate || exit 1
+npm run --silent docs:drift || exit 1
+npm run --silent docs:links || exit 1
+npm run --silent docs:context >/dev/null 2>&1 || echo "(context generation skipped)" >&2
+npm run --silent docs:gov >/dev/null 2>&1 || echo "(governance summary skipped)" >&2
+echo "Docs OK." >&2

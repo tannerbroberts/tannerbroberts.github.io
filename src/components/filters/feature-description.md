@@ -1,5 +1,7 @@
 # Filter Components - Search and Filtering Interface
 
+Breadcrumb: Docs > Architecture > Components System > Filters
+
 ## Feature Overview
 The filter components system provides sophisticated search, filtering, and data discovery capabilities that enable users to find, organize, and analyze their tasks and items efficiently. This system includes text-based search, advanced filtering by multiple criteria, variable-based filtering, and intelligent search suggestions.
 

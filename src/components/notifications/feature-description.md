@@ -1,5 +1,7 @@
 # Notification Components - User Feedback and Communication System
 
+Breadcrumb: Docs > Architecture > Components System > Notifications
+
 ## Feature Overview
 The notification components system provides comprehensive user feedback, system communication, and status reporting throughout the About Time application. This system handles success confirmations, error reporting, progress updates, and system status communication in a non-intrusive manner that supports user workflow rather than disrupting it.
 

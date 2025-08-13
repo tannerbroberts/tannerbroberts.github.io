@@ -1,4 +1,5 @@
 import { Item, ItemFactory, ItemJSON, ItemInstanceImpl, ItemInstanceJSON } from './item/index';
+import { findDuplicateDurations } from './item/cycleDetection';
 import { BaseCalendarEntry } from '../reducers/AppReducer';
 
 // Storage keys
@@ -72,7 +73,18 @@ export function loadItemsFromLocalStorage(): Item[] {
     if (!stored) return [];
 
     const itemsJSON: ItemJSON[] = JSON.parse(stored);
-    return itemsJSON.map(json => ItemFactory.fromJSON(json));
+    const items = itemsJSON.map(json => ItemFactory.fromJSON(json));
+    // Load-time duration duplication advisory
+    try {
+      const duplicates = findDuplicateDurations(items);
+      if (duplicates.size > 0) {
+        console.warn('Duplicate item durations detected (advisory – relationships between equal durations will be blocked):',
+          Array.from(duplicates.entries()).map(([d, ids]) => ({ duration: d, itemIds: ids })));
+      }
+    } catch (e) {
+      console.warn('Duration validation failed during load', e);
+    }
+    return items;
   } catch (error) {
     console.warn('Failed to load items from localStorage:', error);
     return [];

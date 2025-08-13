@@ -50,7 +50,7 @@ export function useItemInstances() {
       hasExecutingInstance: (itemId: string): boolean => {
         const instances = getInstancesByItemId(itemInstances, itemId);
         return instances.some(instance =>
-          instance.actualStartTime && !instance.isComplete
+          instance.actualStartTime && instance.status !== 'complete' && instance.status !== 'canceled'
         );
       },
 
@@ -58,7 +58,7 @@ export function useItemInstances() {
       getExecutingInstance: (itemId: string): ItemInstance | null => {
         const instances = getInstancesByItemId(itemInstances, itemId);
         return instances.find(instance =>
-          instance.actualStartTime && !instance.isComplete
+          instance.actualStartTime && instance.status !== 'complete' && instance.status !== 'canceled'
         ) || null;
       }
     };
