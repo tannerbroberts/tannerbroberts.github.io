@@ -2,6 +2,11 @@ import { useAppState } from "../reducerContexts"
 import { getItemById } from "../functions/utils/item/index"
 import { useViewportHeight } from "../hooks/useViewportHeight"
 
+interface LedgerLinesProps {
+  millisecondsPerSegmentOverride?: number;
+  forcedHeightPx?: number;
+}
+
 const formatTime = (ms: number) => {
   const milliseconds = ms % 1000
   const seconds = Math.floor(ms / 1000)
@@ -16,18 +21,18 @@ const formatTime = (ms: number) => {
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}.${milliseconds.toString()}`
 }
 
-export default function LedgerLines() {
+export default function LedgerLines({ millisecondsPerSegmentOverride, forcedHeightPx }: LedgerLinesProps = {}) {
   const { focusedItemId, items, millisecondsPerSegment, pixelsPerSegment } = useAppState()
   const viewportHeight = useViewportHeight()
   const focusedItem = getItemById(items, focusedItemId)
 
   if (!focusedItem) return null
 
-  // Calculate the natural height based on duration
-  const naturalHeight = focusedItem.duration * pixelsPerSegment / millisecondsPerSegment
-  // Limit to maximum of 2 screen heights
+  const msPerSeg = millisecondsPerSegmentOverride ?? millisecondsPerSegment
+  const naturalHeight = focusedItem.duration * pixelsPerSegment / msPerSeg
   const maxHeight = viewportHeight * 2
-  const totalHeight = Math.min(naturalHeight, maxHeight)
+  const computedHeight = Math.min(naturalHeight, maxHeight)
+  const totalHeight = forcedHeightPx ?? computedHeight
 
   // Calculate number of lines based on time segments
   const numberOfLines = Math.floor(totalHeight / pixelsPerSegment)
@@ -42,7 +47,7 @@ export default function LedgerLines() {
   return (
     <div style={{ position: 'absolute', width: '100%', height: totalHeight + 'px', zIndex: 0 }}>
       {Array.from({ length: numberOfLines + 1 }, (_, i) => {
-        const timeAtLine = i * millisecondsPerSegment
+        const timeAtLine = i * msPerSeg
         const linePosition = i * pixelsPerSegment
         return (
           <div

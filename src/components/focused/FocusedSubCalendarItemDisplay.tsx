@@ -8,6 +8,7 @@ import { useViewportHeight } from '../../hooks/useViewportHeight';
 import { useMemo, useCallback } from 'react';
 import ItemSchedule from '../ItemSchedule';
 import LedgerLines from '../LedgerLines';
+import useDynamicTimelineScale from '../../hooks/useDynamicTimelineScale';
 
 interface FocusedSubCalendarItemDisplayProps {
   readonly item: SubCalendarItem;
@@ -19,12 +20,10 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
   const viewportHeight = useViewportHeight();
 
   const handleEditTemplate = useCallback(() => {
-    // TODO: Implement template property editing (name, duration, description, etc.)
     alert('Edit Template Properties functionality not yet implemented');
   }, []);
 
   const handleScheduleChildTemplate = useCallback(() => {
-    // Enter scheduling mode and open the sidebar
     appDispatch({
       type: 'BATCH', payload: [
         { type: 'SET_SCHEDULING_MODE', payload: { schedulingMode: true } },
@@ -34,23 +33,23 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
   }, [appDispatch]);
 
   const handleCreateInstance = useCallback(() => {
-    // Open the scheduling dialog to create an instance of this template
     appDispatch({ type: 'SET_SCHEDULING_DIALOG_OPEN', payload: { schedulingDialogOpen: true } });
   }, [appDispatch]);
 
   const handleDeleteTemplate = useCallback(() => {
-    // Confirm deletion and delete the template
     if (window.confirm(`Are you sure you want to delete the SubCalendar template "${item.name}"? This action cannot be undone.`)) {
       appDispatch({ type: 'DELETE_ITEM_BY_ID', payload: { id: item.id } });
     }
   }, [appDispatch, item.id, item.name]);
 
-  // Calculate if the template timeline would exceed maximum height
-  const itemExceedsMaxHeight = useMemo(() => {
-    return (item.duration * pixelsPerSegment / millisecondsPerSegment) > (viewportHeight * 2);
-  }, [item.duration, pixelsPerSegment, millisecondsPerSegment, viewportHeight]);
+  const { effectiveMillisecondsPerSegment, targetHeight, naturalHeight, didUpscale, didDownscale } = useDynamicTimelineScale(
+    item.duration,
+    pixelsPerSegment,
+    millisecondsPerSegment,
+    viewportHeight,
+    { maxViewportMultiplier: 2, minViewportMultiplier: 0.9 }
+  );
 
-  // Calculate template statistics
   const templateStats = useMemo(() => {
     const totalChildTemplates = item.children.length;
     const uniqueTemplates = new Set(item.children.map(child => child.id)).size;
@@ -70,7 +69,6 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
 
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Header Information */}
       <Paper sx={{ p: 2, mb: 2, mx: 2, mt: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Box>
@@ -88,7 +86,7 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
           <Box>
             <Typography variant="body2" color="text.secondary">Template Duration</Typography>
             <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-              {formatDuration(item.duration)}
+              {formatDuration(item.duration)} {didUpscale && '(compressed)'} {didDownscale && '(zoomed)'}
             </Typography>
           </Box>
 
@@ -135,7 +133,6 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
           )}
         </Box>
 
-        {/* Template Actions */}
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
           <Button
             variant="outlined"
@@ -176,7 +173,6 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
         </Box>
       </Paper>
 
-      {/* Template Timeline View */}
       <Box
         sx={{
           flex: 1,
@@ -185,18 +181,15 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
           border: '2px dashed',
           borderColor: 'primary.main',
           borderRadius: 1,
-          // Add overflow scrolling when items exceed maximum height
-          ...(itemExceedsMaxHeight && {
-            maxHeight: `${viewportHeight * 2}px`,
-            overflowY: 'auto',
-            borderColor: 'warning.main',
-            borderStyle: 'solid',
-          })
+          height: `${targetHeight || 0}px`,
+          minHeight: '120px'
         }}
       >
-        <LedgerLines />
+        <LedgerLines
+          millisecondsPerSegmentOverride={effectiveMillisecondsPerSegment}
+          forcedHeightPx={targetHeight || undefined}
+        />
 
-        {/* Render child templates on the timeline */}
         {hasChildren(item) && getChildren(item).map((child: ChildReference) => {
           const childId = getChildId(child);
           const childTemplate = getItemById(items, childId);
@@ -209,11 +202,11 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
               item={childTemplate}
               start={'start' in child ? child.start : null}
               relationshipId={child.relationshipId}
+              millisecondsPerSegmentOverride={effectiveMillisecondsPerSegment}
             />
           );
         })}
 
-        {/* Show a message when there are no child templates */}
         {(!hasChildren(item) || getChildren(item).length === 0) && (
           <Box
             sx={{
@@ -248,17 +241,10 @@ export default function FocusedSubCalendarItemDisplay({ item }: FocusedSubCalend
         )}
       </Box>
 
-      {/* Template Info Footer */}
       <Box sx={{ p: 2, mx: 2, mb: 2 }}>
         <Paper sx={{ p: 2, bgcolor: 'info.light' }}>
           <Typography variant="body2" color="info.contrastText">
-            <strong>Template View:</strong> This shows the structural timeline of child templates within this SubCalendar template.
-            When this template is instantiated, each child template will be scheduled at the relative times shown above.
-            {itemExceedsMaxHeight && (
-              <span style={{ display: 'block', marginTop: '8px', fontWeight: 'bold' }}>
-                ⚠ Timeline is truncated due to size - scroll to see all child templates.
-              </span>
-            )}
+            <strong>Template View:</strong> Auto-scaled locally (≈0.9x–2x viewport). Natural height: {Math.round(naturalHeight)}px. Relative timings preserved; other views unaffected.
           </Typography>
         </Paper>
       </Box>

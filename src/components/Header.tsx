@@ -130,28 +130,7 @@ export default function Header() {
           ) : (
             <Button variant="outlined" size="small" onClick={() => setLoginOpen(true)} sx={{ color: 'white', borderColor: 'white' }}>Login</Button>
           )}
-          <ButtonGroup variant="contained" size="small">
-            <Button onClick={() => appDispatch({
-              type: "SET_MILLISECONDS_PER_SEGMENT",
-              payload: { millisecondsPerSegment: 1000 }
-            })}>Second</Button>
-            <Button onClick={() => appDispatch({
-              type: "SET_MILLISECONDS_PER_SEGMENT",
-              payload: { millisecondsPerSegment: 60000 }
-            })}>Minute</Button>
-            <Button onClick={() => appDispatch({
-              type: "SET_MILLISECONDS_PER_SEGMENT",
-              payload: { millisecondsPerSegment: 3600000 }
-            })}>Hour</Button>
-            <Button onClick={() => appDispatch({
-              type: "SET_MILLISECONDS_PER_SEGMENT",
-              payload: { millisecondsPerSegment: 86400000 }
-            })}>Day</Button>
-            <Button onClick={() => appDispatch({
-              type: "SET_MILLISECONDS_PER_SEGMENT",
-              payload: { millisecondsPerSegment: 604800000 }
-            })}>Week</Button>
-          </ButtonGroup>
+          {/* Removed manual unit selector buttons – scaling now automatic based on focused item & viewport */}
         </div>
         <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
       </Toolbar>

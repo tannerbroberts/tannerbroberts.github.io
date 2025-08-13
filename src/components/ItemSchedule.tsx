@@ -4,7 +4,7 @@ import { useAppDispatch, useAppState } from "../reducerContexts";
 import { getItemById, Item, SubCalendarItem, CheckListItem, getChildId, type ChildReference } from "../functions/utils/item/index";
 import { ExpandMore } from "@mui/icons-material";
 
-export default function ItemSchedule({ item, start = null, relationshipId = null }: Readonly<{ item: Item, start?: number | null, relationshipId?: string | null }>) {
+export default function ItemSchedule({ item, start = null, relationshipId = null, millisecondsPerSegmentOverride }: Readonly<{ item: Item, start?: number | null, relationshipId?: string | null, millisecondsPerSegmentOverride?: number }>) {
   const { items, millisecondsPerSegment, pixelsPerSegment } = useAppState();
   const appDispatch = useAppDispatch();
   const { duration } = item;
@@ -37,8 +37,9 @@ export default function ItemSchedule({ item, start = null, relationshipId = null
   }, [item, appDispatch, relationshipId]);
 
   // Calculate the height based on duration and pixel ratio
-  const scheduleHeight = (duration * pixelsPerSegment) / millisecondsPerSegment;
-  const startHeight = start !== null ? start * pixelsPerSegment / millisecondsPerSegment : 0;
+  const msPerSeg = millisecondsPerSegmentOverride ?? millisecondsPerSegment;
+  const scheduleHeight = (duration * pixelsPerSegment) / msPerSeg;
+  const startHeight = start !== null ? start * pixelsPerSegment / msPerSeg : 0;
 
   return (
     <div
@@ -146,6 +147,7 @@ export default function ItemSchedule({ item, start = null, relationshipId = null
                 item={childItem}
                 start={childStart}
                 relationshipId={relationshipId}
+                millisecondsPerSegmentOverride={msPerSeg}
               />
             );
           })}
