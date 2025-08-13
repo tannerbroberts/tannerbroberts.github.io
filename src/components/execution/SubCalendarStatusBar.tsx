@@ -3,7 +3,8 @@ import { Box, Typography, LinearProgress, Tooltip } from "@mui/material";
 import { Timer } from "@mui/icons-material";
 import { styled, keyframes } from "@mui/material/styles";
 import { SubCalendarItem, Item } from "../../functions/utils/item/index";
-import { getTaskProgress, getItemById } from "../../functions/utils/item/utils";
+import { getItemById } from "../../functions/utils/item/utils";
+import useTimedProgress from "../../hooks/useTimedProgress";
 import { Child } from "../../functions/utils/item/Child";
 import { ChildExecutionStatus } from "./executionUtils";
 
@@ -246,27 +247,11 @@ function SubCalendarStatusBar({
         };
     }
   }, [statusBarState, childExecutionStatus, itemName]);
-  // Calculate overall progress for the SubCalendar
-  const overallProgress = useMemo(() => {
-    try {
-      return getTaskProgress(item, currentTime, startTime);
-    } catch (error) {
-      console.error('Error calculating SubCalendar progress:', error);
-      return 0;
-    }
-  }, [item, currentTime, startTime]);
-
-  // Calculate elapsed and remaining time
-  const timeInfo = useMemo(() => {
-    const elapsed = Math.max(0, currentTime - startTime);
-    const remaining = Math.max(0, item.duration - elapsed);
-
-    return {
-      elapsed,
-      remaining,
-      isComplete: elapsed >= item.duration
-    };
-  }, [currentTime, startTime, item.duration]);
+  // Progress & timing via shared hook only when executing
+  const isExecuting = hasActiveBasicDescendant === true;
+  const { progress: overallProgress, elapsed, remaining, isComplete, color: progressColor } = useTimedProgress(item, currentTime, startTime, isExecuting);
+  const derivedComplete = isComplete || (!isExecuting && elapsed >= (item.duration || 0));
+  const timeInfo = { elapsed, remaining: derivedComplete ? 0 : remaining, isComplete: derivedComplete };
 
   // Analyze children status and find current active child
   const childrenStatus = useMemo(() => {
@@ -306,12 +291,7 @@ function SubCalendarStatusBar({
     return { statuses, activeChild };
   }, [item.children, taskChain, currentTime, startTime]);
 
-  // Calculate progress color based on completion
-  const progressColor = useMemo(() => {
-    if (overallProgress >= 100) return "success";
-    if (overallProgress >= 75) return "warning";
-    return "primary";
-  }, [overallProgress]);
+  // progressColor from hook
 
   // Get status bar background color
   const statusBarBgColor = useMemo(() => {
@@ -580,11 +560,17 @@ function SubCalendarStatusBar({
         </Box>
       )}
 
-      {/* Enhanced progress indicator at the bottom */}
+      {/* Enhanced progress indicator at the bottom: always render shell, only show bar if executing */}
       <LinearProgress
+        key={isExecuting ? `active-${item.id}` : `inactive-${item.id}`}
         variant="determinate"
-        value={Math.min(overallProgress, 100)}
+        value={isExecuting ? Math.min(overallProgress, 100) : 0}
         color={progressColor}
+        role={isExecuting ? 'progressbar' : undefined}
+        aria-valuenow={isExecuting ? Math.min(overallProgress, 100) : undefined}
+        aria-valuemin={isExecuting ? 0 : undefined}
+        aria-valuemax={isExecuting ? 100 : undefined}
+        aria-label={isExecuting ? `${item.name} progress ${overallProgress.toFixed(1)} percent` : undefined}
         sx={{
           position: 'absolute',
           bottom: 0,
@@ -592,9 +578,11 @@ function SubCalendarStatusBar({
           right: 0,
           height: 3,
           backgroundColor: 'rgba(0, 0, 0, 0.05)',
+          opacity: isExecuting ? 1 : 0,
+          transition: 'none',
           '& .MuiLinearProgress-bar': {
             backgroundColor: progressBarColor,
-            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'none',
           },
         }}
       />

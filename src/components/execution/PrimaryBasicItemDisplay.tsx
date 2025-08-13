@@ -1,10 +1,10 @@
-import { useMemo } from "react";
+// no React hooks needed beyond custom hook
 import { Box, Typography, LinearProgress, Chip } from "@mui/material";
 import { Star } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
-import { BasicItem, Item } from "../../functions/utils/item/index";
-import { getTaskProgress } from "../../functions/utils/item/utils";
+import { BasicItem } from "../../functions/utils/item/index";
 import { formatDuration } from "../../functions/utils/formatTime";
+import useTimedProgress from "../../hooks/useTimedProgress";
 
 // Styled components for enhanced visuals
 const ItemContainer = styled(Box, {
@@ -41,7 +41,6 @@ const ItemContainer = styled(Box, {
 
 interface PrimaryBasicItemDisplayProps {
   readonly item: BasicItem;
-  readonly taskChain: Item[];
   readonly currentTime: number;
   readonly startTime: number;
   readonly isDeepest?: boolean;
@@ -49,34 +48,15 @@ interface PrimaryBasicItemDisplayProps {
 
 export default function PrimaryBasicItemDisplay({
   item,
-  // taskChain, // Reserved for future use in display router
   currentTime,
   startTime,
   isDeepest = false
 }: PrimaryBasicItemDisplayProps) {
-  // Calculate progress using existing utility
-  const progress = useMemo(() => {
-    try {
-      return getTaskProgress(item, currentTime, startTime);
-    } catch (error) {
-      console.error('Error calculating progress for BasicItem:', error);
-      return 0;
-    }
-  }, [item, currentTime, startTime]);
-
-  // Calculate remaining time
-  const remainingTime = useMemo(() => {
-    const elapsed = currentTime - startTime;
-    const remaining = Math.max(0, item.duration - elapsed);
-    return remaining;
-  }, [item.duration, currentTime, startTime]);
-
-  // Determine progress color based on completion
-  const progressColor = useMemo(() => {
-    if (progress >= 100) return "success";
-    if (progress >= 75) return "warning";
-    return "primary";
-  }, [progress]);
+  // Calculate timed progress only if executing (deepest)
+  const isExecuting = isDeepest;
+  const { progress, remaining, color } = useTimedProgress(item, currentTime, startTime, isExecuting);
+  const remainingTime = remaining; // rename for existing code clarity
+  const progressColor = color;
 
   return (
     <ItemContainer isDeepest={isDeepest}>
@@ -120,8 +100,8 @@ export default function PrimaryBasicItemDisplay({
         )}
       </Box>
 
-      {/* Progress section */}
-      <Box sx={{ mb: 2 }}>
+      {/* Progress section: always render shell, only show active bar if executing */}
+      <Box sx={{ mb: 2, position: 'relative' }}>
         <Box sx={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -138,16 +118,28 @@ export default function PrimaryBasicItemDisplay({
               color: progressColor === 'success' ? 'success.main' : 'text.primary',
               fontSize: '1.1rem',
               fontFamily: 'monospace',
+              visibility: isExecuting ? 'visible' : 'hidden',
             }}
           >
             {progress.toFixed(1)}%
           </Typography>
         </Box>
 
+        {/* Always render the LinearProgress shell, but only show the bar if executing */}
         <LinearProgress
+          key={isExecuting ? `active-${item.id}` : `inactive-${item.id}`}
           variant="determinate"
-          value={Math.min(progress, 100)}
+          value={isExecuting ? Math.min(progress, 100) : 0}
           color={progressColor}
+          sx={{
+            opacity: isExecuting ? 1 : 0,
+            transition: 'none',
+          }}
+          role={isExecuting ? 'progressbar' : undefined}
+          aria-valuenow={isExecuting ? Math.min(progress, 100) : undefined}
+          aria-valuemin={isExecuting ? 0 : undefined}
+          aria-valuemax={isExecuting ? 100 : undefined}
+          aria-label={isExecuting ? `${item.name} progress ${progress.toFixed(1)} percent` : undefined}
         />
       </Box>
 
@@ -216,12 +208,12 @@ export default function PrimaryBasicItemDisplay({
       {/* Pulse animation keyframes */}
       <style>
         {`
-          @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-          }
-        `}
+              @keyframes pulse {
+                0% { opacity: 1; }
+                50% { opacity: 0.6; }
+                100% { opacity: 1; }
+              }
+            `}
       </style>
     </ItemContainer>
   );

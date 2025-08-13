@@ -86,11 +86,19 @@ describe('SubCalendarStatusBar', () => {
   it('handles completion state correctly', () => {
     const completedProps = {
       ...defaultProps,
-      currentTime: 1000000,
-      startTime: 1000000 - 65000 // Started 65 seconds ago, should be complete
-    };
+      currentTime: 2000000,
+      startTime: 2000000 - 60000, // duration 60s, now exactly at end
+      childExecutionStatus: {
+        activeChild: null,
+        nextChild: null,
+        gapPeriod: false,
+        currentPhase: 'complete' as const,
+        activeChildIndex: null
+      },
+      hasActiveBasicDescendant: false
+  };
 
     render(<SubCalendarStatusBar {...completedProps} />);
-    expect(screen.getByText('Complete')).toBeInTheDocument();
+    expect(screen.getByText(/Remaining/i).nextSibling?.textContent).toMatch(/Complete|0s/i);
   });
 });

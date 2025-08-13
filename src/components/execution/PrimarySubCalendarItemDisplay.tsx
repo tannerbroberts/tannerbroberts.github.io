@@ -6,19 +6,18 @@ import { useAppState } from "../../reducerContexts";
 import { useItemVariables } from "../../hooks/useItemVariables";
 import SubCalendarStatusBar from "./SubCalendarStatusBar";
 import UnifiedDropdownContent from "./UnifiedDropdownContent";
+import PrimaryItemDisplayRouter from "./PrimaryItemDisplayRouter";
 
 interface PrimarySubCalendarItemDisplayProps {
   readonly item: SubCalendarItem;
   readonly currentTime: number;
   readonly startTime: number;
-  readonly children?: React.ReactNode; // For recursive rendering
 }
 
 export default function PrimarySubCalendarItemDisplay({
   item,
   currentTime,
   startTime,
-  children
 }: PrimarySubCalendarItemDisplayProps) {
   const { items } = useAppState();
   const { variableSummary } = useItemVariables(item.id);
@@ -82,8 +81,24 @@ export default function PrimarySubCalendarItemDisplay({
         hasActiveBasicDescendant={hierarchyStatus.hasActiveBasicDescendant}
       />
 
-      {/* Render children directly with no extra styling */}
-      {children}
+      {/* Only render the active child, not all children */}
+      {(() => {
+        const activeChild = childExecutionStatus?.activeChild;
+        if (!activeChild) return null;
+        const activeChildRef = item.children.find(child => child.id === activeChild.id);
+        const activeChildItem = items.find(i => i.id === activeChild.id);
+        if (!activeChildItem || !activeChildRef) return null;
+        return (
+          <Box key={activeChildRef.id} sx={{ my: 1 }}>
+            <PrimaryItemDisplayRouter
+              item={activeChildItem}
+              taskChain={items}
+              currentTime={currentTime}
+              startTime={startTime + activeChildRef.start}
+            />
+          </Box>
+        );
+      })()}
     </Box>
   );
 }
