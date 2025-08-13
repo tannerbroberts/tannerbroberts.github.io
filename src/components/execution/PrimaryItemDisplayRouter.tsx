@@ -6,15 +6,9 @@ import {
   CheckListItem,
   Item
 } from "../../functions/utils/item/index";
-import { useAppState } from "../../reducerContexts";
 import PrimaryBasicItemDisplay from "./PrimaryBasicItemDisplay";
 import PrimarySubCalendarItemDisplay from "./PrimarySubCalendarItemDisplay";
-import {
-  getActiveChildForExecution,
-  calculateChildStartTime,
-  isRecursionDepthValid,
-  ExecutionContextWithInstances
-} from "./executionUtils";
+import { isRecursionDepthValid, ExecutionContextWithInstances } from "./executionUtils";
 
 interface PrimaryItemDisplayRouterProps {
   readonly item: Item;
@@ -35,7 +29,7 @@ export default function PrimaryItemDisplayRouter({
   depth = 0,
   executionContext
 }: PrimaryItemDisplayRouterProps) {
-  const { items } = useAppState();
+  // No state usage currently required; router delegates to leaf components.
 
   // Prevent infinite recursion - important for deeply nested SubCalendar structures
   const canRenderChildren = useMemo(() => {
@@ -45,59 +39,19 @@ export default function PrimaryItemDisplayRouter({
   // Get active child for container items (SubCalendar and CheckList)
   // This uses the fixed getActiveChildForExecution function from Steps 2-3
   // which properly handles time-based child transitions for SubCalendar items
-  const activeChild = useMemo(() => {
-    if (!canRenderChildren) return null;
-
-    if (item instanceof SubCalendarItem || item instanceof CheckListItem) {
-      return getActiveChildForExecution(item, items, currentTime, startTime);
-    }
-    return null;
-  }, [item, items, currentTime, startTime, canRenderChildren]);
+  // Active child resolution handled inside PrimarySubCalendarItemDisplay.
 
   // Calculate the correct start time for the active child
   // For SubCalendar: parent start time + child offset
   // For CheckList: same as parent start time (children execute sequentially)
-  const childStartTime = useMemo(() => {
-    if (!activeChild || !(item instanceof SubCalendarItem || item instanceof CheckListItem)) {
-      return startTime;
-    }
-
-    if (item instanceof SubCalendarItem) {
-      // Find the child reference to get the start offset
-      const childRef = item.children.find(child => child.id === activeChild.id);
-      if (childRef) {
-        return calculateChildStartTime(startTime, childRef);
-      }
-    } else if (item instanceof CheckListItem) {
-      // CheckList children use the same start time as parent
-      const childRef = item.children.find(child => child.itemId === activeChild.id);
-      if (childRef) {
-        return calculateChildStartTime(startTime, childRef);
-      }
-    }
-
-    return startTime;
-  }, [activeChild, item, startTime]);
+  // Child start time calculation moved to the SubCalendar display component.
 
   // Render child content recursively
   // This enables proper nesting: SubCalendar -> SubCalendar -> BasicItem
   // The depth parameter prevents infinite recursion
   // Child transitions are handled automatically by the activeChild memoization
-  const renderChildContent = useCallback(() => {
-    if (!activeChild || !canRenderChildren) return null;
-
-    return (
-      <PrimaryItemDisplayRouter
-        item={activeChild}
-        taskChain={taskChain}
-        currentTime={currentTime}
-        startTime={childStartTime}
-        isDeepest={depth + 1 === taskChain.length}
-        depth={depth + 1}
-        executionContext={executionContext}
-      />
-    );
-  }, [activeChild, taskChain, currentTime, childStartTime, depth, canRenderChildren, executionContext]);
+  // NOTE: Previously child content was rendered by passing it as children to the SubCalendar display.
+  // That component now internally routes to the active child, so we no longer need to render it here.
 
   // Route to appropriate primary display component
   const renderPrimaryDisplay = useCallback(() => {
@@ -121,9 +75,7 @@ export default function PrimaryItemDisplayRouter({
         <PrimarySubCalendarItemDisplay
           item={item}
           {...commonProps}
-        >
-          {renderChildContent()}
-        </PrimarySubCalendarItemDisplay>
+        />
       );
     } else if (item instanceof CheckListItem) {
       // CheckListItem display placeholder pending simplified variable system integration
@@ -144,7 +96,7 @@ export default function PrimaryItemDisplayRouter({
         Unknown item type: {item.constructor.name}
       </Box>
     );
-  }, [item, taskChain, currentTime, startTime, isDeepest, renderChildContent, executionContext]);
+  }, [item, taskChain, currentTime, startTime, isDeepest, executionContext]);
 
   // Handle depth limit reached
   if (!canRenderChildren && (item instanceof SubCalendarItem || item instanceof CheckListItem)) {
