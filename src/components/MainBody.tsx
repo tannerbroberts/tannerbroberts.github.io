@@ -3,6 +3,8 @@ import { useAppState } from "../reducerContexts";
 import { getItemById, BasicItem, CheckListItem, SubCalendarItem } from "../functions/utils/item/index";
 import { useViewportHeight } from "../hooks/useViewportHeight";
 import ExecutionView from "./ExecutionView";
+import DayView from "./day/DayView.tsx";
+import AccountingView from './accounting/AccountingView';
 import { FocusedBasicItemDisplay, FocusedCheckListItemDisplay, FocusedSubCalendarItemDisplay } from "./focused";
 // Import accounting components when they exist
 // import AccountingView from "./accounting/AccountingView";
@@ -43,22 +45,25 @@ export default function MainBody() {
       );
     }
 
-    // Accounting view placeholder
-    return (
-      <Box
-        sx={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '20px'
-        }}
-      >
-        <Typography variant="h6" color="text.secondary">
-          Accounting View - Coming Soon
-        </Typography>
-      </Box>
-    );
+    if (currentView === 'day') {
+      return (
+        <Box sx={{ flex: 1, overflow: 'auto', padding: '20px' }}>
+          <DayView />
+        </Box>
+      );
+    }
+
+    // Accounting view
+    if (currentView === 'accounting') {
+      return (
+        <Box sx={{ flex: 1, overflow: 'auto', padding: '20px' }}>
+          <AccountingView />
+        </Box>
+      );
+    }
+
+    // Fallback
+    return <Box sx={{ flex: 1 }} />;
   };
 
   return (

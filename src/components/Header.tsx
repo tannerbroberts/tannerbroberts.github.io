@@ -1,4 +1,4 @@
-import { Menu, MenuOpen, AccountBalance, PlayArrow } from '@mui/icons-material';
+import { Menu, MenuOpen, AccountBalance, PlayArrow, CalendarToday } from '@mui/icons-material';
 import { AppBar, Button, ButtonGroup, IconButton, Toolbar, Typography, Avatar, Tooltip } from '@mui/material';
 import { useMemo, useCallback, useState } from 'react';
 import { useAppDispatch, useAppState } from '../reducerContexts';
@@ -24,7 +24,7 @@ export default function Header() {
     });
   }, [appDispatch]);
 
-  const handleViewChange = useCallback((view: 'execution' | 'accounting') => {
+  const handleViewChange = useCallback((view: 'execution' | 'accounting' | 'day') => {
     appDispatch({
       type: "SET_CURRENT_VIEW",
       payload: { currentView: view },
@@ -82,6 +82,22 @@ export default function Header() {
                 }}
               >
                 Execution
+              </Button>
+              <Button
+                onClick={() => handleViewChange('day')}
+                variant={currentView === 'day' ? 'contained' : 'outlined'}
+                startIcon={<CalendarToday />}
+                sx={{
+                  color: currentView === 'day' ? 'white' : 'rgba(255, 255, 255, 0.8)',
+                  borderColor: 'white',
+                  backgroundColor: currentView === 'day' ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                  '&:hover': {
+                    borderColor: 'white',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }
+                }}
+              >
+                Day
               </Button>
               <Button
                 onClick={() => handleViewChange('accounting')}

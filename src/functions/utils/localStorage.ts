@@ -15,7 +15,7 @@ export interface PersistedAppSettings {
   pixelsPerSegment?: number;
   expandSearchItems?: boolean;
   focusedItemId?: string | null;
-  currentView?: 'execution' | 'accounting';
+  currentView?: 'execution' | 'accounting' | 'day';
   itemSearchWindowRange?: { min: number; max: number };
 }
 

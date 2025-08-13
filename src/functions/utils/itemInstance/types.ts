@@ -9,6 +9,9 @@ export interface ItemInstance {
   readonly completedAt?: number;
   readonly isComplete: boolean;
   readonly executionDetails: InstanceExecutionDetails;
+  readonly accountingStatus?: 'success' | 'canceled' | 'partial';
+  readonly accountedAt?: number; // timestamp when accounting action taken
+  readonly perItemAccounting?: Record<string, 'success' | 'canceled' | 'partial'>; // itemId -> status
 }
 
 export interface InstanceExecutionDetails {
@@ -27,6 +30,9 @@ export interface ItemInstanceJSON {
   completedAt?: number;
   isComplete: boolean;
   executionDetails: InstanceExecutionDetails;
+  accountingStatus?: 'success' | 'canceled' | 'partial';
+  accountedAt?: number;
+  perItemAccounting?: Record<string, 'success' | 'canceled' | 'partial'>;
 }
 
 export class ItemInstanceImpl implements ItemInstance {
@@ -38,6 +44,9 @@ export class ItemInstanceImpl implements ItemInstance {
   readonly completedAt?: number;
   readonly isComplete: boolean;
   readonly executionDetails: InstanceExecutionDetails;
+  readonly accountingStatus?: 'success' | 'canceled' | 'partial';
+  readonly accountedAt?: number;
+  readonly perItemAccounting?: Record<string, 'success' | 'canceled' | 'partial'>;
 
   constructor(data: {
     id?: string;
@@ -48,6 +57,9 @@ export class ItemInstanceImpl implements ItemInstance {
     completedAt?: number;
     isComplete?: boolean;
     executionDetails?: Partial<InstanceExecutionDetails>;
+  accountingStatus?: 'success' | 'canceled' | 'partial';
+  accountedAt?: number;
+  perItemAccounting?: Record<string, 'success' | 'canceled' | 'partial'>;
   }) {
     this.id = data.id || uuid();
     this.itemId = data.itemId;
@@ -63,6 +75,9 @@ export class ItemInstanceImpl implements ItemInstance {
       interruptionCount: 0,
       ...data.executionDetails
     };
+  this.accountingStatus = data.accountingStatus;
+  this.accountedAt = data.accountedAt;
+  this.perItemAccounting = data.perItemAccounting || {};
   }
 
   toJSON(): ItemInstanceJSON {
@@ -74,7 +89,10 @@ export class ItemInstanceImpl implements ItemInstance {
       actualStartTime: this.actualStartTime,
       completedAt: this.completedAt,
       isComplete: this.isComplete,
-      executionDetails: this.executionDetails
+  executionDetails: this.executionDetails,
+  accountingStatus: this.accountingStatus,
+  accountedAt: this.accountedAt,
+  perItemAccounting: this.perItemAccounting
     };
   }
 
@@ -109,6 +127,28 @@ export class ItemInstanceImpl implements ItemInstance {
         ...this.executionDetails,
         ...details
       }
+    });
+  }
+
+  // Mark instance accounting outcome (success, canceled, partial)
+  markAccounted(status: 'success' | 'canceled' | 'partial', time: number = Date.now()): ItemInstanceImpl {
+    return new ItemInstanceImpl({
+      ...this,
+      accountingStatus: status,
+      accountedAt: time
+    });
+  }
+
+  // Mark accounting for a specific item id (one layer unwrapping when partial)
+  markItemAccounting(itemId: string, status: 'success' | 'canceled' | 'partial', time: number = Date.now()): ItemInstanceImpl {
+    const perItemAccounting = { ...(this.perItemAccounting || {}), [itemId]: status };
+    const rootStatusUpdate = (itemId === this.itemId && (status === 'success' || status === 'canceled'))
+      ? { accountingStatus: status, accountedAt: time }
+      : { accountingStatus: this.accountingStatus, accountedAt: this.accountedAt };
+    return new ItemInstanceImpl({
+      ...this,
+      ...rootStatusUpdate,
+      perItemAccounting
     });
   }
 }

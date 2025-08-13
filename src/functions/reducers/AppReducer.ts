@@ -51,7 +51,7 @@ export type AppAction =
   }
   | {
     type: "SET_CURRENT_VIEW";
-    payload: { currentView: 'execution' | 'accounting' };
+    payload: { currentView: 'execution' | 'accounting' | 'day' };
   }
   | {
     type: "SET_ITEM_SEARCH_WINDOW_RANGE";
@@ -115,6 +115,8 @@ export type AppAction =
   | { type: "UPDATE_ITEM_INSTANCE"; payload: { instanceId: string; updates: Partial<ItemInstance> } }
   | { type: "MARK_INSTANCE_STARTED"; payload: { instanceId: string; startTime?: number } }
   | { type: "MARK_INSTANCE_COMPLETED"; payload: { instanceId: string; completedAt?: number } }
+  | { type: "MARK_INSTANCE_ACCOUNTED"; payload: { instanceId: string; status: 'success' | 'canceled' | 'partial'; accountedAt?: number } }
+  | { type: "MARK_ITEM_ACCOUNTING"; payload: { instanceId: string; itemId: string; status: 'success' | 'canceled' | 'partial'; accountedAt?: number } }
   | { type: "DELETE_ITEM_INSTANCE"; payload: { instanceId: string } }
   | { type: "CLEANUP_ORPHANED_INSTANCES"; payload: Record<string, never> }
   // Enhanced calendar actions
@@ -127,7 +129,7 @@ export const initialState = {
   expandSearchItems: false,
   focusedItemId: null as string | null,
   selectedItemId: null as string | null,
-  currentView: 'execution' as 'execution' | 'accounting',
+  currentView: 'execution' as 'execution' | 'accounting' | 'day',
   items: new Array<Item>(),
   baseCalendar: new Map<string, BaseCalendarEntry>(),
   itemInstances: new Map<string, ItemInstanceImpl>(),
@@ -543,6 +545,32 @@ export default function reducer(
         ...previous,
         itemInstances: newInstances
       };
+    }
+
+    case "MARK_INSTANCE_ACCOUNTED": {
+      const { instanceId, status, accountedAt = Date.now() } = action.payload;
+      const existingInstance = previous.itemInstances.get(instanceId);
+      if (!existingInstance) {
+        console.warn(`Instance ${instanceId} not found for accounting`);
+        return previous;
+      }
+      const accounted = existingInstance.markAccounted(status, accountedAt);
+      const newInstances = new Map(previous.itemInstances);
+      newInstances.set(instanceId, accounted);
+      return { ...previous, itemInstances: newInstances };
+    }
+
+    case "MARK_ITEM_ACCOUNTING": {
+      const { instanceId, itemId, status, accountedAt = Date.now() } = action.payload;
+      const existingInstance = previous.itemInstances.get(instanceId);
+      if (!existingInstance) {
+        console.warn(`Instance ${instanceId} not found for item accounting`);
+        return previous;
+      }
+      const updated = existingInstance.markItemAccounting(itemId, status, accountedAt);
+      const newInstances = new Map(previous.itemInstances);
+      newInstances.set(instanceId, updated);
+      return { ...previous, itemInstances: newInstances };
     }
 
     case "DELETE_ITEM_INSTANCE": {
