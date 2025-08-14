@@ -2,7 +2,6 @@ import { Box, Typography } from '@mui/material';
 import { useAppState } from "../reducerContexts";
 import { getItemById, BasicItem, CheckListItem, SubCalendarItem } from "../functions/utils/item/index";
 import { useViewportHeight } from "../hooks/useViewportHeight";
-import ExecutionView from "./ExecutionView";
 import DayView from "./day/DayView.tsx";
 import AccountingView from './accounting/AccountingView';
 import { FocusedBasicItemDisplay, FocusedCheckListItemDisplay, FocusedSubCalendarItemDisplay } from "./focused";
@@ -38,9 +37,10 @@ export default function MainBody() {
     }
 
     if (currentView === 'execution') {
+      // Execution view removed pending replacement
       return (
-        <Box sx={{ flex: 1, overflow: 'auto', padding: '20px' }}>
-          <ExecutionView />
+        <Box sx={{ flex: 1, display:'flex', alignItems:'center', justifyContent:'center', padding: '20px' }}>
+          <Typography variant="h6" color="text.secondary">Execution view temporarily unavailable (under redesign)</Typography>
         </Box>
       );
     }

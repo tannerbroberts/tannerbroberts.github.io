@@ -32,7 +32,7 @@ The components system provides the complete React UI layer for the About Time ap
 - **`SchedulingDialog.tsx`**: Calendar-based item scheduling with timeline visualization
 
 ### Execution and Workflow Components
-- **`ExecutionView.tsx`**: Focused task execution interface with progress tracking
+// ExecutionView and legacy execution subcomponents removed (pending redesigned runtime surface)
 - **`CurrentTaskDisplay.tsx`**: Current active task display with countdown and controls
 - **`PieChartCountdown.tsx`**: Visual countdown timer with progress indication
 

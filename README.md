@@ -39,7 +39,7 @@ _Last updated: 2025-08-13T16:37:26.386Z_
 2. **Scheduled Instances** - Actual executions of templates placed on the calendar
    - Created when templates are scheduled via the scheduling dialogs
    - Have start times, completion states, and execution-specific data
-   - What appears in the ExecutionView and calendar timeline
+   - Previously appeared in a dedicated execution view (now removed) and the calendar timeline
    - Multiple instances can be created from the same template
 
 ### Focused Views for Template Editing

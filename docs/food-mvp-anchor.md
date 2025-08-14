@@ -67,14 +67,11 @@ Purpose: Living plan to ship the food-focused MVP (meal plans, shopping, prep ti
 - M0.4: Food starter pack (templates + sample variables) and onboarding
 
 ## Open tasks backlog
-- [ ] ConflictPrioritizationDialog component and ExecutionView trigger
 - [ ] URL import handler for QR (clone public template)
 - [ ] firebase.ts init; env docs; add dependency
 - [ ] Simplify variable model in code paths (template.data.variables + summary)
 - [ ] S/M/L time scale + rounding in scheduler
 - [ ] Multi-child scheduling support and UI
-- [ ] “Up next” chip in ExecutionView
 - [ ] Starter templates: Weekly Meal Plan, Grocery Trip, Meal Prep (public/free)
-- [x] Pantry variable inspector: “What can I make?” filter
 
 Status: Pantry filter implemented in sidebar (What can I make?).
