@@ -11,8 +11,7 @@
     "docs:drift": "node scripts/check-doc-drift.mjs",
     "docs:links": "node scripts/check-markdown-links.mjs",
   "docs:gov": "node scripts/generate-governance-summary.mjs",
-    "start": "vite --host",
-    "server": "nodemon server/index.js",
+  "start": "vite --host",
     "publish": "vite build && gh-pages -d dist",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -28,10 +27,9 @@
     "@mui/material": "^6.4.5",
     "@mui/x-date-pickers": "^8.8.0",
     "@types/react-window": "^1.8.8",
-    "body-parser": "^2.2.0",
-    "cors": "^2.8.5",
+    
     "dayjs": "^1.11.13",
-    "express": "^5.1.0",
+    
     "lodash": "^4.17.21",
     "node-interval-tree": "^2.1.2",
     "qrcode-terminal": "^0.12.0",
@@ -56,7 +54,7 @@
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
     "jsdom": "^26.1.0",
-    "nodemon": "^3.1.9",
+    
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.22.0",
     "vite": "^6.1.0",

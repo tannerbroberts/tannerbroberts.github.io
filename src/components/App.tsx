@@ -5,7 +5,10 @@ import MainBody from './MainBody';
 import useItemListValidation from '../functions/utils/useItemListValidation';
 import { useAppState } from '../reducerContexts';
 import { useEffect } from 'react';
-import { clonePublicTemplate } from '../api/client';
+// Backend removed: stub template import (no-op success)
+function clonePublicTemplate(): Promise<{ ok: true }> {
+  return Promise.resolve({ ok: true });
+}
 
 export default function App() {
   useItemListValidation();
@@ -23,7 +26,7 @@ export default function App() {
       const owner = url.searchParams.get('importOwner')
       const hash = url.searchParams.get('importHash')
       if (owner && hash) {
-        clonePublicTemplate(owner, hash)
+  clonePublicTemplate()
           .then(() => {
             window.dispatchEvent(new CustomEvent('app:notify', {
               detail: {
