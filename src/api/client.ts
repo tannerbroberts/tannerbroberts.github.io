@@ -10,8 +10,6 @@ function headers() {
   const h: Record<string, string> = { 'Content-Type': 'application/json' }
   const uid = localStorage.getItem('x-user-id') || 'dev-user'
   h['x-user-id'] = uid
-  const token = localStorage.getItem('auth_token')
-  if (token) h['authorization'] = `Bearer ${token}`
   return h
 }
 

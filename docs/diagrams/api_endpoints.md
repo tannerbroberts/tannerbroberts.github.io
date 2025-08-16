@@ -18,9 +18,6 @@ Notes:
 - Legacy `end` query parameter is still accepted (start + end) and will be deprecated; if `duration` is provided it takes precedence.
 - Response now includes a window object: `{ window: { start, duration } }`.
 
-## Auth (Future)
-Firebase direct client SDK; server endpoints only for migration / bridging if needed.
-
 Source References:
 - ../food-mvp-anchor.md
 - ../../src/feature-description.md

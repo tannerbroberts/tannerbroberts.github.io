@@ -1,11 +1,9 @@
 import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
-import { authMiddleware } from './middleware/auth.js'
 import calendarRouter from './routes/calendar.js'
 import templatesRouter from './routes/templates.js'
 import usersRouter from './routes/users.js'
-import authRouter from './routes/auth.js'
 import publicRouter from './routes/public.js'
 
 const app = express()
@@ -20,13 +18,12 @@ app.get('/health', (_req, res) => res.json({ ok: true }))
 // Public, no auth required
 app.use('/public', publicRouter)
 
-// Attach auth; for now accept x-user-id header, or create a dev user
-app.use(authMiddleware)
+// Simple dev user injection (auth removed)
+app.use((req, _res, next) => { req.user = { id: req.header('x-user-id') || 'dev-user' }; next(); })
 
 app.use('/api/calendar', calendarRouter)
 app.use('/api/templates', templatesRouter)
 app.use('/api/users', usersRouter)
-app.use('/api/auth', authRouter)
 
 app.use((err, _req, res, _next) => {
   console.error(err)

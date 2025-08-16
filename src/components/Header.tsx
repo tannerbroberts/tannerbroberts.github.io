@@ -1,38 +1,27 @@
 import { Menu, MenuOpen, AccountBalance, PlayArrow, CalendarToday } from '@mui/icons-material';
 import { AppBar, Button, ButtonGroup, IconButton, Toolbar, Typography, Avatar, Tooltip } from '@mui/material';
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useAppDispatch, useAppState } from '../reducerContexts';
 import { getItemById } from '../functions/utils/item/index';
 import StorageManagementButton from './StorageManagementButton';
-import { useAuth } from '../auth/useAuth';
-import LoginDialog from './LoginDialog';
+// Auth removed – single implicit dev user.
 
 export default function Header() {
-  const { user, logout } = useAuth()
   const { sideDrawerOpen, items, focusedItemId, currentView } = useAppState()
   const appDispatch = useAppDispatch()
-  const [loginOpen, setLoginOpen] = useState(false)
 
-  const focusedItem = useMemo(() => {
-    return getItemById(items, focusedItemId)
-  }, [focusedItemId, items])
+  const focusedItem = useMemo(() => getItemById(items, focusedItemId), [focusedItemId, items])
 
   const handleClose = useCallback(() => {
-    appDispatch({
-      type: "SET_FOCUSED_ITEM_BY_ID",
-      payload: { focusedItemId: null },
-    });
-  }, [appDispatch]);
+    appDispatch({ type: 'SET_FOCUSED_ITEM_BY_ID', payload: { focusedItemId: null } })
+  }, [appDispatch])
 
   const handleViewChange = useCallback((view: 'execution' | 'accounting' | 'day') => {
-    appDispatch({
-      type: "SET_CURRENT_VIEW",
-      payload: { currentView: view },
-    });
-  }, [appDispatch]);
+    appDispatch({ type: 'SET_CURRENT_VIEW', payload: { currentView: view } })
+  }, [appDispatch])
 
   return (
-    <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+    <AppBar position="fixed" sx={{ zIndex: (t) => t.zIndex.drawer + 1 }}>
       <Toolbar>
         <IconButton
           onClick={() => appDispatch({ type: 'SET_SIDE_DRAWER_OPEN', payload: { sideDrawerOpen: !sideDrawerOpen } })}
@@ -54,10 +43,7 @@ export default function Header() {
                 height: '32px',
                 color: 'white',
                 borderColor: 'white',
-                '&:hover': {
-                  borderColor: 'white',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                }
+                '&:hover': { borderColor: 'white', backgroundColor: 'rgba(255,255,255,0.1)' }
               }}
             >
               Close
@@ -72,13 +58,10 @@ export default function Header() {
                 variant={currentView === 'execution' ? 'contained' : 'outlined'}
                 startIcon={<PlayArrow />}
                 sx={{
-                  color: currentView === 'execution' ? 'white' : 'rgba(255, 255, 255, 0.8)',
+                  color: currentView === 'execution' ? 'white' : 'rgba(255,255,255,0.8)',
                   borderColor: 'white',
-                  backgroundColor: currentView === 'execution' ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-                  '&:hover': {
-                    borderColor: 'white',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                  }
+                  backgroundColor: currentView === 'execution' ? 'rgba(255,255,255,0.2)' : 'transparent',
+                  '&:hover': { borderColor: 'white', backgroundColor: 'rgba(255,255,255,0.1)' }
                 }}
               >
                 Execution
@@ -88,13 +71,10 @@ export default function Header() {
                 variant={currentView === 'day' ? 'contained' : 'outlined'}
                 startIcon={<CalendarToday />}
                 sx={{
-                  color: currentView === 'day' ? 'white' : 'rgba(255, 255, 255, 0.8)',
+                  color: currentView === 'day' ? 'white' : 'rgba(255,255,255,0.8)',
                   borderColor: 'white',
-                  backgroundColor: currentView === 'day' ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-                  '&:hover': {
-                    borderColor: 'white',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                  }
+                  backgroundColor: currentView === 'day' ? 'rgba(255,255,255,0.2)' : 'transparent',
+                  '&:hover': { borderColor: 'white', backgroundColor: 'rgba(255,255,255,0.1)' }
                 }}
               >
                 Day
@@ -104,13 +84,10 @@ export default function Header() {
                 variant={currentView === 'accounting' ? 'contained' : 'outlined'}
                 startIcon={<AccountBalance />}
                 sx={{
-                  color: currentView === 'accounting' ? 'white' : 'rgba(255, 255, 255, 0.8)',
+                  color: currentView === 'accounting' ? 'white' : 'rgba(255,255,255,0.8)',
                   borderColor: 'white',
-                  backgroundColor: currentView === 'accounting' ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-                  '&:hover': {
-                    borderColor: 'white',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                  }
+                  backgroundColor: currentView === 'accounting' ? 'rgba(255,255,255,0.2)' : 'transparent',
+                  '&:hover': { borderColor: 'white', backgroundColor: 'rgba(255,255,255,0.1)' }
                 }}
               >
                 Accounting
@@ -118,21 +95,10 @@ export default function Header() {
             </ButtonGroup>
           )}
           <StorageManagementButton />
-          {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Tooltip title={user.email || user.id}>
-                <Avatar sx={{ width: 28, height: 28 }}>
-                  {(user.email || user.id).slice(0, 1).toUpperCase()}
-                </Avatar>
-              </Tooltip>
-              <Button variant="outlined" size="small" onClick={logout} sx={{ color: 'white', borderColor: 'white' }}>Logout</Button>
-            </div>
-          ) : (
-            <Button variant="outlined" size="small" onClick={() => setLoginOpen(true)} sx={{ color: 'white', borderColor: 'white' }}>Login</Button>
-          )}
-          {/* Removed manual unit selector buttons – scaling now automatic based on focused item & viewport */}
+          <Tooltip title={'dev-user'}>
+            <Avatar sx={{ width: 28, height: 28 }}>D</Avatar>
+          </Tooltip>
         </div>
-        <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
       </Toolbar>
     </AppBar>
   )

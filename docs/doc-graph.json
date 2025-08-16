@@ -85,7 +85,7 @@
         "Update Trigger Checklist"
       ],
       "openQuestions": [],
-      "excerpt": "# Diagrams Index Breadcrumb: Docs > Diagrams > Index Diagrams and visual aides summarizing authoritative textual specs. Whenever a referenced source spec changes, confirm whether the diagram text needs regeneration. ## Files - **Architecture Diagram**: high-level module & data flow (architecture.md) - **Data Model Diagram**: entity relationships & invariants mapping (data_model.md) - **Algorithms Notes**: key algorithmic strategies (scheduling, variable summaries) (algorithms.md) - **Auth Flow**: authentication lifecycle & providers (auth.md) - **API Endpoints**: current + planned HTTP interface (api_endpoints.md) - **Usage Walkthrough**: narrative user journey annotated with system touchpoints (USAGE.md) ## Source of Truth References Authoritative specs these diagrams summarize: - Root Ar",
+  "excerpt": "# Diagrams Index Breadcrumb: Docs > Diagrams > Index Diagrams and visual aides summarizing authoritative textual specs. Whenever a referenced source spec changes, confirm whether the diagram text needs regeneration. ## Files - **Architecture Diagram**: high-level module & data flow (architecture.md) - **Data Model Diagram**: entity relationships & invariants mapping (data_model.md) - **Algorithms Notes**: key algorithmic strategies (scheduling, variable summaries) (algorithms.md) - **API Endpoints**: current + planned HTTP interface (api_endpoints.md) - **Usage Walkthrough**: narrative user journey annotated with system touchpoints (USAGE.md) ## Source of Truth References Authoritative specs these diagrams summarize: - Root Ar",
       "lastModifiedEpoch": 1755099477273
     },
     {
@@ -131,21 +131,7 @@
       "openQuestions": [],
       "excerpt": "# Algorithms Notes Breadcrumb: Docs > Diagrams > Algorithms Last Updated: 2025-08-13 Focus: Domain-specific algorithm strategies (not general code walkthroughs). Keep concise; link to authoritative specs. ## 1. Duration-Based Acyclic Heuristic Instead of full cycle detection, enforce parent.duration != child.duration. Provides lightweight partial order for practical hierarchies. Source: ../../src/DATA_MODEL_SPEC.md#4-duration-uniqueness-enforcement ## 2. Variable Summary Propagation Upon variable change in item template: recompute leaf deltas, propagate upward through parent chains, excluding self variables; memoize per itemId + variable key. ## 3. Scheduling Conflict Detection SubCalendarItem uses interval tree (planned / existing) to test [start, start+duration) overlaps; conflicts allow",
       "lastModifiedEpoch": 1755099477283
-    },
-    {
-      "path": "docs/diagrams/auth.md",
-      "title": "Auth Flow Summary",
-      "breadcrumb": "Docs > Diagrams > Auth",
-      "size": 659,
-      "headings": [
-        "Open Questions"
-      ],
-      "openQuestions": [
-        "Token refresh strategy timing? (Pending actual Firebase integration.)"
-      ],
-      "excerpt": "# Auth Flow Summary Breadcrumb: Docs > Diagrams > Auth Last Updated: 2025-08-13 Current State: Local dev server auth utilities + planned Firebase Auth (email link / Google) incremental adoption. Planned Phases (from Food MVP Anchor): 1. Keep Express dev server + add optional Firebase config. 2. Mirror templates/calendar in Firestore keyed by userId. 3. Retire dev store for production. Sequence (Planned Future): User -> Firebase Auth -> Token -> Client stores -> Server (optional bridging) -> Firestore reads/writes. See: ../food-mvp-anchor.md#firebase-plan ## Open Questions - Token refresh strategy timing? (Pending actual Firebase integration.)",
-      "lastModifiedEpoch": 1755099477283
-    },
+  },
     {
       "path": "docs/diagrams/api_endpoints.md",
       "title": "API Endpoints (Planned / Current)",

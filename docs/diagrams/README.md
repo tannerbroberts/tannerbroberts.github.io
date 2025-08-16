@@ -8,7 +8,6 @@ Diagrams and visual aides summarizing authoritative textual specs. Whenever a re
 - **Architecture Diagram**: high-level module & data flow (architecture.md)
 - **Data Model Diagram**: entity relationships & invariants mapping (data_model.md)
 - **Algorithms Notes**: key algorithmic strategies (scheduling, variable summaries) (algorithms.md)
-- **Auth Flow**: authentication lifecycle & providers (auth.md)
 - **API Endpoints**: current + planned HTTP interface (api_endpoints.md)
 - **Usage Walkthrough**: narrative user journey annotated with system touchpoints (USAGE.md)
 
@@ -24,7 +23,6 @@ Run through after merging feature PRs:
 1. Added/changed entity field? -> Update Data Model Diagram.
 2. New reducer/context or boundary shift? -> Architecture Diagram.
 3. New scheduling/variable algorithm? -> Algorithms Notes.
-4. Auth provider / flow change? -> Auth Flow.
 5. Added/modified public endpoint? -> API Endpoints.
 6. New end-to-end user flow? -> Usage Walkthrough.
 

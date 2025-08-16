@@ -23,7 +23,6 @@ Root (this index)
   - Architecture Diagram: [docs/diagrams/architecture.md](./diagrams/architecture.md)
   - Data Model Diagram: [docs/diagrams/data_model.md](./diagrams/data_model.md)
   - Algorithms Notes: [docs/diagrams/algorithms.md](./diagrams/algorithms.md)
-  - Auth Flow: [docs/diagrams/auth.md](./diagrams/auth.md)
   - API Endpoints: [docs/diagrams/api_endpoints.md](./diagrams/api_endpoints.md)
   - Usage Walkthrough: [docs/diagrams/USAGE.md](./diagrams/USAGE.md)
 

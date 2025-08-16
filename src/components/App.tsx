@@ -2,33 +2,22 @@ import Box from '@mui/material/Box';
 import Header from './Header';
 import SideBar from './SideBar';
 import MainBody from './MainBody';
-import NotificationSystem from './notifications/NotificationSystem';
 import useItemListValidation from '../functions/utils/useItemListValidation';
 import { useAppState } from '../reducerContexts';
 import { useEffect } from 'react';
-import { useAuth } from '../auth/useAuth';
-import AuthGate from './AuthGate';
 import { clonePublicTemplate } from '../api/client';
-import { firebaseServices } from '../firebase';
 
 export default function App() {
   useItemListValidation();
   const { items } = useAppState();
-  const { user } = useAuth();
 
   // Debug localStorage loading
   useEffect(() => {
     console.log(`App loaded with ${items.length} items from localStorage`);
   }, [items.length]);
 
-  // Initialize Firebase (optional)
-  useEffect(() => {
-    firebaseServices.init()
-  }, [])
-
   // QR deep-link import: /?importOwner=...&importHash=...
   useEffect(() => {
-    if (!user) return
     try {
       const url = new URL(window.location.href)
       const owner = url.searchParams.get('importOwner')
@@ -63,11 +52,7 @@ export default function App() {
     } catch {
       // ignore
     }
-  }, [user])
-
-  if (!user) {
-    return <AuthGate />
-  }
+  }, [])
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -76,7 +61,6 @@ export default function App() {
         <SideBar />
         <MainBody />
       </Box>
-      <NotificationSystem />
     </Box>
   );
 }

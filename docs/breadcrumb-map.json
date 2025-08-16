@@ -10,7 +10,6 @@
   "docs/diagrams/architecture.md": "Docs > Diagrams > Architecture",
   "docs/diagrams/data_model.md": "Docs > Diagrams > Data Model",
   "docs/diagrams/algorithms.md": "Docs > Diagrams > Algorithms",
-  "docs/diagrams/auth.md": "Docs > Diagrams > Auth",
   "docs/diagrams/api_endpoints.md": "Docs > Diagrams > API Endpoints",
   "docs/diagrams/USAGE.md": "Docs > Diagrams > Usage Walkthrough",
   "src/DATA_MODEL_SPEC.md": "Docs > Domain Model > Data Model Specification",
