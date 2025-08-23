@@ -17,16 +17,12 @@ export class CheckListItem extends Item {
     name: string;
     duration: number;
     parents?: Parent[];
-    allOrNothing?: boolean;
     variables?: Record<string, number>;
     variableSummary?: Record<string, number>;
     children?: CheckListChild[];
     sortType?: SortType;
-    behavior?: { autoShoppingList?: boolean; targetChecklistName?: string };
-    criteria?: { requireChecklistNamed?: string };
     color?: string;
     pattern?: string;
-    scheduling?: import('./types/Scheduling').SchedulingConfig;
   }) {
     super(rest);
     this.children = children;
@@ -57,17 +53,13 @@ export class CheckListItem extends Item {
       name: this.name,
       duration: this.duration,
       parents: this.parents,
-      allOrNothing: this.allOrNothing,
       type: this.constructor.name,
       variables: this.variables,
       variableSummary: this.variableSummary,
       children: this.children,
       sortType: this.sortType,
       color: this.color,
-      pattern: this.pattern,
-      scheduling: this.scheduling,
-      behavior: this.behavior,
-      criteria: this.criteria,
+  pattern: this.pattern,
     };
   }
 
@@ -77,16 +69,12 @@ export class CheckListItem extends Item {
       name: json.name,
       duration: json.duration,
       parents: Array.isArray(json.parents) ? json.parents.map((p) => new Parent(p as { id: string; relationshipId?: string })) : [],
-      allOrNothing: json.allOrNothing || false,
       variables: json.variables || {},
       variableSummary: json.variableSummary || {},
       children: Array.isArray(json.children) ? json.children.map((c) => new CheckListChild(c as { itemId: string; complete?: boolean; relationshipId?: string })) : [],
       sortType: (typeof json.sortType === 'string' && (json.sortType === 'alphabetical' || json.sortType === 'manual' || json.sortType === 'duration')) ? json.sortType : "manual",
       color: json.color,
-      pattern: json.pattern,
-      scheduling: json.scheduling,
-      behavior: json.behavior,
-      criteria: json.criteria,
+  pattern: json.pattern,
     });
   }
 }

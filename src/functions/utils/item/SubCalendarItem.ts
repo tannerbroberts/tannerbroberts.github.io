@@ -16,15 +16,11 @@ export class SubCalendarItem extends Item {
     name: string;
     duration: number;
     parents?: Parent[];
-    allOrNothing?: boolean;
     variables?: Record<string, number>;
     variableSummary?: Record<string, number>;
     children?: Child[];
-    behavior?: { autoShoppingList?: boolean; targetChecklistName?: string };
-    criteria?: { requireChecklistNamed?: string };
     color?: string;
     pattern?: string;
-    scheduling?: import('./types/Scheduling').SchedulingConfig;
   }) {
     super(rest);
     this.children = children;
@@ -54,16 +50,12 @@ export class SubCalendarItem extends Item {
       name: this.name,
       duration: this.duration,
       parents: this.parents,
-      allOrNothing: this.allOrNothing,
       type: this.constructor.name,
       variables: this.variables,
       variableSummary: this.variableSummary,
       children: this.children,
       color: this.color,
-      pattern: this.pattern,
-      scheduling: this.scheduling,
-      behavior: this.behavior,
-      criteria: this.criteria,
+  pattern: this.pattern,
     };
   }
 
@@ -73,15 +65,11 @@ export class SubCalendarItem extends Item {
       name: json.name,
       duration: json.duration,
       parents: Array.isArray(json.parents) ? json.parents.map((p) => new Parent(p as { id: string; relationshipId?: string })) : [],
-      allOrNothing: json.allOrNothing || false,
       variables: json.variables || {},
       variableSummary: json.variableSummary || {},
       children: Array.isArray(json.children) ? json.children.map((c) => new Child(c as { id: string; start: number; relationshipId?: string })) : [],
       color: json.color,
-      pattern: json.pattern,
-      scheduling: json.scheduling,
-      behavior: json.behavior,
-      criteria: json.criteria,
+  pattern: json.pattern,
     });
   }
 }

@@ -5,7 +5,6 @@ export interface ItemJSON {
   name: string;
   duration: number;
   parents: Array<{ id: string; relationshipId?: string }>;
-  allOrNothing: boolean;
   type: string;
   variables?: Record<string, number>;
   variableSummary?: Record<string, number>;
@@ -14,12 +13,4 @@ export interface ItemJSON {
   sortType?: SortType;
   color?: string;
   pattern?: string;
-  scheduling?: import('./types/Scheduling').SchedulingConfig;
-  behavior?: {
-    autoShoppingList?: boolean;
-    targetChecklistName?: string;
-  };
-  criteria?: {
-    requireChecklistNamed?: string;
-  };
 }

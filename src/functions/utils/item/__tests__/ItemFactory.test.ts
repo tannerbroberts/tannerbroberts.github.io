@@ -12,7 +12,6 @@ describe('ItemFactory', () => {
         name: 'test-basic',
         duration: 1000,
         parents: [],
-        allOrNothing: false,
         type: 'BasicItem',
         priority: 1
       };
@@ -30,7 +29,6 @@ describe('ItemFactory', () => {
         name: 'test-sub',
         duration: 2000,
         parents: [],
-        allOrNothing: false,
         type: 'SubCalendarItem',
         children: []
       };
@@ -48,7 +46,6 @@ describe('ItemFactory', () => {
         name: 'test-checklist',
         duration: 3000,
         parents: [],
-        allOrNothing: false,
         type: 'CheckListItem',
         children: [],
         sortType: 'manual' as const
@@ -67,7 +64,6 @@ describe('ItemFactory', () => {
         name: 'test-unknown',
         duration: 1000,
         parents: [],
-        allOrNothing: false,
         type: 'UnknownType'
       };
 
@@ -87,7 +83,7 @@ describe('ItemFactory', () => {
           name: 'subcalendar-item',
           duration: 2000,
           parents: [],
-          allOrNothing: false,
+          
           type: 'SubCalendarItem',
           children: []
         },
@@ -96,7 +92,7 @@ describe('ItemFactory', () => {
           name: 'basic-item',
           duration: 1000,
           parents: [],
-          allOrNothing: false,
+          
           type: 'BasicItem'
         }
       ];

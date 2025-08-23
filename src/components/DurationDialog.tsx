@@ -4,8 +4,7 @@ import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppState } from "../reducerContexts";
 import { getItemById, SubCalendarItem, Child, Parent, addParentToItem } from "../functions/utils/item/index";
 import { useTimeInputState, useTimeInputDispatch } from "../reducerContexts/TimeInput";
-import { applySchedulingRules } from "../utils/schedulingBehaviors";
-import { verifySchedulingPreconditions } from "../utils/schedulingRules";
+// Scheduling behaviors removed
 
 interface TimeUnitControlProps {
   label: string;
@@ -111,19 +110,7 @@ export default function DurationDialog() {
       throw new Error('Can only schedule items into SubCalendarItems');
     }
 
-    // Preflight check for gating rules (condition-only rules)
-    const pre = verifySchedulingPreconditions(items, focusedItem, selectedItem)
-    if (!pre.ok) {
-      window.dispatchEvent(new CustomEvent('app:notify', {
-        detail: {
-          id: `preflight-${Date.now()}`,
-          type: 'error',
-          title: 'Cannot schedule: requirements not met',
-          message: 'One or more required conditions were not met for this item.'
-        }
-      }))
-      return
-    }
+  // Scheduling preflight removed
 
     // Create child relationship with relative start time (using total milliseconds from time input)
     const childRelationship = new Child({
@@ -147,21 +134,7 @@ export default function DurationDialog() {
 
     const updatedChild = addParentToItem(selectedItem, newParent);
 
-    // Apply scheduling behavior (e.g., auto shopping list updates)
-    const behavior = applySchedulingRules(items, focusedItem, selectedItem)
-
-    dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [focusedItem, updatedChild, ...behavior.updatedItems] } });
-    if (behavior.summary) {
-      window.dispatchEvent(new CustomEvent('app:notify', {
-        detail: {
-          id: `auto-shop-${Date.now()}`,
-          type: 'success',
-          title: 'Scheduled actions executed',
-          message: behavior.summary,
-          autoHideDuration: 5000
-        }
-      }))
-    }
+  dispatch({ type: "UPDATE_ITEMS", payload: { updatedItems: [focusedItem, updatedChild] } });
     handleClose();
   }, [dispatch, focusedItemId, selectedItemId, items, total, handleClose]);
 
