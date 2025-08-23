@@ -5,7 +5,7 @@ import type { ItemJSON } from "./ItemJSON";
 import type { SortType } from "./SortType";
 
 export class CheckListItem extends Item {
-  children: CheckListChild[];
+  readonly children: CheckListChild[];
   readonly sortType: SortType;
 
   constructor({
@@ -24,27 +24,9 @@ export class CheckListItem extends Item {
     color?: string;
     pattern?: string;
   }) {
-    super(rest);
-    this.children = children;
-    this.sortType = sortType;
-  }
-
-  /**
-   * Add a child to this checklist item
-   * @param child The CheckListChild to add
-   * @returns void - modifies the current instance
-   */
-  addChild(child: CheckListChild): void {
-    this.children.push(child);
-  }
-
-  /**
-   * Remove a child from this checklist item by relationship ID
-   * @param relationshipId The relationship ID of the child to remove
-   * @returns void - modifies the current instance
-   */
-  removeChild(relationshipId: string): void {
-    this.children = this.children.filter((c) => c.relationshipId !== relationshipId);
+  super(rest);
+  this.children = children;
+  this.sortType = sortType;
   }
 
   toJSON(): ItemJSON {
@@ -76,5 +58,16 @@ export class CheckListItem extends Item {
       color: json.color,
   pattern: json.pattern,
     });
+  }
+
+  withUpdatedProperty<K extends keyof this>(key: K, value: this[K]): this {
+    const { children, sortType, ...rest } = this;
+    const updated = {
+      ...rest,
+      children: key === 'children' ? value as CheckListChild[] : children,
+      sortType: key === 'sortType' ? value as SortType : sortType,
+      [key]: value
+    };
+    return new CheckListItem(updated as ConstructorParameters<typeof CheckListItem>[0]) as this;
   }
 }

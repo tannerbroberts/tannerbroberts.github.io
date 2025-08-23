@@ -1,12 +1,10 @@
 import { Item } from "./Item";
 import { Child } from "./Child";
 import { Parent } from "./Parent";
-import { IntervalTree } from "./IntervalTree";
 import type { ItemJSON } from "./ItemJSON";
 
 export class SubCalendarItem extends Item {
-  children: Child[];
-  private readonly intervalTree: IntervalTree<Child>;
+  readonly children: Child[];
 
   constructor({
     children = [],
@@ -24,25 +22,8 @@ export class SubCalendarItem extends Item {
   }) {
     super(rest);
     this.children = children;
-    this.intervalTree = new IntervalTree<Child>();
   }
 
-  scheduleChild(child: Child, getDuration: (itemId: string) => number): boolean {
-    const duration = getDuration(child.id);
-    const start = child.start;
-    const end = start + duration;
-    if (this.intervalTree.overlaps(start, end)) {
-      return false;
-    }
-    this.children.push(child);
-    this.intervalTree.insert(start, end, child);
-    return true;
-  }
-
-  removeChild(child: Child): void {
-    this.children = this.children.filter((c) => c.relationshipId !== child.relationshipId);
-    this.intervalTree.removeByData(child);
-  }
 
   toJSON(): ItemJSON {
     return {
@@ -71,5 +52,12 @@ export class SubCalendarItem extends Item {
       color: json.color,
   pattern: json.pattern,
     });
+  }
+
+  withUpdatedProperty<K extends keyof this>(key: K, value: this[K]): this {
+  // Create a new instance with the updated property, type-safe
+  const { children, ...rest } = this;
+  const updated = { ...rest, children: key === 'children' ? value as Child[] : children, [key]: value };
+  return new SubCalendarItem(updated as ConstructorParameters<typeof SubCalendarItem>[0]) as this;
   }
 }

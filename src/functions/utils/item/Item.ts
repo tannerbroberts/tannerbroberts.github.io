@@ -42,5 +42,10 @@ export abstract class Item {
     this.pattern = pattern;
   }
 
+  static fromJSON(json: ItemJSON): Item {
+    throw new Error(`fromJSON, called with ${JSON.stringify(json)} must be implemented by subclass`);
+  }
+
   abstract toJSON(): ItemJSON;
+  abstract withUpdatedProperty<K extends keyof this>(key: K, value: this[K]): this;
 }

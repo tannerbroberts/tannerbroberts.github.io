@@ -19,8 +19,8 @@ export class BasicItem extends Item {
     color?: string;
     pattern?: string;
   }) {
-    super(rest);
-    this.priority = priority;
+  super(rest);
+  this.priority = priority;
   }
 
   toJSON(): ItemJSON {
@@ -50,5 +50,11 @@ export class BasicItem extends Item {
       color: json.color,
   pattern: json.pattern,
     });
+  }
+
+  withUpdatedProperty<K extends keyof this>(key: K, value: this[K]): this {
+  const { priority, ...rest } = this;
+  const updated = { ...rest, priority: key === 'priority' ? value as number : priority, [key]: value };
+  return new BasicItem(updated as ConstructorParameters<typeof BasicItem>[0]) as this;
   }
 }
