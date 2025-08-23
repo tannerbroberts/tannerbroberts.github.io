@@ -21,7 +21,7 @@ export default function Header() {
   }, [appDispatch])
 
   return (
-    <AppBar position="fixed" sx={{ zIndex: (t) => t.zIndex.drawer + 1 }}>
+  <AppBar position="static" sx={{ maxHeight: '100vh', overflowY: 'hidden' }}>
       <Toolbar>
         <IconButton
           onClick={() => appDispatch({ type: 'SET_SIDE_DRAWER_OPEN', payload: { sideDrawerOpen: !sideDrawerOpen } })}
@@ -50,7 +50,7 @@ export default function Header() {
             </Button>
           )}
         </Typography>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginLeft: 'auto' }}>
+  <div style={{ display: 'flex', gap: 0, alignItems: 'center', marginLeft: 0, padding: 0 }}>
           {!focusedItem && (
             <ButtonGroup variant="contained" size="small" sx={{ mr: 2 }}>
               <Button
@@ -96,7 +96,7 @@ export default function Header() {
           )}
           <StorageManagementButton />
           <Tooltip title={'dev-user'}>
-            <Avatar sx={{ width: 28, height: 28 }}>D</Avatar>
+            <Avatar sx={{ width: 28, height: 28, maxWidth: '100vw' }}>D</Avatar>
           </Tooltip>
         </div>
       </Toolbar>

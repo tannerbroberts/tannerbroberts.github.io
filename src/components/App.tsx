@@ -58,11 +58,11 @@ export default function App() {
   }, [])
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+  <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', maxWidth: '100vw', maxHeight: '100vh', overflowX: 'hidden', overflowY: 'hidden' }}>
       <Header />
-      <Box sx={{ display: 'flex', flex: 1, marginTop: '64px' }}>
-        <SideBar />
+  <Box sx={{ display: 'flex', flex: 1, minHeight: 0, flexDirection: 'row', width: '100%', maxWidth: '100vw', maxHeight: '100vh', overflowX: 'hidden', overflowY: 'hidden' }}>
         <MainBody />
+        <SideBar />
       </Box>
     </Box>
   );
